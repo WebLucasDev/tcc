@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+:root{
+    margin:0; padding: 0; box-sizing: border-box;
+
+    --color-bg: #1a202c;
+    --color-text: #1a202c;
+}
+
+[data-theme="dark"] {
+  --color-bg: #1a202c;
+  --color-text: #f7fafc;
+}
