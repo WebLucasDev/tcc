@@ -5,14 +5,18 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-:root{
+body{
     margin:0; padding: 0; box-sizing: border-box;
+}
 
-    --color-bg: #1a202c;
-    --color-text: #1a202c;
+:root{
+    /* Light-theme */
+    --color-background: #ffff;
+    --color-text: #2A2223;
+    --color-main: #E13E16;
 }
 
 [data-theme="dark"] {
-  --color-bg: #1a202c;
+  --color-background: #1a202c;
   --color-text: #f7fafc;
 }
