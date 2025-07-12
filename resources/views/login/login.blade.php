@@ -8,6 +8,9 @@
     <title>Login</title>
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -31,14 +34,13 @@
                             class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
                     </div>
                     <div>
-                        <button class="text-xs hover:underline text-[var(--color-main)]" id="forgot-password">Esqueci
+                        <button class="text-xs cursor-pointer hover:underline text-[var(--color-main)]" id="forgot-password">Esqueci
                             minha senha</button>
                     </div>
                     <div>
-                        <div>
-                            <button type="submit"
-                                class="w-full px-8 py-3 font-semibold rounded-md bg-[var(--color-main)] text-white hover:outline-double outline-orange-700 cursor-pointer">Entrar</button>
-                        </div>
+                        <button type="submit"
+                            class="w-full px-8 py-3 font-semibold rounded-md bg-[var(--color-main)] text-white hover:outline-double outline-orange-700 cursor-pointer">Entrar</button>
+                    </div>
             </form>
         </div>
 
