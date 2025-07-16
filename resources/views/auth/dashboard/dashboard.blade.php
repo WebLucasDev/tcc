@@ -1,4 +1,3 @@
-<div>
-    dashboard aqui
+@extends('layouts.layout')
+@section('title', 'Dashboard')
 
-</div>

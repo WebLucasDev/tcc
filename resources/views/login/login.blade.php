@@ -25,13 +25,16 @@
             <form novalidate="" action="" class="space-y-12">
                 <div class="space-y-4">
                     <div>
-                        <input type="email" name="email" id="email" placeholder="Email" required
+                        <input type="email" name="email" id="email_input" placeholder="Email" required
                             pattern="^[a-zA-Z0-9._%+-]+@metresistemas\.com\.br$"
                             class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
                     </div>
-                    <div>
-                        <input type="password" name="password" id="password" placeholder="Senha" required
+                    <div class="relative">
+                        <input type="password" name="password" id="password_input" placeholder="Senha" required
                             class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
+                        <button type="button" id="toggle-icon-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 md:text-[var(--color-text)] sm:text-[var(--color-main)] hover:text-[var(--color-main)] focus:outline-none">
+                            <i class="fa-solid fa-eye-slash" id="eye-icon"></i>
+                        </button>
                     </div>
                     <div>
                         <button class="text-xs cursor-pointer hover:underline text-[var(--color-main)]" id="forgot-password">Esqueci
