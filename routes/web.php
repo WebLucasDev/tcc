@@ -8,7 +8,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Rotas de autenticação (públicas - apenas para usuários não logados)
 Route::middleware('guest')->group(function () {
 
     Route::prefix('login')->group(function () {
@@ -17,12 +16,12 @@ Route::middleware('guest')->group(function () {
     });
 });
 
-// Rotas autenticadas (apenas para usuários logados)
 Route::middleware('auth')->group(function () {
+
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     });
 
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
