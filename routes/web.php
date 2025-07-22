@@ -8,9 +8,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Rotas de autenticação (públicas - apenas para usuários não logados)
+Route::middleware('guest')->group(function () {
 
-Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::prefix('login')->group(function () {
+        Route::get('/', [LoginController::class, 'index'])->name('login.index');
+        Route::post('/', [LoginController::class, 'auth'])->name('login.auth');
+    });
+});
 
-Route::prefix('dashboard')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+// Rotas autenticadas (apenas para usuários logados)
+Route::middleware('auth')->group(function () {
+
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+    });
+
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });

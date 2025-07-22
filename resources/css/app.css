@@ -14,6 +14,8 @@ body{
     --color-background: #ffff;
     --color-text: #2A2223;
     --color-main: #E13E16;
+    --color-error: #f52e22;
+    --color-success: #019967;
 }
 
 [data-theme="dark"] {

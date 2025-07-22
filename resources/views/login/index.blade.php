@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
     <!-- Styles / Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/login.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -17,33 +17,47 @@
 
     <div class="min-w-screen min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)]">
 
+        @include('login.partials.message-success')
+
+        @include('login.partials.message-errors')
+
         <div class="flex flex-col max-w-md p-6 sm:p-10 border rounded-md border-[var(--color-main)] shadow-2xl/55">
             <div class="flex flex-col justify-center items-center mb-8">
                 <img src="/imgs/logo.svg" alt="Logo Metre Sistemas" class="mb-4">
-                <h1 class="text-2xl text-(--color-text)">Acesse sua conta</h1>
+                <h1 class="text-2xl text-[var(--color-text)]">Acesse sua conta</h1>
             </div>
-            <form novalidate="" action="" class="space-y-12">
+
+            <form action="{{ route('login.auth') }}" method="POST" class="space-y-12">
+                @csrf
                 <div class="space-y-4">
                     <div>
                         <input type="email" name="email" id="email_input" placeholder="Email" required
-                            pattern="^[a-zA-Z0-9._%+-]+@metresistemas\.com\.br$"
+                            value="{{ old('email') }}"
                             class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
                     </div>
                     <div class="relative">
                         <input type="password" name="password" id="password_input" placeholder="Senha" required
-                            class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
-                        <button type="button" id="toggle-icon-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 md:text-[var(--color-text)] sm:text-[var(--color-main)] hover:text-[var(--color-main)] focus:outline-none">
+                            class="w-full px-4 py-2 pr-10 text-start border rounded-md border-[var(--color-main)]">
+                        <button type="button" id="toggle-icon-password"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 md:text-[var(--color-text)] sm:text-[var(--color-main)] hover:text-[var(--color-main)] focus:outline-none">
                             <i class="fa-solid fa-eye-slash" id="eye-icon"></i>
                         </button>
                     </div>
-                    <div>
-                        <button class="text-xs cursor-pointer hover:underline text-[var(--color-main)]" id="forgot-password">Esqueci
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="remember" value="1"
+                                class="mr-2 rounded border-[var(--color-main)]">
+                            <span class="text-sm text-[var(--color-text)]">Lembrar-me</span>
+                        </label>
+                        <button type="button" class="text-xs cursor-pointer hover:underline text-[var(--color-main)]"
+                            id="forgot-password">Esqueci
                             minha senha</button>
                     </div>
                     <div>
                         <button type="submit"
                             class="w-full px-8 py-3 font-semibold rounded-md bg-[var(--color-main)] text-white hover:outline-double outline-orange-700 cursor-pointer">Entrar</button>
                     </div>
+                </div>
             </form>
         </div>
 

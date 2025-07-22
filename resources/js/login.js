@@ -1,4 +1,3 @@
-import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
     const forgotPassword = document.getElementById('forgot-password');
@@ -9,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password_input');
     const toggleIconPassword = document.getElementById('toggle-icon-password');
     const eyeIcon = document.getElementById('eye-icon');
+    const messageSuccess = document.getElementById('message-success');
+    const messageError = document.getElementById('message-error');
 
     function openModal() {
         modalForgot.classList.remove('hidden');
@@ -34,16 +35,37 @@ document.addEventListener('DOMContentLoaded', () => {
             eyeIcon.classList.toggle('fa-eye');
             eyeIcon.classList.toggle('fa-eye-slash');
         });
-
-        if (forgotPassword && modalForgot && closeModal && modalContainer && modalOverlay) {
-            forgotPassword.addEventListener('click', (event) => {
-                event.preventDefault();
-                openModal();
-            });
-
-            closeModal.addEventListener('click', closeModalFunc);
-            modalOverlay.addEventListener('click', closeModalFunc);
-        }
     }
+
+    if (forgotPassword && modalForgot && closeModal && modalContainer && modalOverlay) {
+        forgotPassword.addEventListener('click', (event) => {
+            event.preventDefault();
+            openModal();
+        });
+
+        closeModal.addEventListener('click', closeModalFunc);
+        modalOverlay.addEventListener('click', closeModalFunc);
+    }
+
+    if (messageSuccess) {
+        setTimeout(() => {
+            messageSuccess.style.transition = 'opacity 0.5s ease-out';
+            messageSuccess.style.opacity = '0';
+            setTimeout(() => {
+                messageSuccess.style.display = 'none';
+            }, 500);
+        }, 3000);
+    }
+
+    if (messageError) {
+        setTimeout(() => {
+            messageError.style.transition = 'opacity 0.5s ease-out';
+            messageError.style.opacity = '0';
+            setTimeout(() => {
+                messageError.style.display = 'none';
+            }, 500);
+        }, 3000);
+    }
+
 });
 
