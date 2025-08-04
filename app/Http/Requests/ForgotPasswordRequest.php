@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class loginAuthRequest extends FormRequest
+class ForgotPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,18 +24,9 @@ class loginAuthRequest extends FormRequest
         return [
             'email' => [
                 'required',
-                'email:rfc,dns', // Validação mais rigorosa de email
+                'email:rfc,dns',
                 'max:255',
-                'exists:users,email' // Verifica se o email existe na tabela users
-            ],
-            'password' => [
-                'required',
-                'string',
-                'min:6'
-            ],
-            'remember' => [
-                'nullable',
-                'boolean'
+                'exists:users,email'
             ]
         ];
     }
@@ -49,8 +40,6 @@ class loginAuthRequest extends FormRequest
             'email.required' => 'O campo email é obrigatório.',
             'email.email' => 'Por favor, insira um email válido.',
             'email.exists' => 'Este email não está cadastrado em nosso sistema.',
-            'password.required' => 'O campo senha é obrigatório.',
-            'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
         ];
     }
 
@@ -61,31 +50,15 @@ class loginAuthRequest extends FormRequest
     {
         return [
             'email' => 'email',
-            'password' => 'senha',
-            'remember' => 'lembrar-me'
         ];
     }
 
     /**
-     * Get the credentials for authentication.
-     *
-     * @return array<string, string>
+     * Get the email for password reset.
      */
-    public function getCredentials(): array
+    public function getEmail(): string
     {
         $validated = $this->validated();
-        return [
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-        ];
-    }
-
-    /**
-     * Get the remember me boolean.
-     */
-    public function getRemember(): bool
-    {
-        $validated = $this->validated();
-        return isset($validated['remember']) ? (bool) $validated['remember'] : false;
+        return strtolower(trim($validated['email']));
     }
 }

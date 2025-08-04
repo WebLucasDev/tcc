@@ -9,7 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleIconPassword = document.getElementById('toggle-icon-password');
     const eyeIcon = document.getElementById('eye-icon');
     const messageSuccess = document.getElementById('message-success');
-    const messageError = document.getElementById('message-error');
+    const messageError = document.getElementById('message-errors');
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const forgotErrorMessage = document.getElementById('forgot-error-message');
+    const submitText = document.getElementById('submit-text');
+    const loadingText = document.getElementById('loading-text');
 
     function openModal() {
         modalForgot.classList.remove('hidden');
@@ -24,7 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
         modalContainer.classList.add('translate-x-full');
         setTimeout(() => {
             modalForgot.classList.add('hidden');
+            // Limpar formulário e mensagens de erro
+            if (forgotPasswordForm) {
+                forgotPasswordForm.reset();
+            }
+            if (forgotErrorMessage) {
+                forgotErrorMessage.classList.add('hidden');
+            }
         }, 300);
+    }
+
+    function showRecoverSuccessMessage() {
+        // Usar o arquivo message-recover-password.blade.php que você já criou
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50';
+        successDiv.innerHTML = `
+            <div class="border border-[var(--color-main)] px-2 py-1 rounded-md shadow-md/25">
+                <p class="text-sm tracking-wide text-[var(--color-main)]">
+                    Instruções de redefinição de senha enviadas por email
+                    <span>
+                        <i class="fa-solid fa-circle-check text-green-600"></i>
+                    </span>
+                </p>
+            </div>
+        `;
+        
+        document.body.appendChild(successDiv);
+
+        // Remover a mensagem após 5 segundos
+        setTimeout(() => {
+            successDiv.style.transition = 'opacity 0.5s ease-out';
+            successDiv.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(successDiv)) {
+                    document.body.removeChild(successDiv);
+                }
+            }, 500);
+        }, 5000);
     }
 
     if (toggleIconPassword && passwordInput && eyeIcon) {
@@ -45,6 +85,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeModal.addEventListener('click', closeModalFunc);
         modalOverlay.addEventListener('click', closeModalFunc);
+    }
+
+    // Manipular envio do formulário de esqueci senha
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // Mostrar loading
+            if (submitText && loadingText) {
+                submitText.classList.add('hidden');
+                loadingText.classList.remove('hidden');
+            }
+            
+            // Esconder mensagens de erro anteriores
+            if (forgotErrorMessage) {
+                forgotErrorMessage.classList.add('hidden');
+            }
+
+            const formData = new FormData(forgotPasswordForm);
+            
+            try {
+                const response = await fetch(forgotPasswordForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Fechar modal
+                    closeModalFunc();
+                    
+                    // Mostrar mensagem de sucesso após fechar o modal
+                    setTimeout(() => {
+                        showRecoverSuccessMessage();
+                    }, 350);
+                } else {
+                    // Mostrar erro no modal
+                    if (forgotErrorMessage) {
+                        forgotErrorMessage.textContent = data.message || 'Erro ao enviar email de redefinição.';
+                        forgotErrorMessage.classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                // Mostrar erro de rede
+                if (forgotErrorMessage) {
+                    forgotErrorMessage.textContent = 'Erro de conexão. Tente novamente.';
+                    forgotErrorMessage.classList.remove('hidden');
+                }
+            } finally {
+                // Esconder loading
+                if (submitText && loadingText) {
+                    submitText.classList.remove('hidden');
+                    loadingText.classList.add('hidden');
+                }
+            }
+        });
     }
 
     if (messageSuccess) {
@@ -68,4 +168,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
-

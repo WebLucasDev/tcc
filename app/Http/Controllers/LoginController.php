@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\loginAuthRequest;
+use App\Http\Requests\LoginAuthRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -15,7 +15,7 @@ class LoginController extends Controller
         return view('login.index');
     }
 
-    public function auth(loginAuthRequest $request)
+    public function auth(LoginAuthRequest $request)
     {
         $this->ensureIsNotRateLimited($request);
 
