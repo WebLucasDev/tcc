@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +10,11 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Login</title>
 </head>
-
 <body>
-
     <div class="min-w-screen min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)]">
 
-        @include('login.partials.message-success')
-
-        @include('login.partials.message-errors')
+        <x-error/>
+        <x-success/>
 
         <div class="flex flex-col max-w-md p-6 sm:p-10 border rounded-md border-[var(--color-main)] shadow-2xl/55">
             <div class="flex flex-col justify-center items-center mb-8">
@@ -30,27 +26,20 @@
                 @csrf
                 <div class="space-y-4">
                     <div>
-                        <input type="email" name="email" id="email_input" placeholder="Email" required
+                        <input type="email" name="email" placeholder="Email" required
                             value="{{ old('email') }}"
                             class="w-full px-4 py-2 text-start border rounded-md border-[var(--color-main)]">
                     </div>
                     <div class="relative">
-                        <input type="password" name="password" id="password_input" placeholder="Senha" required
+                        <input type="password" name="password" id="password" placeholder="Senha" required
                             class="w-full px-4 py-2 pr-10 text-start border rounded-md border-[var(--color-main)]">
-                        <button type="button" id="toggle-icon-password"
+                        <button type="button" onclick="showPasswordFunc()"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 md:text-[var(--color-text)] sm:text-[var(--color-main)] hover:text-[var(--color-main)] focus:outline-none">
                             <i class="fa-solid fa-eye-slash" id="eye-icon"></i>
                         </button>
                     </div>
                     <div class="flex items-center justify-between">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="remember" value="1"
-                                class="mr-2 rounded border-[var(--color-main)]">
-                            <span class="text-sm text-[var(--color-text)]">Lembrar-me</span>
-                        </label>
-                        <button type="button" class="text-xs cursor-pointer hover:underline text-[var(--color-main)]"
-                            id="forgot-password">Esqueci
-                            minha senha</button>
+                        <button type="button" class="text-xs cursor-pointer hover:underline text-[var(--color-main)]" onclick="openModalFunc()">Esqueci minha senha</button>
                     </div>
                     <div>
                         <button type="submit"
@@ -61,7 +50,7 @@
         </div>
 
     </div>
-    @include('login.partials.recover-password')
+    @include('login.partials.modal-forgot-password')
 
 </body>
 

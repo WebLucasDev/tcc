@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ForgotPasswordRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,8 @@ class ForgotPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => [
-                'required',
-                'email:rfc,dns',
-                'max:255',
-                'exists:users,email'
-            ]
+            'email' => 'required|email|max:255|exists:users,email',
+            'password' => 'required|string|min:6'
         ];
     }
 
@@ -39,26 +35,11 @@ class ForgotPasswordRequest extends FormRequest
         return [
             'email.required' => 'O campo email é obrigatório.',
             'email.email' => 'Por favor, insira um email válido.',
-            'email.exists' => 'Este email não está cadastrado em nosso sistema.',
+            'email.exists' => 'Credenciais inválidas.',
+            'password.required' => 'O campo senha é obrigatório.',
+            'password.string' => 'Credenciais inválidas.',
+            'password.min' => 'Credenciais inválidas.',
         ];
     }
 
-    /**
-     * Get custom attribute names for validator errors.
-     */
-    public function attributes(): array
-    {
-        return [
-            'email' => 'email',
-        ];
-    }
-
-    /**
-     * Get the email for password reset.
-     */
-    public function getEmail(): string
-    {
-        $validated = $this->validated();
-        return strtolower(trim($validated['email']));
-    }
 }

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LoginAuthRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
+use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -15,55 +13,29 @@ class LoginController extends Controller
         return view('login.index');
     }
 
-    public function auth(LoginAuthRequest $request)
+    public function auth(LoginRequest $request)
     {
-        $this->ensureIsNotRateLimited($request);
+        try {
+            $authenticated = Auth::attempt([
+                'email' => $request->email,
+                'password' => $request->password
+            ]);
 
-        $credentials = $request->getCredentials();
-        $remember = $request->getRemember();
+            if(!$authenticated){
+                return back()->withInput()->with('error', 'Credenciais inválidas.');
+            }
 
-        if (Auth::attempt($credentials, $remember)) {
-            session()->regenerate();
-
-            RateLimiter::clear($this->throttleKey($request));
-
-            return redirect()->intended(route('dashboard.index'))
-                ->with('success', 'Login realizado com sucesso!');
+            return redirect()->route('dashboard.index');
         }
-
-        RateLimiter::hit($this->throttleKey($request));
-
-        throw ValidationException::withMessages([
-            'email' => 'As credenciais fornecidas não conferem com nossos registros.',
-        ]);
+        catch (Exception $exception) {
+            return back()->withInput()->with('error', 'Credenciais inválidas.'. $exception);
+        }
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::logout();
 
-        session()->invalidate();
-        session()->regenerateToken();
-
-        return redirect()->route('login.index')
-            ->with('success', 'Logout realizado com sucesso!');
-    }
-
-    protected function ensureIsNotRateLimited(Request $request): void
-    {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey($request), 5)) {
-            return;
-        }
-
-        $seconds = RateLimiter::availableIn($this->throttleKey($request));
-
-        throw ValidationException::withMessages([
-            'email' => "Muitas tentativas de login. Tente novamente em {$seconds} segundos.",
-        ]);
-    }
-
-    protected function throttleKey(Request $request): string
-    {
-        return strtolower((string) $request->input('email')).'|'.$request->ip();
+        return redirect()->route('login.index')->with('success', 'Logout realizado com sucesso!');
     }
 }
