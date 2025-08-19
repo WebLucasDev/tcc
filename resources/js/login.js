@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove a mensagem após 8 segundos
             setTimeout(() => {
                 successMessage.classList.add('hidden')
-            }, 8000)
+            }, 3000)
         } else {
             // Fallback: cria notificação flutuante se o componente não estiver disponível
             const notification = document.createElement('div')
