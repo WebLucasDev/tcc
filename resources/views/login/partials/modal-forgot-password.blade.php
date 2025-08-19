@@ -14,7 +14,7 @@
             <form id="forgot-password-form">
                 @csrf
                 <label for="forgot_email" class="text-xs text-[var(--color-text)]">email <span>*</span></label>
-                <input type="email" id="forgot_email" name="email" placeholder="Seu e-mail cadastrado"
+                <input type="email" name="email" placeholder="Seu e-mail cadastrado"
                     class="w-full border rounded px-3 py-2 mb-4" required>
                 <div class="flex justify-start gap-2">
                     <button type="submit" class="px-8 py-2 rounded bg-[var(--color-main)] hover:outline-double outline-orange-700 cursor-pointer text-white">

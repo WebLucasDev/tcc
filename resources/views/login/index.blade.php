@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    @vite(['resources/css/app.css', 'resources/js/login.js'])
+    @vite(['resources/css/app.css', 'resources/js/login.js', 'resources/js/alerts.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -15,6 +15,8 @@
 
         <x-error/>
         <x-success/>
+
+        @include('login.partials.message-recover-password')
 
         <div class="flex flex-col max-w-md p-6 sm:p-10 border rounded-md border-[var(--color-main)] shadow-2xl/55">
             <div class="flex flex-col justify-center items-center mb-8">

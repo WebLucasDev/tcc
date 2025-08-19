@@ -16,11 +16,11 @@ class AdminUserSeeder extends Seeder
     {
         // Criar usuário administrador para testes
         User::firstOrCreate(
-            ['email' => 'admin@metresistemas.com.br'],
+            ['email' => 'lucas@metresistemas.com.br'],
             [
                 'name' => 'Administrador',
-                'email' => 'admin@metresistemas.com.br',
-                'password' => Hash::make('admin123'),
+                'email' => 'lucas@metresistemas.com.br',
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
@@ -28,8 +28,8 @@ class AdminUserSeeder extends Seeder
         $this->command->info('✅ Usuário administrador criado com sucesso!');
         $this->command->newLine();
         $this->command->line('🔐 <fg=yellow>CREDENCIAIS DE ACESSO:</fg=yellow>');
-        $this->command->line('   Email: admin@metresistemas.com.br');
-        $this->command->line('   Senha: admin123');
+        $this->command->line('   Email: lucas@metresistemas.com.br');
+        $this->command->line('   Senha: password');
         $this->command->newLine();
     }
 }
