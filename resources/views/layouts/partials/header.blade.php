@@ -40,6 +40,7 @@
 
     <div class="flex items-center space-x-5">
         <button
+            onclick="toggleTheme()"
             class="p-2 hover:bg-[var(--color-text)] text-[var(--color-text)] hover:text-[var(--color-main)] rounded-full transition-all duration-300">
             <i class="fa-solid fa-moon"></i>
         </button>

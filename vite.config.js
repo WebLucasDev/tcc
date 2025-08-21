@@ -9,6 +9,7 @@ export default defineConfig({
                     'resources/js/alerts.js',
                     'resources/js/login.js',
                     'resources/js/layout.js',
+                    'resources/js/theme.js',
                 ],
             refresh: true,
         }),

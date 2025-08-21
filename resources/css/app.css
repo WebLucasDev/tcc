@@ -9,19 +9,23 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 :root {
-    --color-background: #ffff;
+    --color-background: #f3eeee;
     --color-text: #2A2223;
     --color-main: #E13E16;
     --color-error: #f52e22;
     --color-success: #019967;
 }
 
-[data-theme="dark"] {
-    --color-background-dark: #1a202c;
-    --color-text-dark: #f7fafc;
+.dark {
+    --color-background: #131212;
+    --color-text: #f7fafc;
+    --color-main: #E13E16;
+    --color-error: #f56565;
+    --color-success: #48bb78;
 }
 
 input[type="password"]::-webkit-textfield-decoration-container {
