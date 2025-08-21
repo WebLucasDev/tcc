@@ -8,6 +8,7 @@ export default defineConfig({
             input: ['resources/css/app.css',
                     'resources/js/alerts.js',
                     'resources/js/login.js',
+                    'resources/js/layout.js',
                 ],
             refresh: true,
         }),

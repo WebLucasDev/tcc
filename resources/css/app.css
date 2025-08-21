@@ -5,11 +5,13 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-body{
-    margin:0; padding: 0; box-sizing: border-box;
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-:root{
+:root {
     --color-background: #ffff;
     --color-text: #2A2223;
     --color-main: #E13E16;
@@ -18,23 +20,54 @@ body{
 }
 
 [data-theme="dark"] {
-  --color-background: #1a202c;
-  --color-text: #f7fafc;
+    --color-background-dark: #1a202c;
+    --color-text-dark: #f7fafc;
 }
 
 input[type="password"]::-webkit-textfield-decoration-container {
-  display: none;
+    display: none;
 }
 
 input[type="password"]::-webkit-credentials-auto-fill-button {
-  visibility: hidden;
-  pointer-events: none;
+    visibility: hidden;
+    pointer-events: none;
 }
+
 input[type="password"]::-webkit-caps-lock-indicator {
-  display: none;
+    display: none;
 }
 
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
-  display: none !important;
+    display: none !important;
+}
+
+aside.w-16 .dropdown-icon,
+aside.w-16 .dropdown-content,
+aside.w-16 .sidebar-text {
+    display: none !important;
+}
+
+aside.w-16 .dropdown-btn {
+    pointer-events: none;
+}
+
+aside.w-16 .dropdown-btn:hover {
+    background-color: transparent;
+}
+
+aside.w-16 .dropdown-icon,
+aside.w-16 .dropdown-content,
+aside.w-16 .sidebar-text {
+    display: none !important;
+}
+
+aside.w-16 .menu-item {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+aside.w-16 .menu-item:hover {
+    background-color: transparent !important;
+    color: inherit !important;
 }
