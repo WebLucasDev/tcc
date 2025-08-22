@@ -30,7 +30,7 @@
                         <a href="#"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-users w-4 h-4 mr-3"></i>
-                            Funcionários
+                            Colaboradores
                         </a>
                     </li>
                     <li>
@@ -58,8 +58,7 @@
                         <i class="fa-solid fa-clock w-5 h-5 mr-3"></i>
                         <span class="sidebar-text">Gestão de Ponto</span>
                     </div>
-                    <i
-                        class="fa-solid fa-chevron-down dropdown-icon transition-transform duration-300 ease-in-out sidebar-text"></i>
+                    <i class="fa-solid fa-chevron-down dropdown-icon transition-transform duration-300 ease-in-out sidebar-text"></i>
                 </button>
                 <ul class="dropdown-content ml-6 mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0"
                     id="timecard-menu">
@@ -73,61 +72,19 @@
                     <li>
                         <a href="#"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-calendar-days w-4 h-4 mr-3"></i>
-                            Espelho de Ponto
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-user-clock w-4 h-4 mr-3"></i>
-                            Horas Extras
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-calendar-xmark w-4 h-4 mr-3"></i>
-                            Faltas e Atrasos
+                            <i class="fa-solid fa-circle-exclamation w-4 h-4 mr-3"></i>
+                            Solicitações
                         </a>
                     </li>
                 </ul>
             </li>
 
             <li>
-                <button
-                    class="dropdown-btn menu-item flex items-center justify-between w-full px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)] focus:outline-none whitespace-nowrap"
-                    data-target="payroll-menu">
-                    <div class="flex items-center whitespace-nowrap">
-                        <i class="fa-solid fa-file-invoice-dollar w-5 h-5 mr-3"></i>
-                        <span class="sidebar-text">Folha de Pagamento</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-down dropdown-icon transition-transform duration-300 ease-in-out sidebar-text"></i>
-                </button>
-                <ul class="dropdown-content ml-6 mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0"
-                    id="payroll-menu">
-                    <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-calculator w-4 h-4 mr-3"></i>
-                            Cálculo da Folha
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-money-bill w-4 h-4 mr-3"></i>
-                            Holerites
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-percent w-4 h-4 mr-3"></i>
-                            Descontos e Benefícios
-                        </a>
-                    </li>
-                </ul>
+                <a href="#"
+                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">Folha de Pagamento</span>
+                </a>
             </li>
 
             <li>
