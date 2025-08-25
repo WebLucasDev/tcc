@@ -8,6 +8,6 @@ class PositionController extends Controller
 {
     public function index()
     {
-
+        return view('auth.registrations.positions.index');
     }
 }

@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'Dashboard')
+@section('title', 'Colaboradores')
 
 @section('content')
     <div class="space-y-6">
