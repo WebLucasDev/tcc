@@ -10,6 +10,7 @@ export default defineConfig({
                     'resources/js/login.js',
                     'resources/js/layout.js',
                     'resources/js/theme.js',
+                    'resources/js/positions.js',
                 ],
             refresh: true,
         }),

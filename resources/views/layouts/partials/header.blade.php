@@ -5,7 +5,6 @@
             <i class="fa-solid fa-bars text-[var(--color-text)] hover:text-[var(--color-main)]"></i>
         </button>
 
-        <!-- Breadcrumb -->
         <nav class="flex items-center space-x-2 text-sm">
             <div class="flex items-center space-x-2">
                 @if (isset($breadcrumbs) && count($breadcrumbs) > 0)
