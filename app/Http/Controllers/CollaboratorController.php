@@ -10,4 +10,24 @@ class CollaboratorController extends Controller
     {
         return view('auth.registrations.collaborators.index');
     }
+
+    public function create()
+    {
+        return view('auth.registrations.collaborators.create');
+    }
+
+    public function store()
+    {
+
+    }
+
+    public function update()
+    {
+
+    }
+
+    public function destroy()
+    {
+
+    }
 }

@@ -10,4 +10,24 @@ class DepartmentController extends Controller
     {
         return view('auth.registrations.departments.index');
     }
+
+    public function create()
+    {
+        return view('auth.registrations.departments.create');
+    }
+
+    public function store()
+    {
+
+    }
+
+    public function update()
+    {
+
+    }
+
+    public function destroy()
+    {
+
+    }
 }

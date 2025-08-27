@@ -36,15 +36,27 @@ Route::middleware('auth')->group(function () {
     Route::prefix('cadastros')->group(function () {
 
         Route::prefix('colaboradores')->group(function () {
-            Route::get('/', [CollaboratorController::class, 'index'])->name('colaboradores.index');
+            Route::get('/', [CollaboratorController::class, 'index'])->name('collaborator.index');
+            Route::get('/create', [CollaboratorController::class, 'create'])->name('collaborator.create');
+            Route::post('/', [CollaboratorController::class, 'store'])->name('collaborator.store');
+            Route::put('/{id}', [CollaboratorController::class, 'update'])->name('collaborator.update');
+            Route::delete('/{id}', [CollaboratorController::class, 'destroy'])->name('collaborator.destroy');
         });
 
         Route::prefix('departamentos')->group(function () {
-            Route::get('/', [DepartmentController::class, 'index'])->name('departamentos.index');
+            Route::get('/', [DepartmentController::class, 'index'])->name('department.index');
+            Route::get('/create', [DepartmentController::class, 'create'])->name('department.create');
+            Route::post('/', [DepartmentController::class, 'store'])->name('department.store');
+            Route::put('/{id}', [DepartmentController::class, 'update'])->name('department.update');
+            Route::delete('/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
         });
 
         Route::prefix('cargos')->group(function () {
-            Route::get('/', [PositionController::class, 'index'])->name('cargos.index');
+            Route::get('/', [PositionController::class, 'index'])->name('position.index');
+            Route::get('/create', [PositionController::class, 'create'])->name('position.create');
+            Route::post('/', [PositionController::class, 'store'])->name('position.store');
+            Route::put('/{id}', [PositionController::class, 'update'])->name('position.update');
+            Route::delete('/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
         });
     });
 

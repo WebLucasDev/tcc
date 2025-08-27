@@ -71,4 +71,24 @@ class PositionController extends Controller
 
         return view('auth.registrations.positions.index', compact('positions', 'departments', 'breadcrumbs'));
     }
+
+    public function create()
+    {
+        return view('auth.registrations.positions.create');
+    }
+
+    public function store()
+    {
+
+    }
+
+    public function update()
+    {
+
+    }
+
+    public function destroy()
+    {
+
+    }
 }
