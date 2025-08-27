@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\CollaboratorModel;
+use App\Models\PositionModel;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,7 +14,7 @@ class CollaboratorSeeder extends Seeder
      */
     public function run(): void
     {
-        $positions = \App\Models\PositionModel::all();
+        $positions = PositionModel::all();
 
         if ($positions->isEmpty()) {
             $this->command->warn('Nenhum cargo encontrado. Execute primeiro a seeder de cargos.');
@@ -43,7 +45,7 @@ class CollaboratorSeeder extends Seeder
         ];
 
         foreach ($collaborators as $collaborator) {
-            \App\Models\CollaboratorModel::create([
+            CollaboratorModel::create([
                 'name' => $collaborator['name'],
                 'email' => $collaborator['email'],
                 'password' => bcrypt('password'),
