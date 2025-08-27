@@ -5,7 +5,7 @@
         <div class="flex-1">
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-[var(--color-text)] opacity-50"></i>
+                    <i class="fa-solid fa-search text-[var(--color-text)] opacity-50"></i>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Buscar por nome do cargo ou departamento..."
@@ -33,7 +33,7 @@
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                    <i class="fas fa-briefcase text-blue-600 dark:text-blue-400"></i>
+                    <i class="fa-solid fa-briefcase text-blue-600 dark:text-blue-400"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Total de Cargos</p>
@@ -46,7 +46,7 @@
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                    <i class="fas fa-link text-green-600 dark:text-green-400"></i>
+                    <i class="fa-solid fa-link text-green-600 dark:text-green-400"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Com Departamento</p>
@@ -59,7 +59,7 @@
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                    <i class="fas fa-unlink text-red-600 dark:text-red-400"></i>
+                    <i class="fa-solid fa-unlink text-red-600 dark:text-red-400"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Sem Departamento</p>

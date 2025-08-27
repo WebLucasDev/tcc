@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\web\registrations\departments\DepartmentStoreRequest;
+use App\Http\Requests\web\registrations\departments\DepartmentUpdateRequest;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
@@ -16,12 +18,12 @@ class DepartmentController extends Controller
         return view('auth.registrations.departments.create');
     }
 
-    public function store()
+    public function store(DepartmentStoreRequest $request)
     {
 
     }
 
-    public function update()
+    public function update(DepartmentUpdateRequest $request)
     {
 
     }

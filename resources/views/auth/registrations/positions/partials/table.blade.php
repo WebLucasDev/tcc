@@ -26,7 +26,7 @@
                         name="sort_direction"
                         value="{{ request('sort_direction', 'asc') }}"
                         class="px-2 py-1 text-sm text-[var(--color-main)] hover:text-[var(--color-main-dark)] transition-colors">
-                        <i class="fas fa-sort-{{ request('sort_direction', 'asc') == 'asc' ? 'up' : 'down' }}"></i>
+                        <i class="fa-solid fa-sort-{{ request('sort_direction', 'asc') == 'asc' ? 'up' : 'down' }}"></i>
                     </button>
                 </div>
             </div>
@@ -68,19 +68,19 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($position->department)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                        <i class="fas fa-building mr-1"></i>
+                                        <i class="fa-solid fa-building mr-1"></i>
                                         {{ $position->department->name }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        <i class="fas fa-minus mr-1"></i>
+                                        <i class="fa-solid fa-minus mr-1"></i>
                                         Sem departamento
                                     </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center text-sm text-[var(--color-text)]">
-                                    <i class="fas fa-users text-[var(--color-main)] mr-2"></i>
+                                    <i class="fa-solid fa-users text-[var(--color-main)] mr-2"></i>
                                     {{ $position->collaborators_count ?? 0 }}
                                 </div>
                             </td>
@@ -92,12 +92,12 @@
                                     <button
                                         class="text-blue-600 hover:text-blue-800 transition-colors duration-200"
                                         title="Editar">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fa-solid fa-edit"></i>
                                     </button>
                                     <button
                                         class="text-red-600 hover:text-red-800 transition-colors duration-200"
                                         title="Excluir">
-                                        <i class="fas fa-trash"></i>
+                                        <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </td>
@@ -116,8 +116,8 @@
                             <h4 class="font-medium text-[var(--color-text)]">{{ $position->name }}</h4>
                         </div>
                         <div class="flex gap-2">
-                            <button class="text-blue-600 p-1"><i class="fas fa-edit text-sm"></i></button>
-                            <button class="text-red-600 p-1"><i class="fas fa-trash text-sm"></i></button>
+                            <button class="text-blue-600 p-1"><i class="fa-solid fa-edit text-sm"></i></button>
+                            <button class="text-red-600 p-1"><i class="fa-solid fa-trash text-sm"></i></button>
                         </div>
                     </div>
 
@@ -150,7 +150,7 @@
         <!-- Estado Vazio -->
         <div class="px-6 py-12 text-center">
             <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-briefcase text-2xl text-gray-400"></i>
+                <i class="fa-solid fa-briefcase text-2xl text-gray-400"></i>
             </div>
             <h3 class="text-lg font-medium text-[var(--color-text)] mb-2">Nenhum cargo encontrado</h3>
             <p class="text-[var(--color-text)] opacity-70 mb-4">
@@ -164,14 +164,14 @@
                 <button
                     id="btn-clear-filters"
                     class="inline-flex items-center gap-2 text-[var(--color-main)] hover:text-[var(--color-main-dark)] font-medium">
-                    <i class="fas fa-times"></i>
+                    <i class="fa-solid fa-times"></i>
                     Limpar filtros
                 </button>
             @else
                 <button
                     id="btn-new-position-empty"
                     class="inline-flex items-center gap-2 bg-[var(--color-main)] hover:bg-[var(--color-main-dark)] text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                    <i class="fas fa-plus"></i>
+                    <i class="fa-solid fa-plus"></i>
                     Criar primeiro cargo
                 </button>
             @endif

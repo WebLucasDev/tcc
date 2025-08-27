@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\web\registrations\collaborators\CollaboratorStoreRequest;
+use App\Http\Requests\web\registrations\collaborators\CollaboratorUpdateRequest;
 use Illuminate\Http\Request;
 
 class CollaboratorController extends Controller
@@ -16,12 +18,12 @@ class CollaboratorController extends Controller
         return view('auth.registrations.collaborators.create');
     }
 
-    public function store()
+    public function store(CollaboratorStoreRequest $request)
     {
 
     }
 
-    public function update()
+    public function update(CollaboratorUpdateRequest $request)
     {
 
     }

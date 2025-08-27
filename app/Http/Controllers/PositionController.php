@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\web\registrations\positions\PositionStoreRequest;
+use App\Http\Requests\web\registrations\positions\PositionUpdateRequest;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
 use Illuminate\Http\Request;
@@ -77,12 +79,12 @@ class PositionController extends Controller
         return view('auth.registrations.positions.create');
     }
 
-    public function store()
+    public function store(PositionStoreRequest $request)
     {
 
     }
 
-    public function update()
+    public function update(PositionUpdateRequest $request)
     {
 
     }
