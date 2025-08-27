@@ -51,7 +51,7 @@
                 <div class="ml-3">
                     <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Com Departamento</p>
                     <p id="with-department" class="text-2xl font-bold text-[var(--color-text)]">
-                        {{ $positions->where('department_id', '!=', null)->count() }}</p>
+                        {{ $withDepartment }}</p>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
                 <div class="ml-3">
                     <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Sem Departamento</p>
                     <p id="without-department" class="text-2xl font-bold text-[var(--color-text)]">
-                        {{ $positions->where('department_id', null)->count() }}</p>
+                        {{ $withoutDepartment }}</p>
                 </div>
             </div>
         </div>

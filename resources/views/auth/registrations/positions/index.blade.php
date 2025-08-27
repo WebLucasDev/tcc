@@ -29,4 +29,7 @@
         </div>
 
     </div>
+
+    @include('auth.registrations.positions.partials.modal-delete')
+
 @endsection

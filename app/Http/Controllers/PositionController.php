@@ -46,6 +46,11 @@ class PositionController extends Controller
         // Departamentos para o filtro
         $departments = DepartmentModel::orderBy('name')->get();
 
+        // Calcular estatísticas corretas do banco total
+        $allPositions = PositionModel::all();
+        $withDepartment = $allPositions->where('department_id', '!=', null)->count();
+        $withoutDepartment = $allPositions->where('department_id', null)->count();
+
         // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
@@ -54,11 +59,6 @@ class PositionController extends Controller
 
         // Se for uma requisição AJAX, retornar apenas os dados necessários
         if ($request->ajax()) {
-            // Calcular estatísticas corretas
-            $allPositions = PositionModel::all();
-            $withDepartment = $allPositions->where('department_id', '!=', null)->count();
-            $withoutDepartment = $allPositions->where('department_id', null)->count();
-
             return response()->json([
                 'success' => true,
                 'html' => view('auth.registrations.positions.partials.table', compact('positions'))->render(),
@@ -71,17 +71,35 @@ class PositionController extends Controller
             ]);
         }
 
-        return view('auth.registrations.positions.index', compact('positions', 'departments', 'breadcrumbs'));
+        return view('auth.registrations.positions.index', compact('positions', 'departments', 'breadcrumbs', 'withDepartment', 'withoutDepartment'));
     }
 
     public function create()
     {
-        return view('auth.registrations.positions.create');
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Cargos', 'url' => null],
+            ['label' => 'Novo Cargo', 'url' => null],
+        ];
+
+        return view('auth.registrations.positions.create', compact('breadcrumbs'));
     }
 
     public function store(PositionStoreRequest $request)
     {
+        try {
+            PositionModel::create([
+                'name' => $request->name,
+            ]);
 
+            return redirect()->route('position.index')
+                ->with('success', 'Cargo criado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao criar o cargo. Tente novamente.']);
+        }
     }
 
     public function update(PositionUpdateRequest $request)
@@ -89,8 +107,24 @@ class PositionController extends Controller
 
     }
 
-    public function destroy()
+    public function destroy($id)
     {
+        try {
+            $position = PositionModel::findOrFail($id);
 
+            // Verificar se o cargo possui colaboradores vinculados
+            if ($position->collaborators()->count() > 0) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'Não é possível excluir este cargo pois existem colaboradores vinculados a ele.']);
+            }
+
+            $position->delete();
+
+            return redirect()->route('position.index')
+                ->with('success', 'Cargo excluído com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Erro ao excluir o cargo. Tente novamente.']);
+        }
     }
 }

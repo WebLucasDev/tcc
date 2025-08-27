@@ -13,21 +13,53 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botões para criar novo cargo
     const btnNewPosition = document.getElementById('btn-new-position');
     const btnNewPositionEmpty = document.getElementById('btn-new-position-empty');
+    const savePositionBtn = document.getElementById('save-position-btn');
 
-    // Event listeners para botões de novo cargo
-    if (btnNewPosition) {
-        btnNewPosition.addEventListener('click', function() {
-            // TODO: Implementar modal ou redirecionamento para criar cargo
-            console.log('Criar novo cargo');
+    // Prevenir múltiplos cliques no botão de salvar
+    if (savePositionBtn) {
+        const form = savePositionBtn.closest('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                savePositionBtn.disabled = true;
+            });
+        }
+    }
+
+    // Elementos do modal
+    const deleteModal = document.getElementById('delete-modal');
+    const positionNameDisplay = document.getElementById('position-name-display');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    let currentPositionId = null;
+
+    // Event listeners para o modal
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+    }
+
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (currentPositionId) {
+                deletePosition(currentPositionId);
+            }
         });
     }
 
-    if (btnNewPositionEmpty) {
-        btnNewPositionEmpty.addEventListener('click', function() {
-            // TODO: Implementar modal ou redirecionamento para criar cargo
-            console.log('Criar primeiro cargo');
+    // Fechar modal ao clicar no overlay
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                hideDeleteModal();
+            }
         });
     }
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+            hideDeleteModal();
+        }
+    });
 
     // Estado atual dos filtros
     let currentFilters = {
@@ -290,19 +322,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para anexar eventos de exclusão
     function attachDeleteEvents() {
-        const deleteButtons = document.querySelectorAll('[title="Excluir"]');
+        const deleteButtons = document.querySelectorAll('.delete-position-btn');
         deleteButtons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (confirm('Tem certeza que deseja excluir este cargo?')) {
-                    // TODO: Implementar exclusão via AJAX
-                    console.log('Excluir cargo');
-                }
+                const positionId = this.dataset.positionId;
+                const positionName = this.dataset.positionName;
+                
+                showDeleteModal(positionId, positionName);
             });
         });
     }
 
-    // Função para anexar evento de limpar filtros
+    // Função para deletar cargo
+    function deletePosition(positionId) {
+        // Esconder modal
+        hideDeleteModal();
+        
+        // Criar formulário para submissão
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cadastros/cargos/${positionId}`;
+        
+        // Token CSRF
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken.getAttribute('content');
+            form.appendChild(csrfInput);
+        }
+        
+        // Method DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        // Adicionar ao body e submeter
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Função para mostrar modal de exclusão
+    function showDeleteModal(positionId, positionName) {
+        currentPositionId = positionId;
+        if (positionNameDisplay) {
+            positionNameDisplay.textContent = positionName;
+        }
+        if (deleteModal) {
+            deleteModal.classList.remove('hidden');
+        }
+    }
+
+    // Função para esconder modal de exclusão
+    function hideDeleteModal() {
+        if (deleteModal) {
+            deleteModal.classList.add('hidden');
+            currentPositionId = null;
+        }
+    }    // Função para anexar evento de limpar filtros
     function attachClearFiltersEvent() {
         const clearFiltersBtn = document.getElementById('btn-clear-filters');
         if (clearFiltersBtn) {
@@ -339,9 +420,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.GlobalLoading) {
             window.GlobalLoading.hide();
         }
-
-        // Mostrar erro simples no console (removido notificação visual)
-        alert('Erro: ' + message);
     }    // Função para highlight na busca
     function highlightSearchTerm(term) {
         if (!term) return;

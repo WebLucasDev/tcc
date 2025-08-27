@@ -59,10 +59,10 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($positions as $position)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
+                        <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="text-sm font-medium text-[var(--color-text)]">{{ $position->name }}</div>
+                                    <div class="text-sm font-medium text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">{{ $position->name }}</div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -79,12 +79,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center text-sm text-[var(--color-text)]">
+                                <div class="flex items-center text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
                                     <i class="fa-solid fa-users text-[var(--color-main)] mr-2"></i>
                                     {{ $position->collaborators_count ?? 0 }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] opacity-70">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] opacity-70 group-hover:text-gray-900 dark:group-hover:text-gray-100 group-hover:opacity-100">
                                 {{ $position->created_at->format('d/m/Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -95,8 +95,10 @@
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
                                     <button
-                                        class="text-red-600 hover:text-red-800 transition-colors duration-200"
-                                        title="Excluir">
+                                        class="text-red-600 hover:text-red-800 transition-colors duration-200 delete-position-btn"
+                                        title="Excluir"
+                                        data-position-id="{{ $position->id }}"
+                                        data-position-name="{{ $position->name }}">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -117,7 +119,12 @@
                         </div>
                         <div class="flex gap-2">
                             <button class="text-blue-600 p-1"><i class="fa-solid fa-edit text-sm"></i></button>
-                            <button class="text-red-600 p-1"><i class="fa-solid fa-trash text-sm"></i></button>
+                            <button
+                                class="text-red-600 p-1 delete-position-btn"
+                                data-position-id="{{ $position->id }}"
+                                data-position-name="{{ $position->name }}">
+                                <i class="fa-solid fa-trash text-sm"></i>
+                            </button>
                         </div>
                     </div>
 
