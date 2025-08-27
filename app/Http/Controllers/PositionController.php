@@ -50,6 +50,25 @@ class PositionController extends Controller
             ['label' => 'Cargos', 'url' => null]
         ];
 
+        // Se for uma requisição AJAX, retornar apenas os dados necessários
+        if ($request->ajax()) {
+            // Calcular estatísticas corretas
+            $allPositions = PositionModel::all();
+            $withDepartment = $allPositions->where('department_id', '!=', null)->count();
+            $withoutDepartment = $allPositions->where('department_id', null)->count();
+
+            return response()->json([
+                'success' => true,
+                'html' => view('auth.registrations.positions.partials.table', compact('positions'))->render(),
+                'pagination' => view('auth.registrations.positions.partials.pagination', compact('positions'))->render(),
+                'statistics' => [
+                    'total' => $positions->total(),
+                    'with_department' => $withDepartment,
+                    'without_department' => $withoutDepartment
+                ]
+            ]);
+        }
+
         return view('auth.registrations.positions.index', compact('positions', 'departments', 'breadcrumbs'));
     }
 }

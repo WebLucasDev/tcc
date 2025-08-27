@@ -48,6 +48,8 @@
                     <div>
                         <button type="submit"
                             class="w-full px-8 py-3 font-semibold rounded-md bg-[var(--color-main)] text-white hover:outline-double outline-orange-700 cursor-pointer">Entrar</button>
+                        <p>lucas@metresistemas.com.br</p>
+                        <p>password</p>
                     </div>
                 </div>
             </form>
