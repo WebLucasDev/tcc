@@ -16,11 +16,6 @@ class CollaboratorSeeder extends Seeder
     {
         $positions = PositionModel::all();
 
-        if ($positions->isEmpty()) {
-            $this->command->warn('Nenhum cargo encontrado. Execute primeiro a seeder de cargos.');
-            return;
-        }
-
         $collaborators = [
             ['name' => 'João Silva', 'email' => 'joao.silva@empresa.com', 'cpf' => '123.456.789-01'],
             ['name' => 'Maria Santos', 'email' => 'maria.santos@empresa.com', 'cpf' => '123.456.789-02'],
@@ -57,7 +52,5 @@ class CollaboratorSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
-
-        $this->command->info('20 colaboradores criados com sucesso!');
     }
 }

@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [PositionController::class, 'index'])->name('position.index');
             Route::get('/create', [PositionController::class, 'create'])->name('position.create');
             Route::post('/', [PositionController::class, 'store'])->name('position.store');
+            Route::get('/{id}/edit', [PositionController::class, 'edit'])->name('position.edit');
             Route::put('/{id}', [PositionController::class, 'update'])->name('position.update');
             Route::delete('/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
         });

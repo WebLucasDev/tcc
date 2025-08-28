@@ -102,9 +102,36 @@ class PositionController extends Controller
         }
     }
 
-    public function update(PositionUpdateRequest $request)
+    public function edit($id)
     {
+        $position = PositionModel::findOrFail($id);
 
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Cargos', 'url' => route('position.index')],
+            ['label' => 'Editar Cargo', 'url' => null],
+        ];
+
+        return view('auth.registrations.positions.create', compact('position', 'breadcrumbs'));
+    }
+
+    public function update(PositionUpdateRequest $request, $id)
+    {
+        try {
+            $position = PositionModel::findOrFail($id);
+
+            $position->update([
+                'name' => $request->name,
+            ]);
+
+            return redirect()->route('position.index')
+                ->with('success', 'Cargo atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao atualizar o cargo. Tente novamente.']);
+        }
     }
 
     public function destroy($id)

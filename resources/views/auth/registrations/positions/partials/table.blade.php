@@ -89,11 +89,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
-                                    <button
+                                    <a href="{{ route('position.edit', $position->id) }}"
                                         class="text-blue-600 hover:text-blue-800 transition-colors duration-200"
                                         title="Editar">
                                         <i class="fa-solid fa-edit"></i>
-                                    </button>
+                                    </a>
                                     <button
                                         class="text-red-600 hover:text-red-800 transition-colors duration-200 delete-position-btn"
                                         title="Excluir"
@@ -118,7 +118,7 @@
                             <h4 class="font-medium text-[var(--color-text)]">{{ $position->name }}</h4>
                         </div>
                         <div class="flex gap-2">
-                            <button class="text-blue-600 p-1"><i class="fa-solid fa-edit text-sm"></i></button>
+                            <a href="{{ route('position.edit', $position->id) }}" class="text-blue-600 p-1"><i class="fa-solid fa-edit text-sm"></i></a>
                             <button
                                 class="text-red-600 p-1 delete-position-btn"
                                 data-position-id="{{ $position->id }}"

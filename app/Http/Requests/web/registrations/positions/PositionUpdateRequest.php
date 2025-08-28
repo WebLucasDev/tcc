@@ -21,8 +21,25 @@ class PositionUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $positionId = $this->route('id');
+
         return [
-            //
+            'name' => 'required|string|max:255|unique:positions,name,' . $positionId,
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'O nome do cargo é obrigatório.',
+            'name.string' => 'O nome do cargo deve ser um texto válido.',
+            'name.max' => 'O nome do cargo não pode ter mais de 255 caracteres.',
+            'name.unique' => 'Já existe um cargo com este nome.',
         ];
     }
 }
