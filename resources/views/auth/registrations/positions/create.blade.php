@@ -48,7 +48,31 @@
                             required>
                     </div>
 
-                                        <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div>
+                        <label for="department_id" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                            Departamento
+                        </label>
+                        <select
+                            id="department_id"
+                            name="department_id"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
+                            <option value="">Selecione um departamento (opcional)</option>
+                            @if(isset($departments))
+                                @foreach($departments as $department)
+                                    <option value="{{ $department->id }}"
+                                        {{ old('department_id', isset($position) ? $position->department_id : '') == $department->id ? 'selected' : '' }}>
+                                        {{ $department->name }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <p class="text-xs text-[var(--color-text)] opacity-60 mt-1">
+                            <i class="fa-solid fa-info-circle mr-1"></i>
+                            Você pode deixar sem departamento e vincular posteriormente
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button
                             type="submit"
                             id="save-position-btn"

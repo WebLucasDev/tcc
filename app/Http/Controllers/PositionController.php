@@ -76,6 +76,9 @@ class PositionController extends Controller
 
     public function create()
     {
+        // Departamentos para o select
+        $departments = DepartmentModel::orderBy('name')->get();
+
         // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
@@ -83,7 +86,7 @@ class PositionController extends Controller
             ['label' => 'Novo Cargo', 'url' => null],
         ];
 
-        return view('auth.registrations.positions.create', compact('breadcrumbs'));
+        return view('auth.registrations.positions.create', compact('departments', 'breadcrumbs'));
     }
 
     public function store(PositionStoreRequest $request)
@@ -91,6 +94,7 @@ class PositionController extends Controller
         try {
             PositionModel::create([
                 'name' => $request->name,
+                'department_id' => $request->department_id ?: null,
             ]);
 
             return redirect()->route('position.index')
@@ -106,6 +110,9 @@ class PositionController extends Controller
     {
         $position = PositionModel::findOrFail($id);
 
+        // Departamentos para o select
+        $departments = DepartmentModel::orderBy('name')->get();
+
         // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
@@ -113,7 +120,7 @@ class PositionController extends Controller
             ['label' => 'Editar Cargo', 'url' => null],
         ];
 
-        return view('auth.registrations.positions.create', compact('position', 'breadcrumbs'));
+        return view('auth.registrations.positions.create', compact('position', 'departments', 'breadcrumbs'));
     }
 
     public function update(PositionUpdateRequest $request, $id)
@@ -123,6 +130,7 @@ class PositionController extends Controller
 
             $position->update([
                 'name' => $request->name,
+                'department_id' => $request->department_id ?: null,
             ]);
 
             return redirect()->route('position.index')

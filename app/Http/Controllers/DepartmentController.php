@@ -78,17 +78,50 @@ class DepartmentController extends Controller
 
     public function store(DepartmentStoreRequest $request)
     {
+        try {
+            DepartmentModel::create([
+                'name' => $request->name,
+            ]);
 
+            return redirect()->route('department.index')
+                ->with('success', 'Departamento criado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao criar o departamento. Tente novamente.']);
+        }
     }
 
-    public function edit(DepartmentStoreRequest $request)
+    public function edit($id)
     {
+        $department = DepartmentModel::findOrFail($id);
 
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Departamentos', 'url' => route('department.index')],
+            ['label' => 'Editar Departamento', 'url' => null],
+        ];
+
+        return view('auth.registrations.departments.create', compact('department', 'breadcrumbs'));
     }
 
-    public function update(DepartmentUpdateRequest $request)
+    public function update(DepartmentUpdateRequest $request, $id)
     {
+        try {
+            $department = DepartmentModel::findOrFail($id);
 
+            $department->update([
+                'name' => $request->name,
+            ]);
+
+            return redirect()->route('department.index')
+                ->with('success', 'Departamento atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao atualizar o departamento. Tente novamente.']);
+        }
     }
 
     public function destroy($id)

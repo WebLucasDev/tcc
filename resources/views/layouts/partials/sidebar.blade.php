@@ -27,6 +27,13 @@
                 <ul class="dropdown-content ml-6 mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0"
                     id="register-menu">
                     <li>
+                        <a href="{{ route('position.index') }}"
+                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
+                            <i class="fa-solid fa-briefcase w-4 h-4 mr-3"></i>
+                            Cargos
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('collaborator.index') }}"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-users w-4 h-4 mr-3"></i>
@@ -38,13 +45,6 @@
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-building w-4 h-4 mr-3"></i>
                             Departamentos
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('position.index') }}"
-                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
-                            <i class="fa-solid fa-briefcase w-4 h-4 mr-3"></i>
-                            Cargos
                         </a>
                     </li>
                 </ul>

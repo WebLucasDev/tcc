@@ -22,7 +22,22 @@ class DepartmentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255|unique:departments,name',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'O nome do departamento é obrigatório.',
+            'name.string' => 'O nome do departamento deve ser um texto válido.',
+            'name.max' => 'O nome do departamento não pode ter mais de 255 caracteres.',
+            'name.unique' => 'Já existe um departamento com este nome.',
         ];
     }
 }
