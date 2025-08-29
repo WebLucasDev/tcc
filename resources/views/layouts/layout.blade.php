@@ -14,7 +14,7 @@
 </head>
     <body>
 
-        <x-loading />
+        @include('layouts.partials.loading')
 
         <div class="flex min-h-screen bg-[var(--color-background)]">
             @include('layouts.partials.sidebar')
