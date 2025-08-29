@@ -8,25 +8,11 @@
                     <i class="fa-solid fa-search text-[var(--color-text)] opacity-50"></i>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Buscar por nome do cargo ou departamento..."
+                    placeholder="Buscar por nome do departamento..."
                     autocomplete="off"
                     spellcheck="false"
                     class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
             </div>
-        </div>
-
-        <!-- Filtro por Departamento -->
-        <div class="lg:w-64">
-            <select name="department_id"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
-                <option value="">Todos os departamentos</option>
-                @foreach ($departments as $department)
-                    <option value="{{ $department->id }}"
-                        {{ request('department_id') == $department->id ? 'selected' : '' }}>
-                        {{ $department->name }}
-                    </option>
-                @endforeach
-            </select>
         </div>
     </div>
 
@@ -35,12 +21,12 @@
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                    <i class="fa-solid fa-briefcase text-blue-600 dark:text-blue-400"></i>
+                    <i class="fa-solid fa-building text-blue-600 dark:text-blue-400"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Total de Cargos</p>
-                    <p id="total-positions" class="text-2xl font-bold text-[var(--color-text)]">
-                        {{ $positions->total() }}</p>
+                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Total de Departamentos</p>
+                    <p id="total-departments" class="text-2xl font-bold text-[var(--color-text)]">
+                        {{ $departments->total() }}</p>
                 </div>
             </div>
         </div>
@@ -48,25 +34,25 @@
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                    <i class="fa-solid fa-link text-green-600 dark:text-green-400"></i>
+                    <i class="fa-solid fa-briefcase text-green-600 dark:text-green-400"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Com Departamento</p>
-                    <p id="with-department" class="text-2xl font-bold text-[var(--color-text)]">
-                        {{ $withDepartment }}</p>
+                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Com Cargos</p>
+                    <p id="with-positions" class="text-2xl font-bold text-[var(--color-text)]">
+                        {{ $withPositions }}</p>
                 </div>
             </div>
         </div>
 
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div class="flex items-center">
-                <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                    <i class="fa-solid fa-unlink text-red-600 dark:text-red-400"></i>
+                <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <i class="fa-solid fa-users text-gray-600 dark:text-gray-400"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Sem Departamento</p>
-                    <p id="without-department" class="text-2xl font-bold text-[var(--color-text)]">
-                        {{ $withoutDepartment }}</p>
+                    <p class="text-sm font-medium text-[var(--color-text)] opacity-70">Com Colaboradores</p>
+                    <p id="with-collaborators" class="text-2xl font-bold text-[var(--color-text)]">
+                        {{ $withCollaborators }}</p>
                 </div>
             </div>
         </div>
