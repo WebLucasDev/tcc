@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [CollaboratorController::class, 'index'])->name('collaborator.index');
             Route::get('/create', [CollaboratorController::class, 'create'])->name('collaborator.create');
             Route::post('/', [CollaboratorController::class, 'store'])->name('collaborator.store');
+            Route::get('/{id}/edit', [CollaboratorController::class, 'edit'])->name('collaborator.edit');
             Route::put('/{id}', [CollaboratorController::class, 'update'])->name('collaborator.update');
             Route::delete('/{id}', [CollaboratorController::class, 'destroy'])->name('collaborator.destroy');
         });

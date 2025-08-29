@@ -10,6 +10,7 @@ export default defineConfig({
                     'resources/js/layout.js',
                     'resources/js/loading.js',
                     'resources/js/theme.js',
+                    'resources/js/menus/collaboratons.js',
                     'resources/js/menus/departments.js',
                     'resources/js/menus/login.js',
                     'resources/js/menus/positions.js',

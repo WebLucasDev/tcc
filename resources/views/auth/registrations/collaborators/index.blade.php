@@ -18,7 +18,16 @@
             </div>
         </div>
 
+        @include('auth.registrations.collaborators.partials.filters')
 
+        <div id="collaborators-table-container">
+            @include('auth.registrations.collaborators.partials.table', ['collaborators' => $collaborators])
+        </div>
+
+        <div id="pagination-container">
+            @include('auth.registrations.collaborators.partials.pagination', ['collaborators' => $collaborators])
+        </div>
     </div>
 
+    @include('auth.registrations.collaborators.partials.modal-delete')
 @endsection
