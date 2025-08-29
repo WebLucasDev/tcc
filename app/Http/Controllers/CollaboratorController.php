@@ -10,12 +10,25 @@ class CollaboratorController extends Controller
 {
     public function index()
     {
-        return view('auth.registrations.collaborators.index');
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Colaborador', 'url' => null],
+        ];
+
+        return view('auth.registrations.collaborators.index', compact('breadcrumbs'));
     }
 
     public function create()
     {
-        return view('auth.registrations.collaborators.create');
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Colaborador', 'url' => null],
+            ['label' => 'Novo Colaborador', 'url' => null],
+        ];
+
+        return view('auth.registrations.collaborators.create', compact('breadcrumbs'));
     }
 
     public function store(CollaboratorStoreRequest $request)
