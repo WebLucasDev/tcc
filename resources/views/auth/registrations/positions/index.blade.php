@@ -27,9 +27,11 @@
         <div id="pagination-container">
             @include('auth.registrations.positions.partials.pagination', ['positions' => $positions])
         </div>
-
     </div>
 
     @include('auth.registrations.positions.partials.modal-delete')
-
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/menus/positions.js'])
+@endpush

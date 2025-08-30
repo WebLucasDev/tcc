@@ -11,7 +11,7 @@ class DepartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DepartmentModel::with(['positions', 'collaborators']);
+        $query = DepartmentModel::with(['positions.collaborators']);
 
         // Filtro de busca
         if ($request->filled('search')) {
@@ -33,13 +33,9 @@ class DepartmentController extends Controller
         $departments = $query->paginate(10)->withQueryString();
 
         // Calcular estatísticas corretas do banco total
-        $allDepartments = DepartmentModel::all();
-        $withPositions = $allDepartments->filter(function($dept) {
-            return $dept->positions()->count() > 0;
-        })->count();
-        $withCollaborators = $allDepartments->filter(function($dept) {
-            return $dept->collaborators()->count() > 0;
-        })->count();
+        $allDepartments = DepartmentModel::withCount(['positions', 'collaborators'])->get();
+        $withPositions = $allDepartments->where('positions_count', '>', 0)->count();
+        $withCollaborators = $allDepartments->where('collaborators_count', '>', 0)->count();
 
         // Breadcrumbs
         $breadcrumbs = [

@@ -13,7 +13,7 @@ class CollaboratorController extends Controller
 {
     public function index(Request $request)
     {
-        $query = CollaboratorModel::with(['department', 'position']);
+        $query = CollaboratorModel::with(['position.department']);
 
         // Filtro de busca
         if ($request->filled('search')) {
@@ -21,7 +21,7 @@ class CollaboratorController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('department', function ($dept) use ($search) {
+                  ->orWhereHas('position.department', function ($dept) use ($search) {
                       $dept->where('name', 'like', "%{$search}%");
                   })
                   ->orWhereHas('position', function ($pos) use ($search) {
@@ -30,9 +30,11 @@ class CollaboratorController extends Controller
             });
         }
 
-        // Filtro por departamento
+        // Filtro por departamento (via position)
         if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
+            $query->whereHas('position', function ($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
         }
 
         // Filtro por cargo
@@ -54,9 +56,11 @@ class CollaboratorController extends Controller
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::orderBy('name')->get();
 
-        // Calcular estatísticas corretas do banco total
-        $allCollaborators = CollaboratorModel::all();
-        $withDepartment = $allCollaborators->where('department_id', '!=', null)->count();
+        // Calcular estatísticas corretas do banco total (via position)
+        $allCollaborators = CollaboratorModel::with('position')->get();
+        $withDepartment = $allCollaborators->filter(function ($collaborator) {
+            return $collaborator->position && $collaborator->position->department_id;
+        })->count();
         $withPosition = $allCollaborators->where('position_id', '!=', null)->count();
 
         // Breadcrumbs
@@ -84,6 +88,10 @@ class CollaboratorController extends Controller
 
     public function create()
     {
+        // Departamentos e cargos para os selects
+        $departments = DepartmentModel::orderBy('name')->get();
+        $positions = PositionModel::with('department')->orderBy('name')->get();
+
         // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
@@ -91,7 +99,7 @@ class CollaboratorController extends Controller
             ['label' => 'Novo Colaborador', 'url' => null],
         ];
 
-        return view('auth.registrations.collaborators.create', compact('breadcrumbs'));
+        return view('auth.registrations.collaborators.create', compact('breadcrumbs', 'departments', 'positions'));
     }
 
     public function store(CollaboratorStoreRequest $request)

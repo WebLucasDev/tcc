@@ -35,7 +35,6 @@ class CollaboratorModel extends Authenticatable
         'entry_time_2',
         'return_time_1',
         'return_time_2',
-        'department_id',
         'position_id',
     ];
 
@@ -56,7 +55,6 @@ class CollaboratorModel extends Authenticatable
         'entry_time_2' => 'datetime:H:i',
         'return_time_1' => 'datetime:H:i',
         'return_time_2' => 'datetime:H:i',
-        'department_id' => 'integer',
         'position_id' => 'integer',
         'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
@@ -72,11 +70,18 @@ class CollaboratorModel extends Authenticatable
     }
 
     /**
-     * Get the department that owns the collaborator.
+     * Get the department that owns the collaborator (via position).
      */
     public function department()
     {
-        return $this->belongsTo(DepartmentModel::class, 'department_id');
+        return $this->hasOneThrough(
+            DepartmentModel::class,
+            PositionModel::class,
+            'id', // Foreign key on the positions table
+            'id', // Foreign key on the departments table
+            'position_id', // Local key on the collaborators table
+            'department_id' // Local key on the positions table
+        );
     }
 
     /**
@@ -137,11 +142,13 @@ class CollaboratorModel extends Authenticatable
     }
 
     /**
-     * Scope to filter by department.
+     * Scope to filter by department (via position).
      */
     public function scopeByDepartment($query, $departmentId)
     {
-        return $query->where('department_id', $departmentId);
+        return $query->whereHas('position', function ($q) use ($departmentId) {
+            $q->where('department_id', $departmentId);
+        });
     }
 
     /**

@@ -38,10 +38,17 @@ class DepartmentModel extends Model
     }
 
     /**
-     * Get the collaborators for this department.
+     * Get the collaborators for this department (via positions).
      */
     public function collaborators()
     {
-        return $this->hasMany(CollaboratorModel::class, 'department_id');
+        return $this->hasManyThrough(
+            CollaboratorModel::class,
+            PositionModel::class,
+            'department_id', // Foreign key on the positions table
+            'position_id', // Foreign key on the collaborators table
+            'id', // Local key on the departments table
+            'id' // Local key on the positions table
+        );
     }
 }

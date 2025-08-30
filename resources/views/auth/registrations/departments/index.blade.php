@@ -31,3 +31,7 @@
 
     @include('auth.registrations.departments.partials.modal-delete')
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/menus/departments.js'])
+@endpush
