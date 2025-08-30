@@ -8,6 +8,7 @@ use App\Models\CollaboratorModel;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CollaboratorController extends Controller
 {
@@ -104,21 +105,108 @@ class CollaboratorController extends Controller
 
     public function store(CollaboratorStoreRequest $request)
     {
+        try {
+            // Log dos dados recebidos para debug
+            Log::info('Dados recebidos para criar colaborador:', $request->all());
 
+            $collaborator = CollaboratorModel::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'cpf' => $request->cpf,
+                'admission_date' => $request->admission_date,
+                'phone' => $request->phone,
+                'zip_code' => $request->zip_code,
+                'street' => $request->street,
+                'number' => $request->number,
+                'neighborhood' => $request->neighborhood,
+                'position_id' => $request->position_id,
+                'entry_time_1' => $request->entry_time_1,
+                'return_time_1' => $request->return_time_1,
+                'entry_time_2' => $request->entry_time_2,
+                'return_time_2' => $request->return_time_2,
+                'password' => 'senha123', // Senha padrão temporária
+            ]);
+
+            Log::info('Colaborador criado com sucesso:', ['id' => $collaborator->id]);
+
+            return redirect()->route('collaborator.index')
+                ->with('success', 'Colaborador criado com sucesso!');
+        } catch (\Exception $e) {
+            // Log do erro específico
+            Log::error('Erro ao criar colaborador:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao criar o colaborador: ' . $e->getMessage()]);
+        }
     }
 
-    public function edit()
+    public function edit($id)
     {
+        $collaborator = CollaboratorModel::findOrFail($id);
 
+        // Departamentos e cargos para os selects
+        $departments = DepartmentModel::orderBy('name')->get();
+        $positions = PositionModel::with('department')->orderBy('name')->get();
+
+        // Breadcrumbs
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Colaborador', 'url' => null],
+            ['label' => 'Editar Colaborador', 'url' => null],
+        ];
+
+        return view('auth.registrations.collaborators.create', compact('collaborator', 'breadcrumbs', 'departments', 'positions'));
     }
 
-    public function update(CollaboratorUpdateRequest $request)
+    public function update(CollaboratorUpdateRequest $request, $id)
     {
+        try {
+            $collaborator = CollaboratorModel::findOrFail($id);
 
+            $collaborator->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'cpf' => $request->cpf,
+                'admission_date' => $request->admission_date,
+                'phone' => $request->phone,
+                'zip_code' => $request->zip_code,
+                'street' => $request->street,
+                'number' => $request->number,
+                'neighborhood' => $request->neighborhood,
+                'position_id' => $request->position_id,
+                'entry_time_1' => $request->entry_time_1,
+                'return_time_1' => $request->return_time_1,
+                'entry_time_2' => $request->entry_time_2,
+                'return_time_2' => $request->return_time_2,
+            ]);
+
+            return redirect()->route('collaborator.index')
+                ->with('success', 'Colaborador atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao atualizar o colaborador. Tente novamente.']);
+        }
     }
 
-    public function destroy()
+    public function destroy($id)
     {
+        try {
+            $collaborator = CollaboratorModel::findOrFail($id);
 
+            $collaborator->delete();
+
+            return redirect()->route('collaborator.index')
+                ->with('success', 'Colaborador excluído com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Erro ao excluir o colaborador. Tente novamente.']);
+        }
     }
 }

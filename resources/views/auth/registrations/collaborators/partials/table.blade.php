@@ -63,39 +63,31 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($collaborators as $collaborator)
-                        <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
+                                                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="text-sm font-medium text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100 collaborator-name">{{ $collaborator->name }}</div>
+                                    <div class="text-sm font-medium text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
+                                        {{ $collaborator->name }}
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">{{ $collaborator->email }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($collaborator->department)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                        <i class="fa-solid fa-building mr-1"></i>
-                                        {{ $collaborator->department->name }}
+                                @if($collaborator->position && $collaborator->position->department)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                        {{ $collaborator->position->department->name }}
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        <i class="fa-solid fa-minus mr-1"></i>
-                                        Sem departamento
-                                    </span>
+                                    <span class="text-gray-400 text-sm">Sem departamento</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($collaborator->position)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                                        <i class="fa-solid fa-briefcase mr-1"></i>
-                                        {{ $collaborator->position->name }}
-                                    </span>
+                                    <span class="text-sm text-[var(--color-text)]">{{ $collaborator->position->name }}</span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        <i class="fa-solid fa-minus mr-1"></i>
-                                        Sem cargo
-                                    </span>
+                                    <span class="text-gray-400 text-sm">Sem cargo</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] opacity-70 group-hover:text-gray-900 dark:group-hover:text-gray-100 group-hover:opacity-100">
@@ -104,15 +96,15 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('collaborator.edit', $collaborator->id) }}"
-                                        class="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                                        title="Editar">
+                                       class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                                       title="Editar">
                                         <i class="fa-solid fa-edit"></i>
                                     </a>
                                     <button
-                                        class="text-red-600 hover:text-red-800 transition-colors duration-200 delete-collaborator-btn"
-                                        title="Excluir"
+                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors delete-collaborator-btn"
                                         data-collaborator-id="{{ $collaborator->id }}"
-                                        data-collaborator-name="{{ $collaborator->name }}">
+                                        data-collaborator-name="{{ $collaborator->name }}"
+                                        title="Excluir">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -150,9 +142,9 @@
                         <div>
                             <span class="text-[var(--color-text)] opacity-70">Departamento:</span>
                             <div class="mt-1">
-                                @if($collaborator->department)
+                                @if($collaborator->position && $collaborator->position->department)
                                     <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                        {{ $collaborator->department->name }}
+                                        {{ $collaborator->position->department->name }}
                                     </span>
                                 @else
                                     <span class="text-[var(--color-text)] opacity-50">Sem departamento</span>

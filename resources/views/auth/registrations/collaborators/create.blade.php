@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'Novo Colaborador')
+@section('title', isset($collaborator) ? 'Editar Colaborador' : 'Novo Colaborador')
 
 @section('content')
 
@@ -9,11 +9,11 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-[var(--color-text)]">
-                    <i class="fa-solid fa-user-plus text-[var(--color-main)] mr-2"></i>
-                    Novo Colaborador
+                    <i class="fa-solid fa-{{ isset($collaborator) ? 'edit' : 'user-plus' }} text-[var(--color-main)] mr-2"></i>
+                    {{ isset($collaborator) ? 'Editar Colaborador' : 'Novo Colaborador' }}
                 </h1>
                 <p class="text-sm text-[var(--color-text)] opacity-70 mt-1">
-                    Cadastre um novo colaborador no sistema
+                    {{ isset($collaborator) ? 'Edite as informações do colaborador' : 'Cadastre um novo colaborador no sistema' }}
                 </p>
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
@@ -27,8 +27,11 @@
 
         <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
             <div class="p-6">
-                <form action="{{ route('collaborator.store') }}" method="POST" class="space-y-6">
+                <form action="{{ isset($collaborator) ? route('collaborator.update', $collaborator->id) : route('collaborator.store') }}" method="POST" class="space-y-6">
                     @csrf
+                    @if(isset($collaborator))
+                        @method('PUT')
+                    @endif
 
                     <!-- Dados Pessoais -->
                     <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
@@ -47,7 +50,7 @@
                                     type="text"
                                     id="name"
                                     name="name"
-                                    value="{{ old('name') }}"
+                                    value="{{ old('name', isset($collaborator) ? $collaborator->name : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="Ex: João Silva Santos"
                                     required>
@@ -62,7 +65,7 @@
                                     type="text"
                                     id="cpf"
                                     name="cpf"
-                                    value="{{ old('cpf') }}"
+                                    value="{{ old('cpf', isset($collaborator) ? $collaborator->cpf : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="000.000.000-00"
                                     maxlength="14"
@@ -78,22 +81,22 @@
                                     type="email"
                                     id="email"
                                     name="email"
-                                    value="{{ old('email') }}"
+                                    value="{{ old('email', isset($collaborator) ? $collaborator->email : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="joao@exemplo.com"
                                     required>
                             </div>
 
                             <div>
-                                <label for="celular" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Celular
+                                <label for="phone" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Telefone
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="celular"
-                                    name="celular"
-                                    value="{{ old('celular') }}"
+                                    id="phone"
+                                    name="phone"
+                                    value="{{ old('phone', isset($collaborator) ? $collaborator->phone : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="(11) 99999-9999"
                                     maxlength="15"
@@ -101,29 +104,15 @@
                             </div>
 
                             <div>
-                                <label for="password" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    Senha
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
-                                    placeholder="••••••••"
-                                    required>
-                            </div>
-
-                            <div>
-                                <label for="data_admissao" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                <label for="admission_date" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Data de Admissão
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="date"
-                                    id="data_admissao"
-                                    name="data_admissao"
-                                    value="{{ old('data_admissao') }}"
+                                    id="admission_date"
+                                    name="admission_date"
+                                    value="{{ old('admission_date', isset($collaborator) ? $collaborator->admission_date : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     required>
                             </div>
@@ -139,15 +128,15 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
-                                <label for="cep" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                <label for="zip_code" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     CEP
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="cep"
-                                    name="cep"
-                                    value="{{ old('cep') }}"
+                                    id="zip_code"
+                                    name="zip_code"
+                                    value="{{ old('zip_code', isset($collaborator) ? $collaborator->zip_code : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="00000-000"
                                     maxlength="9"
@@ -155,45 +144,45 @@
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="rua" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                <label for="street" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Rua
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="rua"
-                                    name="rua"
-                                    value="{{ old('rua') }}"
+                                    id="street"
+                                    name="street"
+                                    value="{{ old('street', isset($collaborator) ? $collaborator->street : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="Rua das Flores"
                                     required>
                             </div>
 
                             <div>
-                                <label for="numero" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                <label for="number" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Número
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="numero"
-                                    name="numero"
-                                    value="{{ old('numero') }}"
+                                    id="number"
+                                    name="number"
+                                    value="{{ old('number', isset($collaborator) ? $collaborator->number : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="123"
                                     required>
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="bairro" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                <label for="neighborhood" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Bairro
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="bairro"
-                                    name="bairro"
-                                    value="{{ old('bairro') }}"
+                                    id="neighborhood"
+                                    name="neighborhood"
+                                    value="{{ old('neighborhood', isset($collaborator) ? $collaborator->neighborhood : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     placeholder="Centro"
                                     required>
@@ -224,7 +213,7 @@
                                         @foreach($positions as $position)
                                             <option value="{{ $position->id }}"
                                                     data-department-id="{{ $position->department_id }}"
-                                                    {{ old('position_id') == $position->id ? 'selected' : '' }}>
+                                                    {{ old('position_id', isset($collaborator) ? $collaborator->position_id : '') == $position->id ? 'selected' : '' }}>
                                                 {{ $position->name }}
                                                 @if($position->department)
                                                     - {{ $position->department->name }}
@@ -266,29 +255,29 @@
                                 <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Primeiro Turno</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="horario_entrada_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                        <label for="entry_time_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                             Entrada 1
                                             <span class="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="time"
-                                            id="horario_entrada_1"
-                                            name="horario_entrada_1"
-                                            value="{{ old('horario_entrada_1') }}"
+                                            id="entry_time_1"
+                                            name="entry_time_1"
+                                            value="{{ old('entry_time_1', isset($collaborator) ? $collaborator->entry_time_1 : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                             required>
                                     </div>
 
                                     <div>
-                                        <label for="horario_saida_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                        <label for="return_time_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                             Saída 1
                                             <span class="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="time"
-                                            id="horario_saida_1"
-                                            name="horario_saida_1"
-                                            value="{{ old('horario_saida_1') }}"
+                                            id="return_time_1"
+                                            name="return_time_1"
+                                            value="{{ old('return_time_1', isset($collaborator) ? $collaborator->return_time_1 : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                             required>
                                     </div>
@@ -299,26 +288,26 @@
                                 <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Segundo Turno (Opcional)</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="horario_entrada_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                        <label for="entry_time_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                             Entrada 2
                                         </label>
                                         <input
                                             type="time"
-                                            id="horario_entrada_2"
-                                            name="horario_entrada_2"
-                                            value="{{ old('horario_entrada_2') }}"
+                                            id="entry_time_2"
+                                            name="entry_time_2"
+                                            value="{{ old('entry_time_2', isset($collaborator) ? $collaborator->entry_time_2 : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
                                     </div>
 
                                     <div>
-                                        <label for="horario_saida_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                        <label for="return_time_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                             Saída 2
                                         </label>
                                         <input
                                             type="time"
-                                            id="horario_saida_2"
-                                            name="horario_saida_2"
-                                            value="{{ old('horario_saida_2') }}"
+                                            id="return_time_2"
+                                            name="return_time_2"
+                                            value="{{ old('return_time_2', isset($collaborator) ? $collaborator->return_time_2 : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
                                     </div>
                                 </div>
@@ -333,7 +322,7 @@
                             id="save-collaborator-btn"
                             class="bg-[var(--color-main)] hover:bg-[var(--color-main-dark)] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fa-solid fa-save"></i>
-                            <span class="btn-text">Salvar Colaborador</span>
+                            <span class="btn-text">{{ isset($collaborator) ? 'Atualizar Colaborador' : 'Salvar Colaborador' }}</span>
                         </button>
 
                         <a href="{{ route('collaborator.index') }}"
@@ -380,8 +369,8 @@
                 });
             }
 
-            if (document.getElementById('celular')) {
-                document.getElementById('celular').addEventListener('input', function(e) {
+            if (document.getElementById('phone')) {
+                document.getElementById('phone').addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
                     value = value.replace(/(\d{2})(\d)/, '($1) $2');
                     value = value.replace(/(\d{5})(\d)/, '$1-$2');
@@ -389,8 +378,8 @@
                 });
             }
 
-            if (document.getElementById('cep')) {
-                document.getElementById('cep').addEventListener('input', function(e) {
+            if (document.getElementById('zip_code')) {
+                document.getElementById('zip_code').addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
                     value = value.replace(/(\d{5})(\d)/, '$1-$2');
                     e.target.value = value;
