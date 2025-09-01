@@ -14,6 +14,8 @@ export default defineConfig({
                     'resources/js/menus/departments.js',
                     'resources/js/menus/login.js',
                     'resources/js/menus/positions.js',
+                    'resources/js/menus/solicitations.js',
+                    'resources/js/menus/time-record.js',
                 ],
             refresh: true,
         }),

@@ -55,7 +55,7 @@
                     class="dropdown-btn menu-item flex items-center justify-between w-full px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)] focus:outline-none"
                     data-target="timecard-menu">
                     <div class="flex items-center">
-                        <i class="fa-solid fa-clock w-5 h-5 mr-3"></i>
+                        <i class="fa-solid fa-thumbtack w-5 h-5 mr-3"></i>
                         <span class="sidebar-text">Gestão de Ponto</span>
                     </div>
                     <i class="fa-solid fa-chevron-down dropdown-icon transition-transform duration-300 ease-in-out sidebar-text"></i>
@@ -63,14 +63,14 @@
                 <ul class="dropdown-content ml-6 mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0"
                     id="timecard-menu">
                     <li>
-                        <a href="#"
+                        <a href="{{ route('time-record.index') }}"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-clock-four w-4 h-4 mr-3"></i>
                             Registro de Ponto
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('solicitation.index') }}"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-circle-exclamation w-4 h-4 mr-3"></i>
                             Solicitações

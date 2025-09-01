@@ -6,7 +6,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
-
+use App\Http\Controllers\SolicitationController;
+use App\Http\Controllers\TimeRecordController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +36,15 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('cadastros')->group(function () {
 
+        Route::prefix('cargos')->group(function () {
+            Route::get('/', [PositionController::class, 'index'])->name('position.index');
+            Route::get('/create', [PositionController::class, 'create'])->name('position.create');
+            Route::post('/', [PositionController::class, 'store'])->name('position.store');
+            Route::get('/{id}/edit', [PositionController::class, 'edit'])->name('position.edit');
+            Route::put('/{id}', [PositionController::class, 'update'])->name('position.update');
+            Route::delete('/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
+        });
+
         Route::prefix('colaboradores')->group(function () {
             Route::get('/', [CollaboratorController::class, 'index'])->name('collaborator.index');
             Route::get('/create', [CollaboratorController::class, 'create'])->name('collaborator.create');
@@ -53,13 +63,12 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
         });
 
-        Route::prefix('cargos')->group(function () {
-            Route::get('/', [PositionController::class, 'index'])->name('position.index');
-            Route::get('/create', [PositionController::class, 'create'])->name('position.create');
-            Route::post('/', [PositionController::class, 'store'])->name('position.store');
-            Route::get('/{id}/edit', [PositionController::class, 'edit'])->name('position.edit');
-            Route::put('/{id}', [PositionController::class, 'update'])->name('position.update');
-            Route::delete('/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
+        Route::prefix('registro-ponto')->group(function () {
+            Route::get('/', [TimeRecordController::class, 'index'])->name('time-record.index');
+        });
+
+        Route::prefix('solicitacoes')->group(function () {
+            Route::get('/', [SolicitationController::class, 'index'])->name('solicitation.index');
         });
     });
 
