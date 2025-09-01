@@ -13,13 +13,11 @@ class DepartmentController extends Controller
     {
         $query = DepartmentModel::with(['positions.collaborators']);
 
-        // Filtro de busca
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%{$search}%");
         }
 
-        // Ordenação
         $sortBy = $request->get('sort_by', 'name');
         $sortDirection = $request->get('sort_direction', 'asc');
 
@@ -27,23 +25,19 @@ class DepartmentController extends Controller
             $query->orderBy($sortBy, $sortDirection);
         }
 
-        // Adicionar contagem de relacionamentos
         $query->withCount(['positions', 'collaborators']);
 
         $departments = $query->paginate(10)->withQueryString();
 
-        // Calcular estatísticas corretas do banco total
         $allDepartments = DepartmentModel::withCount(['positions', 'collaborators'])->get();
         $withPositions = $allDepartments->where('positions_count', '>', 0)->count();
         $withCollaborators = $allDepartments->where('collaborators_count', '>', 0)->count();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Departamentos', 'url' => null]
         ];
 
-        // Se for uma requisição AJAX, retornar apenas os dados necessários
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -62,7 +56,6 @@ class DepartmentController extends Controller
 
     public function create()
     {
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Departamentos', 'url' => null],
@@ -92,7 +85,6 @@ class DepartmentController extends Controller
     {
         $department = DepartmentModel::findOrFail($id);
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Departamentos', 'url' => route('department.index')],
@@ -125,7 +117,7 @@ class DepartmentController extends Controller
         try {
             $department = DepartmentModel::findOrFail($id);
 
-            // Verificar se o departamento possui colaboradores vinculados
+
             if ($department->collaborators()->count() > 0) {
                 return redirect()->back()
                     ->withErrors(['error' => 'Não é possível excluir este departamento pois existem colaboradores vinculados a ele.']);

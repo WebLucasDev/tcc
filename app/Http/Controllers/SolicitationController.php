@@ -8,8 +8,6 @@ class SolicitationController extends Controller
 {
     public function index()
     {
-
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Gestão de Ponto', 'url' => null],
             ['label' => 'Solicitações', 'url' => null]

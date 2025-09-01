@@ -16,7 +16,6 @@ class CollaboratorController extends Controller
     {
         $query = CollaboratorModel::with(['position.department']);
 
-        // Filtro de busca
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -31,19 +30,16 @@ class CollaboratorController extends Controller
             });
         }
 
-        // Filtro por departamento (via position)
         if ($request->filled('department_id')) {
             $query->whereHas('position', function ($q) use ($request) {
                 $q->where('department_id', $request->department_id);
             });
         }
 
-        // Filtro por cargo
         if ($request->filled('position_id')) {
             $query->where('position_id', $request->position_id);
         }
 
-        // Ordenação
         $sortBy = $request->get('sort_by', 'name');
         $sortDirection = $request->get('sort_direction', 'asc');
 
@@ -53,24 +49,20 @@ class CollaboratorController extends Controller
 
         $collaborators = $query->paginate(10)->withQueryString();
 
-        // Departamentos e cargos para os filtros
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::orderBy('name')->get();
 
-        // Calcular estatísticas corretas do banco total (via position)
         $allCollaborators = CollaboratorModel::with('position')->get();
         $withDepartment = $allCollaborators->filter(function ($collaborator) {
             return $collaborator->position && $collaborator->position->department_id;
         })->count();
         $withPosition = $allCollaborators->where('position_id', '!=', null)->count();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Colaboradores', 'url' => null]
         ];
 
-        // Se for uma requisição AJAX, retornar apenas os dados necessários
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -89,11 +81,9 @@ class CollaboratorController extends Controller
 
     public function create()
     {
-        // Departamentos e cargos para os selects
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::with('department')->orderBy('name')->get();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Colaborador', 'url' => null],
@@ -106,7 +96,6 @@ class CollaboratorController extends Controller
     public function store(CollaboratorStoreRequest $request)
     {
         try {
-            // Log dos dados recebidos para debug
             Log::info('Dados recebidos para criar colaborador:', $request->all());
 
             $collaborator = CollaboratorModel::create([
@@ -124,7 +113,7 @@ class CollaboratorController extends Controller
                 'return_time_1' => $request->return_time_1,
                 'entry_time_2' => $request->entry_time_2,
                 'return_time_2' => $request->return_time_2,
-                'password' => 'senha123', // Senha padrão temporária
+                'password' => 'senha123',
             ]);
 
             Log::info('Colaborador criado com sucesso:', ['id' => $collaborator->id]);
@@ -132,7 +121,6 @@ class CollaboratorController extends Controller
             return redirect()->route('collaborator.index')
                 ->with('success', 'Colaborador criado com sucesso!');
         } catch (\Exception $e) {
-            // Log do erro específico
             Log::error('Erro ao criar colaborador:', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -150,11 +138,9 @@ class CollaboratorController extends Controller
     {
         $collaborator = CollaboratorModel::findOrFail($id);
 
-        // Departamentos e cargos para os selects
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::with('department')->orderBy('name')->get();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Colaborador', 'url' => null],

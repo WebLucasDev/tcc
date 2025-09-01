@@ -14,7 +14,6 @@ class PositionController extends Controller
     {
         $query = PositionModel::with(['department', 'collaborators']);
 
-        // Filtro de busca
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -25,12 +24,10 @@ class PositionController extends Controller
             });
         }
 
-        // Filtro por departamento
         if ($request->filled('department_id')) {
             $query->where('department_id', $request->department_id);
         }
 
-        // Ordenação
         $sortBy = $request->get('sort_by', 'name');
         $sortDirection = $request->get('sort_direction', 'asc');
 
@@ -38,26 +35,21 @@ class PositionController extends Controller
             $query->orderBy($sortBy, $sortDirection);
         }
 
-        // Adicionar contagem de colaboradores
         $query->withCount('collaborators');
 
         $positions = $query->paginate(10)->withQueryString();
 
-        // Departamentos para o filtro
         $departments = DepartmentModel::orderBy('name')->get();
 
-        // Calcular estatísticas corretas do banco total
         $allPositions = PositionModel::all();
         $withDepartment = $allPositions->where('department_id', '!=', null)->count();
         $withoutDepartment = $allPositions->where('department_id', null)->count();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Cargos', 'url' => null]
         ];
 
-        // Se for uma requisição AJAX, retornar apenas os dados necessários
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -76,10 +68,8 @@ class PositionController extends Controller
 
     public function create()
     {
-        // Departamentos para o select
         $departments = DepartmentModel::orderBy('name')->get();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Cargos', 'url' => null],
@@ -110,10 +100,8 @@ class PositionController extends Controller
     {
         $position = PositionModel::findOrFail($id);
 
-        // Departamentos para o select
         $departments = DepartmentModel::orderBy('name')->get();
 
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
             ['label' => 'Cargos', 'url' => route('position.index')],
@@ -147,7 +135,7 @@ class PositionController extends Controller
         try {
             $position = PositionModel::findOrFail($id);
 
-            // Verificar se o cargo possui colaboradores vinculados
+
             if ($position->collaborators()->count() > 0) {
                 return redirect()->back()
                     ->withErrors(['error' => 'Não é possível excluir este cargo pois existem colaboradores vinculados a ele.']);

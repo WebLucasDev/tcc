@@ -8,8 +8,6 @@ class TimeRecordController extends Controller
 {
     public function index()
     {
-
-        // Breadcrumbs
         $breadcrumbs = [
             ['label' => 'Gestão de Ponto', 'url' => null],
             ['label' => 'Registro de Ponto', 'url' => null]

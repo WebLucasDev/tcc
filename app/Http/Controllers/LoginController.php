@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+
+    /**
+     * Exibe a tela de login
+     */
     public function index()
     {
         return view('login.index');

@@ -8,13 +8,12 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     /**
-     * Display the dashboard.
+     * Exibe o Dashboard mostrando o usuário autenticado.
      */
     public function index()
     {
         $user = Auth::user();
 
-        
         return view('auth.dashboard.index', compact('user'));
     }
 }
