@@ -93,6 +93,14 @@ class CollaboratorModel extends Authenticatable
     }
 
     /**
+     * Get the time tracking records for the collaborator.
+     */
+    public function timeTrackings()
+    {
+        return $this->hasMany(TimeTrackingModel::class, 'collaborator_id');
+    }
+
+    /**
      * Format CPF for display.
      */
     public function getFormattedCpfAttribute()

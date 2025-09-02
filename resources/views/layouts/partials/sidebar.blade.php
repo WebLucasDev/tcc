@@ -63,7 +63,7 @@
                 <ul class="dropdown-content ml-6 mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0"
                     id="timecard-menu">
                     <li>
-                        <a href="{{ route('time-record.index') }}"
+                        <a href="{{ route('time-tracking.index') }}"
                             class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
                             <i class="fa-solid fa-clock-four w-4 h-4 mr-3"></i>
                             Registro de Ponto

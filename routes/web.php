@@ -7,7 +7,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\SolicitationController;
-use App\Http\Controllers\TimeRecordController;
+use App\Http\Controllers\TimeTrackingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('registro-ponto')->group(function () {
-            Route::get('/', [TimeRecordController::class, 'index'])->name('time-record.index');
+            Route::get('/', [TimeTrackingController::class , 'index'])->name('time-tracking.index');
         });
 
         Route::prefix('solicitacoes')->group(function () {
