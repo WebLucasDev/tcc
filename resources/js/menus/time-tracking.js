@@ -1,75 +1,97 @@
+// Time Tracking page functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Cache de elementos DOM
-    const elements = {
-        currentTime: document.getElementById('current-time'),
-        currentDate: document.getElementById('current-date'),
-        searchInput: document.getElementById('search'),
-        searchSuggestions: document.getElementById('search-suggestions'),
-        collaboratorSelect: document.getElementById('collaborator_id'),
-        sortBy: document.querySelector('select[name="sort_by"]'),
-        sortDirection: document.querySelector('button[name="sort_direction"]'),
-        clearFiltersBtn: document.getElementById('btn-clear-filters')
+    console.log('Time Tracking JS carregado');
+
+    // Cache dos elementos
+    const searchInput = document.querySelector('input[name="search"]');
+    const collaboratorSelect = document.querySelector('select[name="collaborator_id"]');
+    const sortBySelect = document.querySelector('select[name="sort_by"]');
+    const sortDirectionBtn = document.querySelector('[name="sort_direction"]');
+    const tableContainer = document.getElementById('table-container');
+    const paginationContainer = document.getElementById('pagination-container');
+    const resultsSummary = document.getElementById('results-summary');
+
+    // Elementos do relógio
+    const currentTime = document.getElementById('current-time');
+    const currentDate = document.getElementById('current-date');
+
+    // Debug: Verificar se os elementos foram encontrados
+    console.log('Elementos encontrados:', {
+        searchInput: !!searchInput,
+        collaboratorSelect: !!collaboratorSelect,
+        sortBySelect: !!sortBySelect,
+        sortDirectionBtn: !!sortDirectionBtn,
+        tableContainer: !!tableContainer,
+        paginationContainer: !!paginationContainer,
+        currentTime: !!currentTime,
+        currentDate: !!currentDate
+    });
+
+    // Estado atual dos filtros
+    let currentFilters = {
+        search: searchInput ? searchInput.value : '',
+        collaborator_id: collaboratorSelect ? collaboratorSelect.value : '',
+        sort_by: sortBySelect ? sortBySelect.value : 'date',
+        sort_direction: getSortDirection()
     };
 
-    // Estado da aplicação
-    let searchTimeout = null;
-    const collaborators = window.timeTrackingData?.collaborators || [];
+    // Inicializar relógio digital
+    initClock();
 
-    // Inicialização
-    init();
-
-    function init() {
-        initClock();
-        bindEvents();
-        console.log('Sistema de registro de ponto inicializado');
-    }
-
-    function bindEvents() {
-        // Relógio digital
-        updateClock();
-        setInterval(updateClock, 1000);
-
-        // Busca com autocompletar
-        if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', handleSearchInput);
-            elements.searchInput.addEventListener('focus', handleSearchFocus);
-            elements.searchInput.addEventListener('blur', handleSearchBlur);
-        }
-
-        // Eventos de ordenação
-        if (elements.sortBy) {
-            elements.sortBy.addEventListener('change', handleSortChange);
-        }
-
-        if (elements.sortDirection) {
-            elements.sortDirection.addEventListener('click', handleSortDirectionChange);
-        }
-
-        // Limpar filtros
-        if (elements.clearFiltersBtn) {
-            elements.clearFiltersBtn.addEventListener('click', clearFilters);
-        }
-
-        // Botões de ação nas tabelas
-        bindTableEvents();
-
-        // Paginação AJAX
-        bindPaginationEvents();
-
-        // Clique fora das sugestões
-        document.addEventListener('click', function(e) {
-            if (!elements.searchInput?.contains(e.target) && !elements.searchSuggestions?.contains(e.target)) {
-                hideSuggestions();
-            }
+    // Auto-submit do filtro de busca com debounce
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentFilters.search = this.value;
+                performAjaxSearch();
+            }, 500);
         });
     }
 
-    function initClock() {
-        // Clock já será atualizado no bindEvents
+    // Event listener para filtro de colaborador
+    if (collaboratorSelect) {
+        collaboratorSelect.addEventListener('change', function() {
+            currentFilters.collaborator_id = this.value;
+            performAjaxSearch();
+        });
     }
 
+    // Event listener para ordenação
+    if (sortBySelect) {
+        sortBySelect.addEventListener('change', function() {
+            currentFilters.sort_by = this.value;
+            performAjaxSearch();
+        });
+    }
+
+    if (sortDirectionBtn) {
+        sortDirectionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentDirection = this.value;
+            currentFilters.sort_direction = currentDirection === 'asc' ? 'desc' : 'asc';
+            performAjaxSearch();
+        });
+    }
+
+    // Função para obter direção atual de ordenação
+    function getSortDirection() {
+        if (sortDirectionBtn) {
+            return sortDirectionBtn.value || 'desc';
+        }
+        return 'desc';
+    }
+
+    // Função para inicializar o relógio digital
+    function initClock() {
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+
+    // Função para atualizar o relógio
     function updateClock() {
-        if (!elements.currentTime || !elements.currentDate) return;
+        if (!currentTime || !currentDate) return;
 
         const now = new Date();
         
@@ -80,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             second: '2-digit',
             hour12: false
         });
-        elements.currentTime.textContent = timeString;
+        currentTime.textContent = timeString;
         
         // Atualizar data
         const dateString = now.toLocaleDateString('pt-BR', {
@@ -89,125 +111,249 @@ document.addEventListener('DOMContentLoaded', function() {
             month: 'long',
             day: 'numeric'
         });
-        elements.currentDate.textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+        currentDate.textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
     }
 
-    function handleSearchInput(e) {
-        const query = e.target.value.trim();
+    // Função principal para realizar busca AJAX
+    function performAjaxSearch() {
+        console.log('Executando busca AJAX com filtros:', currentFilters);
         
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            if (query.length >= 1) {
-                showSuggestions(query);
-            } else {
-                hideSuggestions();
-            }
-        }, 300);
-    }
-
-    function handleSearchFocus(e) {
-        const query = e.target.value.trim();
-        if (query.length >= 1) {
-            showSuggestions(query);
-        }
-    }
-
-    function handleSearchBlur(e) {
-        // Delay para permitir clique nas sugestões
-        setTimeout(() => {
-            hideSuggestions();
-        }, 200);
-    }
-
-    function showSuggestions(query) {
-        if (!elements.searchSuggestions) return;
-
-        const filteredCollaborators = collaborators.filter(collaborator =>
-            collaborator.name.toLowerCase().includes(query.toLowerCase())
-        );
-
-        if (filteredCollaborators.length === 0) {
-            hideSuggestions();
+        // Verificar se GlobalLoading existe
+        if (!window.GlobalLoading) {
+            console.error('GlobalLoading não encontrado!');
             return;
         }
 
-        const suggestionsHtml = filteredCollaborators.map(collaborator => `
-            <div class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer suggestion-item" 
-                 data-name="${collaborator.name}" 
-                 data-id="${collaborator.id}">
-                <div class="text-sm font-medium text-[var(--color-text)]">${collaborator.name}</div>
-                <div class="text-xs text-[var(--color-text)] opacity-70">${collaborator.position.name}</div>
-            </div>
-        `).join('');
+        // Usar o sistema de loading global
+        window.GlobalLoading.show('Buscando registros...');
 
-        elements.searchSuggestions.innerHTML = suggestionsHtml;
-        elements.searchSuggestions.classList.remove('hidden');
+        // Construir parâmetros da URL
+        const params = new URLSearchParams();
+        Object.keys(currentFilters).forEach(key => {
+            if (currentFilters[key]) {
+                params.set(key, currentFilters[key]);
+            }
+        });
 
-        // Bind eventos das sugestões
-        elements.searchSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const name = this.dataset.name;
-                const id = this.dataset.id;
-                
-                elements.searchInput.value = name;
-                if (elements.collaboratorSelect) {
-                    elements.collaboratorSelect.value = id;
+        // Atualizar URL sem recarregar a página
+        const newUrl = '/cadastros/registro-ponto' + (params.toString() ? '?' + params.toString() : '');
+        console.log('URL da requisição:', newUrl);
+        
+        window.history.pushState({}, '', newUrl);
+
+        // Fazer requisição AJAX usando fetch normal
+        fetch(newUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Resposta recebida:', response.status, response.headers.get('content-type'));
+            
+            // Verificar se a resposta é JSON válida
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                throw new Error('Resposta não é JSON válida');
+            }
+        })
+        .then(data => {
+            console.log('Dados recebidos:', data);
+            
+            if (data.success) {
+                updateContent(data);
+                updateSortButton();
+                updateResultsSummary();
+            } else {
+                showError(data.message || 'Erro ao carregar os dados');
+            }
+        })
+        .catch(error => {
+            console.error('Erro na busca:', error);
+            showError('Erro ao carregar os dados. Tente novamente.');
+        })
+        .finally(() => {
+            if (window.GlobalLoading) {
+                window.GlobalLoading.hide();
+            }
+        });
+    }
+
+    // Função para atualizar o conteúdo da página
+    function updateContent(data) {
+        console.log('Atualizando conteúdo com:', data);
+        
+        if (tableContainer && data.html) {
+            console.log('Atualizando tabela');
+            tableContainer.innerHTML = data.html;
+        } else {
+            console.error('tableContainer não encontrado ou data.html vazio');
+        }
+
+        if (paginationContainer) {
+            console.log('Atualizando paginação');
+            paginationContainer.innerHTML = data.pagination || '';
+        } else {
+            console.error('paginationContainer não encontrado');
+        }
+
+        // Reanexar eventos após atualizar o conteúdo
+        reattachEvents();
+    }
+
+    // Função para reanexar todos os eventos após atualização de conteúdo
+    function reattachEvents() {
+        // Reanexar eventos de ordenação
+        const newSortBySelect = document.querySelector('select[name="sort_by"]');
+        const newSortDirectionBtn = document.querySelector('[name="sort_direction"]');
+
+        if (newSortBySelect) {
+            newSortBySelect.addEventListener('change', function() {
+                currentFilters.sort_by = this.value;
+                performAjaxSearch();
+            });
+        }
+
+        if (newSortDirectionBtn) {
+            newSortDirectionBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentDirection = this.value;
+                currentFilters.sort_direction = currentDirection === 'asc' ? 'desc' : 'asc';
+                performAjaxSearch();
+            });
+        }
+
+        // Anexar outros eventos
+        attachPaginationEvents();
+        attachTableEvents();
+        attachClearFiltersEvent();
+    }
+
+    // Função para atualizar o botão de ordenação
+    function updateSortButton() {
+        console.log('Atualizando botão de ordenação');
+        
+        if (sortDirectionBtn) {
+            const icon = sortDirectionBtn.querySelector('i');
+            if (icon) {
+                icon.className = `fa-solid fa-sort-${currentFilters.sort_direction === 'asc' ? 'up' : 'down'}`;
+            }
+            sortDirectionBtn.value = currentFilters.sort_direction;
+            console.log('Botão de direção atualizado para:', currentFilters.sort_direction);
+        }
+
+        // Atualizar o select de ordenação
+        if (sortBySelect) {
+            sortBySelect.value = currentFilters.sort_by;
+            console.log('Select de ordenação atualizado para:', currentFilters.sort_by);
+        }
+    }
+
+    // Função para atualizar resumo dos resultados
+    function updateResultsSummary() {
+        if (resultsSummary) {
+            const hasFilters = currentFilters.search || currentFilters.collaborator_id;
+            console.log('Atualizando resumo. Filtros ativos:', hasFilters, currentFilters);
+            resultsSummary.style.display = hasFilters ? 'inline' : 'none';
+        } else {
+            console.log('results-summary element não encontrado');
+        }
+    }
+
+    // Função para anexar eventos de paginação
+    function attachPaginationEvents() {
+        const paginationButtons = document.querySelectorAll('.pagination-btn');
+        console.log('Anexando eventos de paginação. Botões encontrados:', paginationButtons.length);
+        
+        paginationButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.dataset.page;
+                console.log('Clique na paginação, página:', page);
+                if (page) {
+                    performAjaxPagination(page);
                 }
-                hideSuggestions();
             });
         });
     }
 
-    function hideSuggestions() {
-        if (elements.searchSuggestions) {
-            elements.searchSuggestions.classList.add('hidden');
-        }
-    }
-
-    function handleSortChange() {
-        submitForm();
-    }
-
-    function handleSortDirectionChange(e) {
-        e.preventDefault();
-        const currentDirection = e.target.value;
-        const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-        e.target.value = newDirection;
+    // Função para paginação AJAX
+    function performAjaxPagination(page) {
+        console.log('Executando paginação AJAX para página:', page);
         
-        // Atualizar ícone
-        const icon = e.target.querySelector('i');
-        if (icon) {
-            icon.className = `fa-solid fa-sort-${newDirection === 'asc' ? 'up' : 'down'}`;
+        // Verificar se GlobalLoading existe
+        if (!window.GlobalLoading) {
+            console.error('GlobalLoading não encontrado!');
+            return;
         }
-        
-        submitForm();
-    }
 
-    function submitForm() {
-        const form = elements.sortBy?.closest('form');
-        if (form) {
-            // Criar input hidden para sort_direction
-            let sortDirectionInput = form.querySelector('input[name="sort_direction"]');
-            if (!sortDirectionInput) {
-                sortDirectionInput = document.createElement('input');
-                sortDirectionInput.type = 'hidden';
-                sortDirectionInput.name = 'sort_direction';
-                form.appendChild(sortDirectionInput);
+        // Usar o sistema de loading global
+        window.GlobalLoading.show('Carregando página...');
+
+        const params = new URLSearchParams();
+        Object.keys(currentFilters).forEach(key => {
+            if (currentFilters[key]) {
+                params.set(key, currentFilters[key]);
             }
-            sortDirectionInput.value = elements.sortDirection?.value || 'desc';
+        });
+        params.set('page', page);
+
+        const url = '/cadastros/registro-ponto' + '?' + params.toString();
+        console.log('URL da paginação:', url);
+
+        // Atualizar URL sem recarregar a página
+        window.history.pushState({}, '', url);
+
+        // Usar fetch normal
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Resposta da paginação:', response.status);
             
-            form.submit();
-        }
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                throw new Error('Resposta não é JSON válida');
+            }
+        })
+        .then(data => {
+            console.log('Dados da paginação:', data);
+            
+            if (data.success) {
+                updateContent(data);
+                updateResultsSummary();
+            } else {
+                showError(data.message || 'Erro ao carregar os dados');
+            }
+        })
+        .catch(error => {
+            console.error('Erro na paginação:', error);
+            showError('Erro ao carregar página. Tente novamente.');
+        })
+        .finally(() => {
+            if (window.GlobalLoading) {
+                window.GlobalLoading.hide();
+            }
+        });
     }
 
-    function clearFilters() {
-        window.location.href = window.location.pathname;
-    }
-
-    function bindTableEvents() {
+    // Função para anexar eventos de tabela
+    function attachTableEvents() {
         // Botões de editar
-        document.querySelectorAll('.edit-tracking-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        const editButtons = document.querySelectorAll('.edit-tracking-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
                 const trackingId = this.dataset.trackingId;
                 const collaboratorName = this.dataset.trackingCollaborator;
                 editTimeTracking(trackingId, collaboratorName);
@@ -215,8 +361,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Botões de excluir
-        document.querySelectorAll('.delete-tracking-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        const deleteButtons = document.querySelectorAll('.delete-tracking-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
                 const trackingId = this.dataset.trackingId;
                 const collaboratorName = this.dataset.trackingCollaborator;
                 const date = this.dataset.trackingDate;
@@ -225,102 +372,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function bindPaginationEvents() {
-        document.querySelectorAll('.pagination-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const page = this.dataset.page;
-                if (page) {
-                    loadPage(page);
-                }
-            });
-        });
-    }
-
-    async function loadPage(page) {
-        try {
-            // Mostrar loading global
-            window.GlobalLoading.show('Carregando página...');
-
-            // Construir URL com parâmetros atuais
-            const url = new URL(window.location.href);
-            url.searchParams.set('page', page);
-
-            // Fazer requisição AJAX
-            const response = await fetch(url.toString(), {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'text/html',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const html = await response.text();
-            
-            // Parse do HTML retornado
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Extrair apenas a tabela do HTML retornado
-            const newTableContainer = doc.querySelector('#time-tracking-container');
-            const currentTableContainer = document.querySelector('#time-tracking-container');
-            
-            if (newTableContainer && currentTableContainer) {
-                currentTableContainer.innerHTML = newTableContainer.innerHTML;
-                
-                // Re-bind eventos após atualizar conteúdo
-                bindTableEvents();
-                bindPaginationEvents();
-                
-                // Atualizar URL do browser sem recarregar
-                window.history.pushState(null, '', url.toString());
-                
-                // Scroll suave para o topo da tabela
-                currentTableContainer.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
-
-        } catch (error) {
-            console.error('Erro ao carregar página:', error);
-            showError('Erro ao carregar dados. Tente novamente.');
-        } finally {
-            window.GlobalLoading.hide();
+    // Função para anexar evento de limpar filtros
+    function attachClearFiltersEvent() {
+        const clearFiltersBtn = document.getElementById('btn-clear-filters');
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', clearFilters);
         }
     }
 
+    // Função para limpar filtros
+    function clearFilters() {
+        currentFilters = {
+            search: '',
+            collaborator_id: '',
+            sort_by: 'date',
+            sort_direction: 'desc'
+        };
+
+        // Limpar campos do formulário
+        if (searchInput) searchInput.value = '';
+        if (collaboratorSelect) collaboratorSelect.value = '';
+        if (sortBySelect) sortBySelect.value = 'date';
+
+        // Realizar nova busca
+        performAjaxSearch();
+    }
+
+    // Função para mostrar erro
     function showError(message) {
-        // Criar toast de erro
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-transform duration-300 translate-x-full';
-        toast.innerHTML = `
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-exclamation-circle"></i>
-                <span>${message}</span>
-            </div>
-        `;
+        console.error('Erro detalhado:', message);
+
+        // Se houver um elemento de loading ativo, escondê-lo
+        if (window.GlobalLoading) {
+            window.GlobalLoading.hide();
+        }
+
+        // Mostrar erro em alert temporariamente para debug
+        alert('Erro: ' + message);
         
-        document.body.appendChild(toast);
-        
-        // Animar entrada
-        setTimeout(() => {
-            toast.classList.remove('translate-x-full');
-        }, 100);
-        
-        // Remover após 3 segundos
-        setTimeout(() => {
-            toast.classList.add('translate-x-full');
-            setTimeout(() => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
+        // TODO: Implementar toast de erro em vez de alert
+        // window.location.href = '/cadastros/registro-ponto?error=' + encodeURIComponent(message);
     }
 
     // Funções globais para os botões
@@ -338,14 +429,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Auto-update da contagem de resultados
-    function updateResultsSummary() {
-        const resultsElement = document.getElementById('results-summary');
-        if (resultsElement && (elements.searchInput?.value || elements.collaboratorSelect?.value)) {
-            resultsElement.style.display = 'inline';
-        }
-    }
+    // Anexar eventos iniciais
+    attachTableEvents();
+    attachClearFiltersEvent();
+    attachPaginationEvents(); // Anexar eventos de paginação na inicialização
 
-    // Atualizar resumo de resultados na inicialização
-    updateResultsSummary();
+    // Atualizações iniciais
+    updateSortButton(); // Garantir que o botão de ordenação está correto
+    updateResultsSummary(); // Atualizar resumo inicial
+    
+    console.log('Inicialização completa. Estado dos filtros:', currentFilters);
 });

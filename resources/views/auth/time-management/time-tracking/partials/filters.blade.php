@@ -49,19 +49,6 @@
                     </select>
                 </div>
             </div>
-
-            <div class="flex gap-3">
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-[var(--color-main)] hover:bg-[var(--color-main-dark)] text-white font-medium rounded-lg transition-colors duration-200">
-                    <i class="fa-solid fa-search mr-2"></i>
-                    Buscar
-                </button>
-                @if(request('search') || request('collaborator_id'))
-                    <a href="{{ route('time-tracking.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors duration-200">
-                        <i class="fa-solid fa-times mr-2"></i>
-                        Limpar Filtros
-                    </a>
-                @endif
-            </div>
         </form>
     </div>
 </div>

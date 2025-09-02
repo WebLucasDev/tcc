@@ -19,7 +19,6 @@
                         class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-[var(--color-background)] text-[var(--color-text)]">
                         <option value="date" {{ request('sort_by', 'date') == 'date' ? 'selected' : '' }}>Data</option>
                         <option value="collaborator" {{ request('sort_by') == 'collaborator' ? 'selected' : '' }}>Colaborador</option>
-                        <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Data de Criação</option>
                     </select>
 
                     <button
@@ -201,11 +200,6 @@
                 </div>
             @endforeach
         </div>
-
-        <!-- Paginação -->
-        @if($timeTrackings->hasPages())
-            @include('auth.time-management.time-tracking.partials.pagination', ['paginator' => $timeTrackings])
-        @endif
     @else
         <!-- Estado Vazio -->
         <div class="px-6 py-12 text-center">

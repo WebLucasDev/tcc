@@ -40,15 +40,22 @@
         @include('auth.time-management.time-tracking.partials.filters')
 
         <!-- Histórico de Pontos -->
-        @include('auth.time-management.time-tracking.partials.table')
+        <div id="table-container">
+            @include('auth.time-management.time-tracking.partials.table')
+        </div>
+
+        <!-- Paginação -->
+        <div id="pagination-container">
+            @if($timeTrackings->hasPages())
+                @include('auth.time-management.time-tracking.partials.pagination', [
+                    'paginator' => $timeTrackings,
+                    'paginationInfo' => $paginationInfo
+                ])
+            @endif
+        </div>
     </div>
 @endsection
 
 @push('scripts')
-    <script>
-        window.timeTrackingData = {
-            collaborators: @json($collaborators)
-        };
-    </script>
     @vite(['resources/js/menus/time-tracking.js'])
 @endpush

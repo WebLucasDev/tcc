@@ -34,23 +34,17 @@
             @endif
 
             {{-- Números das páginas --}}
-            @php
-                $start = max(1, $paginator->currentPage() - 5);
-                $end = min($paginator->lastPage(), $start + 9);
-                $start = max(1, $end - 9);
-            @endphp
-
-            @if($start > 1)
+            @if($paginationInfo['start'] > 1)
                 <button type="button" data-page="1"
                         class="pagination-btn inline-flex items-center px-3 py-2 text-sm bg-[var(--color-background)] border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-[var(--color-text)] transition-colors duration-200">
                     1
                 </button>
-                @if($start > 2)
+                @if($paginationInfo['start'] > 2)
                     <span class="inline-flex items-center px-3 py-2 text-sm text-gray-400">...</span>
                 @endif
             @endif
 
-            @for($page = $start; $page <= $end; $page++)
+            @for($page = $paginationInfo['start']; $page <= $paginationInfo['end']; $page++)
                 @if($page == $paginator->currentPage())
                     <span class="inline-flex items-center px-3 py-2 text-sm bg-[var(--color-main)] border border-[var(--color-main)] rounded-lg text-white font-medium">
                         {{ $page }}
@@ -63,8 +57,8 @@
                 @endif
             @endfor
 
-            @if($end < $paginator->lastPage())
-                @if($end < $paginator->lastPage() - 1)
+            @if($paginationInfo['end'] < $paginator->lastPage())
+                @if($paginationInfo['end'] < $paginator->lastPage() - 1)
                     <span class="inline-flex items-center px-3 py-2 text-sm text-gray-400">...</span>
                 @endif
                 <button type="button" data-page="{{ $paginator->lastPage() }}"
