@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             PositionSeeder::class,
             CollaboratorSeeder::class,
+            TimeTrackingSeeder::class,
         ]);
     }
 }
