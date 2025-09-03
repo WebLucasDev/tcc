@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentTime = document.getElementById('current-time');
     const currentDate = document.getElementById('current-date');
 
+    // Elementos do formulário de registro
+    const timeTrackingForm = document.getElementById('time-tracking-form');
+    const collaboratorIdSelect = timeTrackingForm ? timeTrackingForm.querySelector('#collaborator_id') : null;
+    const trackingTypeSelect = timeTrackingForm ? timeTrackingForm.querySelector('#tracking_type') : null;
+    const dateInput = timeTrackingForm ? timeTrackingForm.querySelector('#date') : null;
+    const timeInput = timeTrackingForm ? timeTrackingForm.querySelector('#time') : null;
+    const timeObservationInput = timeTrackingForm ? timeTrackingForm.querySelector('#time_observation') : null;
+    const charCounter = timeTrackingForm ? timeTrackingForm.querySelector('#char-counter') : null;
+
     // Debug: Verificar se os elementos foram encontrados
     console.log('Elementos encontrados:', {
         searchInput: !!searchInput,
@@ -24,7 +33,12 @@ document.addEventListener('DOMContentLoaded', function() {
         tableContainer: !!tableContainer,
         paginationContainer: !!paginationContainer,
         currentTime: !!currentTime,
-        currentDate: !!currentDate
+        currentDate: !!currentDate,
+        timeTrackingForm: !!timeTrackingForm,
+        collaboratorIdSelect: !!collaboratorIdSelect,
+        trackingTypeSelect: !!trackingTypeSelect,
+        timeObservationInput: !!timeObservationInput,
+        charCounter: !!charCounter
     });
 
     // Estado atual dos filtros
@@ -37,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Inicializar relógio digital
     initClock();
+
+    // Inicializar formulário de registro
+    initTimeTrackingForm();
 
     // Auto-submit do filtro de busca com debounce
     if (searchInput) {
@@ -94,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentTime || !currentDate) return;
 
         const now = new Date();
-        
+
         // Atualizar hora
         const timeString = now.toLocaleTimeString('pt-BR', {
             hour: '2-digit',
@@ -103,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hour12: false
         });
         currentTime.textContent = timeString;
-        
+
         // Atualizar data
         const dateString = now.toLocaleDateString('pt-BR', {
             weekday: 'long',
@@ -112,12 +129,129 @@ document.addEventListener('DOMContentLoaded', function() {
             day: 'numeric'
         });
         currentDate.textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
+        // Atualizar campos de data e hora do formulário se existirem
+        updateFormDateTime(now);
+    }
+
+    // Função para inicializar o formulário de registro de ponto
+    function initTimeTrackingForm() {
+        if (!timeTrackingForm) return;
+
+        console.log('Inicializando formulário de registro de ponto');
+
+        // Atualizar campos de data e hora a cada segundo
+        updateFormDateTime(new Date());
+
+        // Event listener para o formulário
+        timeTrackingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitTimeTracking();
+        });
+
+        // Auto-completar horário atual quando o tipo é selecionado
+        if (trackingTypeSelect) {
+            trackingTypeSelect.addEventListener('change', function() {
+                if (this.value && timeInput) {
+                    const now = new Date();
+                    const currentTime = now.toTimeString().slice(0, 5);
+                    timeInput.value = currentTime;
+                }
+            });
+        }
+
+        // Contador de caracteres para observação
+        if (timeObservationInput && charCounter) {
+            timeObservationInput.addEventListener('input', function() {
+                const currentLength = this.value.length;
+                charCounter.textContent = `${currentLength}/30`;
+
+                // Mudança de cor baseada no limite
+                if (currentLength >= 25) {
+                    charCounter.className = 'text-xs text-red-500';
+                } else if (currentLength >= 20) {
+                    charCounter.className = 'text-xs text-yellow-500';
+                } else {
+                    charCounter.className = 'text-xs text-gray-500';
+                }
+            });
+        }
+    }    // Função para atualizar data e hora no formulário
+    function updateFormDateTime(now) {
+        if (dateInput && !dateInput.value) {
+            const dateString = now.toISOString().split('T')[0];
+            dateInput.value = dateString;
+        }
+
+        if (timeInput && !timeInput.value) {
+            const timeString = now.toTimeString().slice(0, 5);
+            timeInput.value = timeString;
+        }
+    }
+
+    // Função para enviar registro de ponto via formulário normal
+    function submitTimeTracking() {
+        if (!timeTrackingForm) return;
+
+        console.log('Enviando registro de ponto');
+
+        // Validação básica
+        const collaboratorId = collaboratorIdSelect ? collaboratorIdSelect.value : '';
+        const trackingType = trackingTypeSelect ? trackingTypeSelect.value : '';
+
+        if (!collaboratorId) {
+            alert('Por favor, selecione um colaborador.');
+            return;
+        }
+
+        if (!trackingType) {
+            alert('Por favor, selecione o tipo de registro.');
+            return;
+        }
+
+        // Usar o sistema de loading global
+        if (window.GlobalLoading) {
+            window.GlobalLoading.show('Registrando ponto...');
+        }
+
+        // Submit normal do formulário - não AJAX
+        // O Laravel irá processar e redirecionar com as mensagens de sucesso/erro
+        timeTrackingForm.submit();
+    }
+
+    // Função para resetar o formulário de registro
+    function resetTimeTrackingForm() {
+        if (!timeTrackingForm) return;
+
+        // Resetar campos selecionados
+        if (collaboratorIdSelect) collaboratorIdSelect.value = '';
+        if (trackingTypeSelect) trackingTypeSelect.value = '';
+
+        // Manter data atual mas limpar horário para novo registro
+        const now = new Date();
+        if (dateInput) dateInput.value = now.toISOString().split('T')[0];
+        if (timeInput) timeInput.value = now.toTimeString().slice(0, 5);
+
+        // Limpar observação e resetar contador
+        if (timeObservationInput) {
+            timeObservationInput.value = '';
+            if (charCounter) {
+                charCounter.textContent = '0/30';
+                charCounter.className = 'text-xs text-gray-500';
+            }
+        }
+
+        // Limpar observações gerais (se ainda existir)
+        const observationsField = timeTrackingForm.querySelector('#observations');
+        if (observationsField) observationsField.value = '';
+
+        console.log('Formulário resetado');
     }
 
     // Função principal para realizar busca AJAX
     function performAjaxSearch() {
         console.log('Executando busca AJAX com filtros:', currentFilters);
-        
+
         // Verificar se GlobalLoading existe
         if (!window.GlobalLoading) {
             console.error('GlobalLoading não encontrado!');
@@ -138,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Atualizar URL sem recarregar a página
         const newUrl = '/cadastros/registro-ponto' + (params.toString() ? '?' + params.toString() : '');
         console.log('URL da requisição:', newUrl);
-        
+
         window.history.pushState({}, '', newUrl);
 
         // Fazer requisição AJAX usando fetch normal
@@ -152,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             console.log('Resposta recebida:', response.status, response.headers.get('content-type'));
-            
+
             // Verificar se a resposta é JSON válida
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
@@ -163,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log('Dados recebidos:', data);
-            
+
             if (data.success) {
                 updateContent(data);
                 updateSortButton();
@@ -186,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para atualizar o conteúdo da página
     function updateContent(data) {
         console.log('Atualizando conteúdo com:', data);
-        
+
         if (tableContainer && data.html) {
             console.log('Atualizando tabela');
             tableContainer.innerHTML = data.html;
@@ -236,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para atualizar o botão de ordenação
     function updateSortButton() {
         console.log('Atualizando botão de ordenação');
-        
+
         if (sortDirectionBtn) {
             const icon = sortDirectionBtn.querySelector('i');
             if (icon) {
@@ -268,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function attachPaginationEvents() {
         const paginationButtons = document.querySelectorAll('.pagination-btn');
         console.log('Anexando eventos de paginação. Botões encontrados:', paginationButtons.length);
-        
+
         paginationButtons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -284,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para paginação AJAX
     function performAjaxPagination(page) {
         console.log('Executando paginação AJAX para página:', page);
-        
+
         // Verificar se GlobalLoading existe
         if (!window.GlobalLoading) {
             console.error('GlobalLoading não encontrado!');
@@ -319,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             console.log('Resposta da paginação:', response.status);
-            
+
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 return response.json();
@@ -329,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log('Dados da paginação:', data);
-            
+
             if (data.success) {
                 updateContent(data);
                 updateResultsSummary();
@@ -409,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Mostrar erro em alert temporariamente para debug
         alert('Erro: ' + message);
-        
+
         // TODO: Implementar toast de erro em vez de alert
         // window.location.href = '/cadastros/registro-ponto?error=' + encodeURIComponent(message);
     }
@@ -437,6 +571,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Atualizações iniciais
     updateSortButton(); // Garantir que o botão de ordenação está correto
     updateResultsSummary(); // Atualizar resumo inicial
-    
+
     console.log('Inicialização completa. Estado dos filtros:', currentFilters);
 });

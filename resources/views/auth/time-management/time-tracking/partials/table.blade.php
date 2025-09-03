@@ -82,16 +82,60 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                                {{ $tracking->entry_time_1 ? \Carbon\Carbon::parse($tracking->entry_time_1)->format('H:i') : '-' }}
+                                <div class="flex items-center gap-2">
+                                    <span>{{ $tracking->entry_time_1 ? \Carbon\Carbon::parse($tracking->entry_time_1)->format('H:i') : '-' }}</span>
+                                    @if($tracking->entry_time_1_observation)
+                                        <div class="relative group/tooltip">
+                                            <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                                {{ $tracking->entry_time_1_observation }}
+                                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                                {{ $tracking->return_time_1 ? \Carbon\Carbon::parse($tracking->return_time_1)->format('H:i') : '-' }}
+                                <div class="flex items-center gap-2">
+                                    <span>{{ $tracking->return_time_1 ? \Carbon\Carbon::parse($tracking->return_time_1)->format('H:i') : '-' }}</span>
+                                    @if($tracking->return_time_1_observation)
+                                        <div class="relative group/tooltip">
+                                            <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                                {{ $tracking->return_time_1_observation }}
+                                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                                {{ $tracking->entry_time_2 ? \Carbon\Carbon::parse($tracking->entry_time_2)->format('H:i') : '-' }}
+                                <div class="flex items-center gap-2">
+                                    <span>{{ $tracking->entry_time_2 ? \Carbon\Carbon::parse($tracking->entry_time_2)->format('H:i') : '-' }}</span>
+                                    @if($tracking->entry_time_2_observation)
+                                        <div class="relative group/tooltip">
+                                            <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                                {{ $tracking->entry_time_2_observation }}
+                                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                                {{ $tracking->return_time_2 ? \Carbon\Carbon::parse($tracking->return_time_2)->format('H:i') : '-' }}
+                                <div class="flex items-center gap-2">
+                                    <span>{{ $tracking->return_time_2 ? \Carbon\Carbon::parse($tracking->return_time_2)->format('H:i') : '-' }}</span>
+                                    @if($tracking->return_time_2_observation)
+                                        <div class="relative group/tooltip">
+                                            <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                                {{ $tracking->return_time_2_observation }}
+                                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($tracking->status->value === 'completo')
@@ -163,19 +207,63 @@
                     <div class="grid grid-cols-2 gap-3 text-sm">
                         <div>
                             <span class="text-[var(--color-text)] opacity-70">Entrada:</span>
-                            <div class="mt-1 text-[var(--color-text)]">{{ $tracking->entry_time_1 ? \Carbon\Carbon::parse($tracking->entry_time_1)->format('H:i') : '-' }}</div>
+                            <div class="mt-1 text-[var(--color-text)] flex items-center gap-2">
+                                <span>{{ $tracking->entry_time_1 ? \Carbon\Carbon::parse($tracking->entry_time_1)->format('H:i') : '-' }}</span>
+                                @if($tracking->entry_time_1_observation)
+                                    <div class="relative group/tooltip">
+                                        <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                            {{ $tracking->entry_time_1_observation }}
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                         <div>
                             <span class="text-[var(--color-text)] opacity-70">Saída Almoço:</span>
-                            <div class="mt-1 text-[var(--color-text)]">{{ $tracking->return_time_1 ? \Carbon\Carbon::parse($tracking->return_time_1)->format('H:i') : '-' }}</div>
+                            <div class="mt-1 text-[var(--color-text)] flex items-center gap-2">
+                                <span>{{ $tracking->return_time_1 ? \Carbon\Carbon::parse($tracking->return_time_1)->format('H:i') : '-' }}</span>
+                                @if($tracking->return_time_1_observation)
+                                    <div class="relative group/tooltip">
+                                        <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                            {{ $tracking->return_time_1_observation }}
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                         <div>
                             <span class="text-[var(--color-text)] opacity-70">Volta Almoço:</span>
-                            <div class="mt-1 text-[var(--color-text)]">{{ $tracking->entry_time_2 ? \Carbon\Carbon::parse($tracking->entry_time_2)->format('H:i') : '-' }}</div>
+                            <div class="mt-1 text-[var(--color-text)] flex items-center gap-2">
+                                <span>{{ $tracking->entry_time_2 ? \Carbon\Carbon::parse($tracking->entry_time_2)->format('H:i') : '-' }}</span>
+                                @if($tracking->entry_time_2_observation)
+                                    <div class="relative group/tooltip">
+                                        <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                            {{ $tracking->entry_time_2_observation }}
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                         <div>
                             <span class="text-[var(--color-text)] opacity-70">Saída:</span>
-                            <div class="mt-1 text-[var(--color-text)]">{{ $tracking->return_time_2 ? \Carbon\Carbon::parse($tracking->return_time_2)->format('H:i') : '-' }}</div>
+                            <div class="mt-1 text-[var(--color-text)] flex items-center gap-2">
+                                <span>{{ $tracking->return_time_2 ? \Carbon\Carbon::parse($tracking->return_time_2)->format('H:i') : '-' }}</span>
+                                @if($tracking->return_time_2_observation)
+                                    <div class="relative group/tooltip">
+                                        <i class="fa-solid fa-info-circle text-blue-500 text-xs cursor-help"></i>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                            {{ $tracking->return_time_2_observation }}
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
