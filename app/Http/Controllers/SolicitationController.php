@@ -13,6 +13,6 @@ class SolicitationController extends Controller
             ['label' => 'Solicitações', 'url' => null]
         ];
 
-        return view('auth.time-management.time-record.index', compact('breadcrumbs'));
+        return view('auth.time-management.solicitations.index', compact('breadcrumbs'));
     }
 }
