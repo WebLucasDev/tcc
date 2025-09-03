@@ -1,10 +1,4 @@
 <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
-            <i class="fa-solid fa-clock text-[var(--color-main)]"></i>
-            Registro de Ponto
-        </h3>
-    </div>
     <div class="p-8">
         <!-- Relógio Digital -->
         <div class="text-center mb-8">

@@ -27,7 +27,9 @@
             </div>
 
             <!-- Formulário de Edição -->
-            <form id="editTimeForm">
+            <form id="editTimeForm" action="{{ route('time-tracking.update') }}" method="POST">
+                @csrf
+                @method('PATCH')
                 <!-- Campo de Horário -->
                 <div class="mb-4">
                     <label for="editTimeInput" class="block text-sm font-medium text-[var(--color-text)] mb-2">
@@ -71,8 +73,8 @@
                 <i class="fa-solid fa-times mr-1"></i>
                 Cancelar
             </button>
-            <button type="button"
-                    onclick="submitTimeEdit()"
+            <button type="submit"
+                    form="editTimeForm"
                     class="px-4 py-2 bg-[var(--color-main)] hover:bg-[var(--color-main)] text-white rounded-lg font-medium transition-colors duration-200">
                 <i class="fa-solid fa-save mr-1"></i>
                 Salvar Alterações

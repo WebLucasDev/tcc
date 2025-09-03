@@ -164,14 +164,6 @@
                                         data-tracking-collaborator="{{ $tracking->collaborator->name }}">
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
-                                    <button type="button"
-                                        class="text-red-600 hover:text-red-800 transition-colors duration-200 delete-tracking-btn"
-                                        title="Excluir"
-                                        data-tracking-id="{{ $tracking->id }}"
-                                        data-tracking-collaborator="{{ $tracking->collaborator->name }}"
-                                        data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>

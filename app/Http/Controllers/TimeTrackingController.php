@@ -283,10 +283,8 @@ class TimeTrackingController extends Controller
                             'return_time_2' => 'Saída (Final do Dia)'
                         ];
 
-                        return response()->json([
-                            'success' => false,
-                            'message' => "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted})."
-                        ], 422);
+                        return redirect()->back()
+                            ->with('error', "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted}).");
                     }
                 }
             }
@@ -308,10 +306,8 @@ class TimeTrackingController extends Controller
                             'return_time_2' => 'Saída (Final do Dia)'
                         ];
 
-                        return response()->json([
-                            'success' => false,
-                            'message' => "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTimeFormatted})."
-                        ], 422);
+                        return redirect()->back()
+                            ->with('error', "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTimeFormatted}).");
                     }
                 }
             }
@@ -340,35 +336,19 @@ class TimeTrackingController extends Controller
                 'return_time_2' => 'Saída (Final do Dia)'
             ];
 
-            return response()->json([
-                'success' => true,
-                'message' => "Horário de {$typeNames[$timeSlotType]} atualizado com sucesso para {$newTime}!",
-                'data' => [
-                    'tracking_id' => $timeTracking->id,
-                    'collaborator_name' => $timeTracking->collaborator->name,
-                    'time_slot_type' => $timeSlotType,
-                    'time_slot_name' => $typeNames[$timeSlotType],
-                    'new_time' => $newTime,
-                    'observation' => $validated['observation']
-                ]
-            ]);
+            return redirect()->route('time-tracking.index')
+                ->with('success', "Horário de {$typeNames[$timeSlotType]} atualizado com sucesso para {$newTime}!");
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Registro de ponto não encontrado.'
-            ], 404);
+            return redirect()->back()
+                ->with('error', 'Registro de ponto não encontrado.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Dados inválidos.',
-                'errors' => $e->errors()
-            ], 422);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro interno do servidor: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Erro interno do servidor: ' . $e->getMessage());
         }
     }
 
