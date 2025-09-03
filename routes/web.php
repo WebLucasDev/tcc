@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('registro-ponto')->group(function () {
             Route::get('/', [TimeTrackingController::class , 'index'])->name('time-tracking.index');
             Route::post('/', [TimeTrackingController::class, 'store'])->name('time-tracking.store');
+            Route::get('/next-tracking-info', [TimeTrackingController::class, 'getNextTrackingInfo'])->name('time-tracking.next-info');
             Route::get('/{id}', [TimeTrackingController::class, 'show'])->name('time-tracking.show');
             Route::patch('/update', [TimeTrackingController::class, 'update'])->name('time-tracking.update');
         });

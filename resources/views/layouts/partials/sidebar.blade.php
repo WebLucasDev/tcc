@@ -76,15 +76,14 @@
                             Solicitações
                         </a>
                     </li>
+                    <li>
+                        <a href="#"
+                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
+                            <i class="fa-solid fa-file-invoice-dollar w-5 h-5 mr-3"></i>
+                            Banco de Horas
+                        </a>
+                    </li>
                 </ul>
-            </li>
-
-            <li>
-                <a href="#"
-                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
-                    <i class="fa-solid fa-file-invoice-dollar w-5 h-5 mr-3"></i>
-                    <span class="sidebar-text">Folha de Pagamento</span>
-                </a>
             </li>
 
             <li>

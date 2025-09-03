@@ -98,21 +98,23 @@ class TimeTrackingController extends Controller
                 ->where('date', $validated['date'])
                 ->first();
 
-            // Validar se o tipo de registro já foi realizado
-            if ($existingRecord && !is_null($existingRecord->{$validated['tracking_type']})) {
+            // Determinar automaticamente o próximo tipo de registro
+            $nextTrackingType = $this->getNextTrackingType($existingRecord);
+
+            // Se não há próximo tipo disponível, significa que todos os registros já foram feitos
+            if (!$nextTrackingType) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Este tipo de registro já foi realizado para este colaborador na data selecionada. Use a função de editar para alterar.');
+                    ->with('error', 'Todos os registros de ponto já foram realizados para este colaborador na data selecionada.');
             }
 
             // Validar ordem cronológica dos horários
             if ($existingRecord) {
                 $newTime = $validated['time']; // Formato H:i (ex: "10:10")
-                $trackingType = $validated['tracking_type'];
 
                 // Definir a ordem correta dos tipos de registro
                 $timeOrder = ['entry_time_1', 'return_time_1', 'entry_time_2', 'return_time_2'];
-                $currentIndex = array_search($trackingType, $timeOrder);
+                $currentIndex = array_search($nextTrackingType, $timeOrder);
 
                 // Verificar horários anteriores (devem ser menores que o atual)
                 for ($i = 0; $i < $currentIndex; $i++) {
@@ -125,51 +127,27 @@ class TimeTrackingController extends Controller
 
                         if ($newTime <= $previousTimeFormatted) {
                             $typeNames = [
-                                'entry_time_1' => 'Entrada (Manhã)',
-                                'return_time_1' => 'Saída para Almoço',
-                                'entry_time_2' => 'Volta do Almoço',
-                                'return_time_2' => 'Saída (Final do Dia)'
+                                'entry_time_1' => 'Entrada',
+                                'return_time_1' => 'Saída',
+                                'entry_time_2' => 'Entrada',
+                                'return_time_2' => 'Saída'
                             ];
 
                             return redirect()->back()
                                 ->withInput()
-                                ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted}).");
-                        }
-                    }
-                }
-
-                // Verificar horários posteriores (devem ser maiores que o atual)
-                for ($i = $currentIndex + 1; $i < count($timeOrder); $i++) {
-                    $nextType = $timeOrder[$i];
-                    $nextTime = $existingRecord->{$nextType};
-
-                    if ($nextTime) {
-                        // Converter ambos para formato de comparação (apenas hora e minuto)
-                        $nextTimeFormatted = \Carbon\Carbon::parse($nextTime)->format('H:i');
-
-                        if ($newTime >= $nextTimeFormatted) {
-                            $typeNames = [
-                                'entry_time_1' => 'Entrada (Manhã)',
-                                'return_time_1' => 'Saída para Almoço',
-                                'entry_time_2' => 'Volta do Almoço',
-                                'return_time_2' => 'Saída (Final do Dia)'
-                            ];
-
-                            return redirect()->back()
-                                ->withInput()
-                                ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTimeFormatted}).");
+                                ->with('error', "O horário de {$typeNames[$nextTrackingType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted}).");
                         }
                     }
                 }
             }
 
             // Definir o campo de observação baseado no tipo de registro
-            $observationField = $validated['tracking_type'] . '_observation';
+            $observationField = $nextTrackingType . '_observation';
 
             if ($existingRecord) {
                 // Atualizar registro existente
                 $updateData = [
-                    $validated['tracking_type'] => $validated['time']
+                    $nextTrackingType => $validated['time']
                 ];
 
                 // Adicionar observação específica se fornecida
@@ -186,7 +164,7 @@ class TimeTrackingController extends Controller
                 $createData = [
                     'collaborator_id' => $validated['collaborator_id'],
                     'date' => $validated['date'],
-                    $validated['tracking_type'] => $validated['time']
+                    $nextTrackingType => $validated['time']
                 ];
 
                 // Adicionar observação específica se fornecida
@@ -197,7 +175,9 @@ class TimeTrackingController extends Controller
                 $timeTracking = TimeTrackingModel::create($createData);
 
                 $message = 'Ponto registrado com sucesso!';
-            }            return redirect()->route('time-tracking.index')
+            }
+
+            return redirect()->route('time-tracking.index')
                 ->with('success', $message);
 
         } catch (\Exception $e) {
@@ -277,10 +257,10 @@ class TimeTrackingController extends Controller
 
                     if ($newTime <= $previousTimeFormatted) {
                         $typeNames = [
-                            'entry_time_1' => 'Entrada (Manhã)',
-                            'return_time_1' => 'Saída para Almoço',
-                            'entry_time_2' => 'Volta do Almoço',
-                            'return_time_2' => 'Saída (Final do Dia)'
+                            'entry_time_1' => 'Entrada',
+                            'return_time_1' => 'Saída',
+                            'entry_time_2' => 'Entrada',
+                            'return_time_2' => 'Saída'
                         ];
 
                         return redirect()->back()
@@ -300,10 +280,10 @@ class TimeTrackingController extends Controller
 
                     if ($newTime >= $nextTimeFormatted) {
                         $typeNames = [
-                            'entry_time_1' => 'Entrada (Manhã)',
-                            'return_time_1' => 'Saída para Almoço',
-                            'entry_time_2' => 'Volta do Almoço',
-                            'return_time_2' => 'Saída (Final do Dia)'
+                            'entry_time_1' => 'Entrada',
+                            'return_time_1' => 'Saída',
+                            'entry_time_2' => 'Entrada',
+                            'return_time_2' => 'Saída'
                         ];
 
                         return redirect()->back()
@@ -330,10 +310,10 @@ class TimeTrackingController extends Controller
 
             // Definir nomes amigáveis para resposta
             $typeNames = [
-                'entry_time_1' => 'Entrada (Manhã)',
-                'return_time_1' => 'Saída para Almoço',
-                'entry_time_2' => 'Volta do Almoço',
-                'return_time_2' => 'Saída (Final do Dia)'
+                'entry_time_1' => 'Entrada',
+                'return_time_1' => 'Saída',
+                'entry_time_2' => 'Entrada',
+                'return_time_2' => 'Saída'
             ];
 
             return redirect()->route('time-tracking.index')
@@ -352,9 +332,64 @@ class TimeTrackingController extends Controller
         }
     }
 
-    public function destroy()
-    {
 
+    /**
+     * Determina automaticamente o próximo tipo de registro baseado nos registros existentes
+     */
+    private function getNextTrackingType($existingRecord)
+    {
+        // Ordem dos tipos de registro
+        $timeOrder = ['entry_time_1', 'return_time_1', 'entry_time_2', 'return_time_2'];
+
+        // Se não existe registro, o próximo é o primeiro (entrada manhã)
+        if (!$existingRecord) {
+            return $timeOrder[0];
+        }
+
+        // Verificar qual é o próximo registro disponível
+        foreach ($timeOrder as $type) {
+            if (is_null($existingRecord->{$type})) {
+                return $type;
+            }
+        }
+
+        // Se todos os registros já foram feitos, retorna null
+        return null;
+    }
+
+    /**
+     * Retorna informações sobre o próximo registro para um colaborador em uma data específica
+     */
+    public function getNextTrackingInfo()
+    {
+        $collaboratorId = request('collaborator_id');
+        $date = request('date', date('Y-m-d'));
+
+        if (!$collaboratorId) {
+            return response()->json([
+                'next_type' => null,
+                'next_type_name' => 'Selecione um colaborador'
+            ]);
+        }
+
+        // Buscar registro existente
+        $existingRecord = TimeTrackingModel::where('collaborator_id', $collaboratorId)
+            ->where('date', $date)
+            ->first();
+
+        $nextType = $this->getNextTrackingType($existingRecord);
+
+        $typeNames = [
+            'entry_time_1' => 'Entrada',
+            'return_time_1' => 'Saída',
+            'entry_time_2' => 'Entrada',
+            'return_time_2' => 'Saída'
+        ];
+
+        return response()->json([
+            'next_type' => $nextType,
+            'next_type_name' => $nextType ? $typeNames[$nextType] : 'Todos os registros completos'
+        ]);
     }
 
 }

@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elementos do formulário de registro
     const timeTrackingForm = document.getElementById('time-tracking-form');
     const collaboratorIdSelect = timeTrackingForm ? timeTrackingForm.querySelector('#collaborator_id') : null;
-    const trackingTypeSelect = timeTrackingForm ? timeTrackingForm.querySelector('#tracking_type') : null;
     const dateInput = timeTrackingForm ? timeTrackingForm.querySelector('#date') : null;
     const timeInput = timeTrackingForm ? timeTrackingForm.querySelector('#time') : null;
     const timeObservationInput = timeTrackingForm ? timeTrackingForm.querySelector('#time_observation') : null;
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         currentDate: !!currentDate,
         timeTrackingForm: !!timeTrackingForm,
         collaboratorIdSelect: !!collaboratorIdSelect,
-        trackingTypeSelect: !!trackingTypeSelect,
         timeObservationInput: !!timeObservationInput,
         charCounter: !!charCounter
     });
@@ -154,14 +152,24 @@ document.addEventListener('DOMContentLoaded', function() {
             submitTimeTracking();
         });
 
-        // Auto-completar horário atual quando o tipo é selecionado
-        if (trackingTypeSelect) {
-            trackingTypeSelect.addEventListener('change', function() {
+        // Event listener para mudança de colaborador - buscar próximo tipo de registro
+        if (collaboratorIdSelect) {
+            collaboratorIdSelect.addEventListener('change', function() {
+                updateNextTrackingInfo();
+
+                // Auto-completar horário atual quando colaborador é selecionado
                 if (this.value && timeInput) {
                     const now = new Date();
                     const currentTime = now.toTimeString().slice(0, 5);
                     timeInput.value = currentTime;
                 }
+            });
+        }
+
+        // Event listener para mudança de data - atualizar próximo tipo
+        if (dateInput) {
+            dateInput.addEventListener('change', function() {
+                updateNextTrackingInfo();
             });
         }
 
@@ -181,6 +189,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+
+        // Inicializar informação do próximo registro
+        updateNextTrackingInfo();
     }    // Função para atualizar data e hora no formulário
     function updateFormDateTime(now) {
         if (dateInput && !dateInput.value) {
@@ -202,15 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validação básica
         const collaboratorId = collaboratorIdSelect ? collaboratorIdSelect.value : '';
-        const trackingType = trackingTypeSelect ? trackingTypeSelect.value : '';
 
         if (!collaboratorId) {
             alert('Por favor, selecione um colaborador.');
-            return;
-        }
-
-        if (!trackingType) {
-            alert('Por favor, selecione o tipo de registro.');
             return;
         }
 
@@ -230,7 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Resetar campos selecionados
         if (collaboratorIdSelect) collaboratorIdSelect.value = '';
-        if (trackingTypeSelect) trackingTypeSelect.value = '';
 
         // Manter data atual mas limpar horário para novo registro
         const now = new Date();
@@ -250,7 +254,63 @@ document.addEventListener('DOMContentLoaded', function() {
         const observationsField = timeTrackingForm.querySelector('#observations');
         if (observationsField) observationsField.value = '';
 
+        // Atualizar informações do próximo registro
+        updateNextTrackingInfo();
+
         console.log('Formulário resetado');
+    }
+
+    // Função para atualizar informações do próximo tipo de registro
+    function updateNextTrackingInfo() {
+        const nextTrackingTypeElement = document.getElementById('next-tracking-type');
+        if (!nextTrackingTypeElement) return;
+
+        const collaboratorId = collaboratorIdSelect ? collaboratorIdSelect.value : '';
+        const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+
+        // Se não há colaborador selecionado, mostrar mensagem padrão
+        if (!collaboratorId) {
+            nextTrackingTypeElement.textContent = 'Selecione um colaborador';
+            return;
+        }
+
+        // Fazer requisição AJAX para buscar próximo tipo de registro
+        const params = new URLSearchParams({
+            collaborator_id: collaboratorId,
+            date: date
+        });
+
+        fetch(`/cadastros/registro-ponto/next-tracking-info?${params}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.next_type_name) {
+                nextTrackingTypeElement.textContent = data.next_type_name;
+
+                // Se todos os registros estão completos, desabilitar o botão de submit
+                const submitBtn = document.getElementById('submit-btn');
+                if (submitBtn) {
+                    if (!data.next_type) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Registros Completos';
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.innerHTML = '<i class="fa-solid fa-clock"></i> Registrar Ponto';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar próximo tipo de registro:', error);
+            nextTrackingTypeElement.textContent = 'Erro ao carregar informações';
+        });
     }
 
     // Função principal para realizar busca AJAX
@@ -736,10 +796,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🕐 Populando lista de horários com dados:', data);
 
         const timeSlots = [
-            { type: 'entry_time_1', name: 'Entrada (Manhã)', icon: 'fa-sun', time: data.entry_time_1, observation: data.entry_time_1_observation },
-            { type: 'return_time_1', name: 'Saída para Almoço', icon: 'fa-utensils', time: data.return_time_1, observation: data.return_time_1_observation },
-            { type: 'entry_time_2', name: 'Volta do Almoço', icon: 'fa-coffee', time: data.entry_time_2, observation: data.entry_time_2_observation },
-            { type: 'return_time_2', name: 'Saída (Final do Dia)', icon: 'fa-moon', time: data.return_time_2, observation: data.return_time_2_observation }
+            { type: 'entry_time_1', name: 'Entrada', icon: 'fa-sun', time: data.entry_time_1, observation: data.entry_time_1_observation },
+            { type: 'return_time_1', name: 'Saída', icon: 'fa-utensils', time: data.return_time_1, observation: data.return_time_1_observation },
+            { type: 'entry_time_2', name: 'Entrada', icon: 'fa-coffee', time: data.entry_time_2, observation: data.entry_time_2_observation },
+            { type: 'return_time_2', name: 'Saída', icon: 'fa-moon', time: data.return_time_2, observation: data.return_time_2_observation }
         ];
 
         // Filtrar apenas horários que existem (foram registrados)

@@ -34,22 +34,16 @@
                     </select>
                 </div>
 
-                <!-- Tipo de Registro -->
-                <div class="mb-6">
-                    <label for="tracking_type" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                        <i class="fa-solid fa-clock mr-2"></i>
-                        Tipo de Registro
-                    </label>
-                    <select id="tracking_type"
-                            name="tracking_type"
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent bg-[var(--color-background)] text-[var(--color-text)]">
-                        <option value="">-- Selecione o tipo --</option>
-                        <option value="entry_time_1">Entrada (Manhã)</option>
-                        <option value="return_time_1">Saída para Almoço</option>
-                        <option value="entry_time_2">Volta do Almoço</option>
-                        <option value="return_time_2">Saída (Final do Dia)</option>
-                    </select>
+                <!-- Próximo Registro -->
+                <div class="mb-6" id="next-tracking-info">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-info-circle text-blue-500 mr-2"></i>
+                            <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                Próximo registro: <span id="next-tracking-type">Selecione um colaborador</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>                <!-- Data e Hora (opcionais para ajustes) -->
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
