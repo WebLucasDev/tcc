@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\web\timeManagement\timeTracking\TimeTrackingStoreRequest;
+use App\Http\Requests\web\timeManagement\timeTracking\TimeTrackingUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\TimeTrackingModel;
 
@@ -85,16 +87,10 @@ class TimeTrackingController extends Controller
         return view('auth.time-management.time-tracking.index', compact('collaborators', 'timeTrackings', 'breadcrumbs', 'paginationInfo'));
     }
 
-    public function store()
+    public function store(TimeTrackingStoreRequest $request)
     {
-        // Validação dos dados
-        $validated = request()->validate([
-            'collaborator_id' => 'required|exists:collaborators,id',
-            'tracking_type' => 'required|in:entry_time_1,return_time_1,entry_time_2,return_time_2',
-            'date' => 'required|date',
-            'time' => 'required|date_format:H:i',
-            'time_observation' => 'nullable|string|max:30'
-        ]);
+        // Obter dados validados do FormRequest
+        $validated = $request->validated();
 
         try {
             // Verificar se já existe um registro para este colaborador na data
@@ -111,7 +107,7 @@ class TimeTrackingController extends Controller
 
             // Validar ordem cronológica dos horários
             if ($existingRecord) {
-                $newTime = $validated['time'];
+                $newTime = $validated['time']; // Formato H:i (ex: "10:10")
                 $trackingType = $validated['tracking_type'];
 
                 // Definir a ordem correta dos tipos de registro
@@ -123,17 +119,22 @@ class TimeTrackingController extends Controller
                     $previousType = $timeOrder[$i];
                     $previousTime = $existingRecord->{$previousType};
 
-                    if ($previousTime && $newTime <= $previousTime) {
-                        $typeNames = [
-                            'entry_time_1' => 'Entrada (Manhã)',
-                            'return_time_1' => 'Saída para Almoço',
-                            'entry_time_2' => 'Volta do Almoço',
-                            'return_time_2' => 'Saída (Final do Dia)'
-                        ];
+                    if ($previousTime) {
+                        // Converter ambos para formato de comparação (apenas hora e minuto)
+                        $previousTimeFormatted = \Carbon\Carbon::parse($previousTime)->format('H:i');
 
-                        return redirect()->back()
-                            ->withInput()
-                            ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTime}).");
+                        if ($newTime <= $previousTimeFormatted) {
+                            $typeNames = [
+                                'entry_time_1' => 'Entrada (Manhã)',
+                                'return_time_1' => 'Saída para Almoço',
+                                'entry_time_2' => 'Volta do Almoço',
+                                'return_time_2' => 'Saída (Final do Dia)'
+                            ];
+
+                            return redirect()->back()
+                                ->withInput()
+                                ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted}).");
+                        }
                     }
                 }
 
@@ -142,17 +143,22 @@ class TimeTrackingController extends Controller
                     $nextType = $timeOrder[$i];
                     $nextTime = $existingRecord->{$nextType};
 
-                    if ($nextTime && $newTime >= $nextTime) {
-                        $typeNames = [
-                            'entry_time_1' => 'Entrada (Manhã)',
-                            'return_time_1' => 'Saída para Almoço',
-                            'entry_time_2' => 'Volta do Almoço',
-                            'return_time_2' => 'Saída (Final do Dia)'
-                        ];
+                    if ($nextTime) {
+                        // Converter ambos para formato de comparação (apenas hora e minuto)
+                        $nextTimeFormatted = \Carbon\Carbon::parse($nextTime)->format('H:i');
 
-                        return redirect()->back()
-                            ->withInput()
-                            ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTime}).");
+                        if ($newTime >= $nextTimeFormatted) {
+                            $typeNames = [
+                                'entry_time_1' => 'Entrada (Manhã)',
+                                'return_time_1' => 'Saída para Almoço',
+                                'entry_time_2' => 'Volta do Almoço',
+                                'return_time_2' => 'Saída (Final do Dia)'
+                            ];
+
+                            return redirect()->back()
+                                ->withInput()
+                                ->with('error', "O horário de {$typeNames[$trackingType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTimeFormatted}).");
+                        }
                     }
                 }
             }
@@ -201,9 +207,169 @@ class TimeTrackingController extends Controller
         }
     }
 
-    public function update()
+    public function show($id)
     {
-        
+        try {
+            // Buscar o registro com o colaborador
+            $timeTracking = TimeTrackingModel::with('collaborator.position')
+                ->findOrFail($id);
+
+            // Preparar dados para retorno
+            $data = [
+                'id' => $timeTracking->id,
+                'collaborator_id' => $timeTracking->collaborator_id,
+                'collaborator_name' => $timeTracking->collaborator->name,
+                'date' => $timeTracking->date,
+                'entry_time_1' => $timeTracking->entry_time_1 ? \Carbon\Carbon::parse($timeTracking->entry_time_1)->format('H:i') : null,
+                'return_time_1' => $timeTracking->return_time_1 ? \Carbon\Carbon::parse($timeTracking->return_time_1)->format('H:i') : null,
+                'entry_time_2' => $timeTracking->entry_time_2 ? \Carbon\Carbon::parse($timeTracking->entry_time_2)->format('H:i') : null,
+                'return_time_2' => $timeTracking->return_time_2 ? \Carbon\Carbon::parse($timeTracking->return_time_2)->format('H:i') : null,
+                'entry_time_1_observation' => $timeTracking->entry_time_1_observation,
+                'return_time_1_observation' => $timeTracking->return_time_1_observation,
+                'entry_time_2_observation' => $timeTracking->entry_time_2_observation,
+                'return_time_2_observation' => $timeTracking->return_time_2_observation,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registro de ponto não encontrado.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(TimeTrackingUpdateRequest $request)
+    {
+        // Obter dados validados do FormRequest
+        $validated = $request->validated();
+
+        try {
+            // Buscar o registro de ponto
+            $timeTracking = TimeTrackingModel::with('collaborator')->findOrFail($validated['tracking_id']);
+
+            // Armazenar dados para validação cronológica
+            $newTime = $validated['time'];
+            $timeSlotType = $validated['time_slot_type'];
+            $observationField = $timeSlotType . '_observation';
+
+            // Validar ordem cronológica dos horários (similar ao store, mas excluindo o campo atual)
+            $timeOrder = ['entry_time_1', 'return_time_1', 'entry_time_2', 'return_time_2'];
+            $currentIndex = array_search($timeSlotType, $timeOrder);
+
+            // Verificar horários anteriores (devem ser menores que o atual)
+            for ($i = 0; $i < $currentIndex; $i++) {
+                $previousType = $timeOrder[$i];
+                $previousTime = $timeTracking->{$previousType};
+
+                if ($previousTime) {
+                    // Converter para formato de comparação (apenas hora e minuto)
+                    $previousTimeFormatted = \Carbon\Carbon::parse($previousTime)->format('H:i');
+
+                    if ($newTime <= $previousTimeFormatted) {
+                        $typeNames = [
+                            'entry_time_1' => 'Entrada (Manhã)',
+                            'return_time_1' => 'Saída para Almoço',
+                            'entry_time_2' => 'Volta do Almoço',
+                            'return_time_2' => 'Saída (Final do Dia)'
+                        ];
+
+                        return response()->json([
+                            'success' => false,
+                            'message' => "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser posterior ao horário de {$typeNames[$previousType]} ({$previousTimeFormatted})."
+                        ], 422);
+                    }
+                }
+            }
+
+            // Verificar horários posteriores (devem ser maiores que o atual)
+            for ($i = $currentIndex + 1; $i < count($timeOrder); $i++) {
+                $nextType = $timeOrder[$i];
+                $nextTime = $timeTracking->{$nextType};
+
+                if ($nextTime) {
+                    // Converter para formato de comparação (apenas hora e minuto)
+                    $nextTimeFormatted = \Carbon\Carbon::parse($nextTime)->format('H:i');
+
+                    if ($newTime >= $nextTimeFormatted) {
+                        $typeNames = [
+                            'entry_time_1' => 'Entrada (Manhã)',
+                            'return_time_1' => 'Saída para Almoço',
+                            'entry_time_2' => 'Volta do Almoço',
+                            'return_time_2' => 'Saída (Final do Dia)'
+                        ];
+
+                        return response()->json([
+                            'success' => false,
+                            'message' => "O horário de {$typeNames[$timeSlotType]} ({$newTime}) deve ser anterior ao horário de {$typeNames[$nextType]} ({$nextTimeFormatted})."
+                        ], 422);
+                    }
+                }
+            }
+
+            // Preparar dados para atualização
+            $updateData = [
+                $timeSlotType => $newTime
+            ];
+
+            // Adicionar ou remover observação
+            if (!empty($validated['observation'])) {
+                $updateData[$observationField] = $validated['observation'];
+            } else {
+                // Se observação está vazia, definir como null para limpar
+                $updateData[$observationField] = null;
+            }
+
+            // Atualizar registro
+            $timeTracking->update($updateData);
+
+            // Definir nomes amigáveis para resposta
+            $typeNames = [
+                'entry_time_1' => 'Entrada (Manhã)',
+                'return_time_1' => 'Saída para Almoço',
+                'entry_time_2' => 'Volta do Almoço',
+                'return_time_2' => 'Saída (Final do Dia)'
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => "Horário de {$typeNames[$timeSlotType]} atualizado com sucesso para {$newTime}!",
+                'data' => [
+                    'tracking_id' => $timeTracking->id,
+                    'collaborator_name' => $timeTracking->collaborator->name,
+                    'time_slot_type' => $timeSlotType,
+                    'time_slot_name' => $typeNames[$timeSlotType],
+                    'new_time' => $newTime,
+                    'observation' => $validated['observation']
+                ]
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registro de ponto não encontrado.'
+            ], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dados inválidos.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy()

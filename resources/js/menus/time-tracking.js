@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cache dos elementos
     const searchInput = document.querySelector('input[name="search"]');
-    const collaboratorSelect = document.querySelector('select[name="collaborator_id"]');
+    const collaboratorSelect = document.querySelector('#filter_collaborator_id'); // ID único do filtro
     const sortBySelect = document.querySelector('select[name="sort_by"]');
     const sortDirectionBtn = document.querySelector('[name="sort_direction"]');
     const tableContainer = document.getElementById('table-container');
@@ -69,10 +69,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener para filtro de colaborador
     if (collaboratorSelect) {
+        console.log('✅ Filtro de colaborador encontrado (#filter_collaborator_id), anexando event listener');
         collaboratorSelect.addEventListener('change', function() {
+            console.log('🔄 Filtro de colaborador alterado para:', this.value);
             currentFilters.collaborator_id = this.value;
+            console.log('📊 Filtros atualizados:', currentFilters);
             performAjaxSearch();
         });
+    } else {
+        console.error('❌ Elemento collaboratorSelect (#filter_collaborator_id) não encontrado!');
     }
 
     // Event listener para ordenação
@@ -550,9 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funções globais para os botões
     window.editTimeTracking = function(trackingId, collaboratorName) {
-        // TODO: Implementar modal de edição
-        console.log('Editar registro:', trackingId, collaboratorName);
-        alert(`Funcionalidade de editar será implementada para: ${collaboratorName}`);
+        openEditTimeSelectModal(trackingId, collaboratorName);
     };
 
     window.deleteTimeTracking = function(trackingId, collaboratorName, date) {
@@ -561,6 +564,426 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Excluir registro:', trackingId, collaboratorName, date);
             alert(`Funcionalidade de exclusão será implementada para: ${collaboratorName} - ${date}`);
         }
+    };
+
+    // === FUNÇÕES DE CONTROLE DOS MODAIS DE EDIÇÃO ===
+    
+    // Abrir modal de seleção de horário
+    function openEditTimeSelectModal(trackingId, collaboratorName) {
+        console.log('🔥 Abrindo modal de seleção de horário para:', collaboratorName);
+        
+        const modal = document.getElementById('editTimeSelectModal');
+        const collaboratorNameElement = document.getElementById('selectedCollaboratorName');
+        const timeSlotsList = document.getElementById('timeSlotsList');
+        
+        if (!modal || !collaboratorNameElement || !timeSlotsList) {
+            console.error('❌ Elementos do modal de seleção não encontrados');
+            return;
+        }
+        
+        // Atualizar nome do colaborador
+        collaboratorNameElement.textContent = collaboratorName;
+        
+        // Buscar dados do registro via AJAX
+        fetchTrackingData(trackingId, collaboratorName);
+        
+        // Mostrar modal
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        
+        console.log('✅ Modal de seleção de horário aberto');
+    }
+    
+    // Fechar modal de seleção de horário
+    window.closeEditTimeSelectModal = function() {
+        console.log('🔒 Fechando modal de seleção de horário');
+        const modal = document.getElementById('editTimeSelectModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+            
+            // Limpar lista de horários
+            const timeSlotsList = document.getElementById('timeSlotsList');
+            if (timeSlotsList) {
+                timeSlotsList.innerHTML = '';
+            }
+        }
+    };
+    
+    // Abrir modal final de edição
+    function openEditTimeFinishModal(trackingId, collaboratorName, timeSlotType, timeSlotName, currentTime, currentObservation) {
+        console.log('🔥 Abrindo modal de edição final para:', timeSlotName);
+        
+        // Fechar modal anterior
+        window.closeEditTimeSelectModal();
+        
+        const modal = document.getElementById('editTimeFinishModal');
+        const collaboratorNameElement = document.getElementById('editCollaboratorName');
+        const timeSlotNameElement = document.getElementById('editTimeSlotName');
+        const timeInput = document.getElementById('editTimeInput');
+        const observationInput = document.getElementById('editObservationInput');
+        const trackingIdInput = document.getElementById('editTrackingId');
+        const timeSlotTypeInput = document.getElementById('editTimeSlotType');
+        const charCounter = document.getElementById('editCharCounter');
+        
+        if (!modal) {
+            console.error('❌ Modal de edição final não encontrado');
+            return;
+        }
+        
+        // Preencher dados do modal
+        if (collaboratorNameElement) collaboratorNameElement.textContent = collaboratorName;
+        if (timeSlotNameElement) timeSlotNameElement.textContent = timeSlotName;
+        if (timeInput) timeInput.value = currentTime || '';
+        if (observationInput) {
+            observationInput.value = currentObservation || '';
+            updateCharCounter();
+        }
+        if (trackingIdInput) trackingIdInput.value = trackingId;
+        if (timeSlotTypeInput) timeSlotTypeInput.value = timeSlotType;
+        
+        // Mostrar modal
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        
+        // Focar no campo de horário
+        if (timeInput) {
+            setTimeout(() => timeInput.focus(), 100);
+        }
+        
+        console.log('✅ Modal de edição final aberto');
+    }
+    
+    // Fechar modal final de edição
+    window.closeEditTimeFinishModal = function() {
+        console.log('🔒 Fechando modal de edição final');
+        const modal = document.getElementById('editTimeFinishModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+            
+            // Limpar formulário
+            const form = document.getElementById('editTimeForm');
+            if (form) form.reset();
+            
+            // Resetar contador
+            const charCounter = document.getElementById('editCharCounter');
+            if (charCounter) {
+                charCounter.textContent = '0/30';
+                charCounter.className = 'text-xs text-gray-500';
+            }
+        }
+    };
+    
+    // Buscar dados do registro via AJAX
+    function fetchTrackingData(trackingId, collaboratorName) {
+        console.log('📡 Buscando dados do registro:', trackingId);
+        
+        // Mostrar loading enquanto busca os dados
+        const timeSlotsList = document.getElementById('timeSlotsList');
+        if (timeSlotsList) {
+            timeSlotsList.innerHTML = `
+                <div class="flex items-center justify-center py-6">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl text-[var(--color-main)] mr-3"></i>
+                    <span class="text-[var(--color-text)]">Carregando horários...</span>
+                </div>
+            `;
+        }
+        
+        // Fazer requisição AJAX para buscar dados reais
+        fetch(`/cadastros/registro-ponto/${trackingId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('📡 Resposta recebida:', response);
+            return response.json().then(json => ({ status: response.status, json }));
+        })
+        .then(({ status, json }) => {
+            console.log('📊 Dados recebidos:', json);
+            
+            if (status === 200 && json.success) {
+                // Sucesso - popular lista com dados reais
+                populateTimeSlotsList(trackingId, collaboratorName, json.data);
+            } else {
+                // Erro
+                console.error('❌ Erro ao buscar dados:', json);
+                
+                if (timeSlotsList) {
+                    timeSlotsList.innerHTML = `
+                        <div class="text-center py-6">
+                            <i class="fa-solid fa-exclamation-triangle text-2xl text-red-500 mb-3"></i>
+                            <p class="text-[var(--color-text)] mb-3">Erro ao carregar horários:</p>
+                            <p class="text-sm text-red-500">${json.message || 'Erro desconhecido'}</p>
+                            <button onclick="fetchTrackingData(${trackingId}, '${collaboratorName}')" 
+                                    class="mt-3 px-3 py-1 text-sm bg-[var(--color-main)] text-white rounded hover:bg-[var(--color-main)]/90">
+                                Tentar Novamente
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            
+            if (timeSlotsList) {
+                timeSlotsList.innerHTML = `
+                    <div class="text-center py-6">
+                        <i class="fa-solid fa-wifi text-2xl text-red-500 mb-3"></i>
+                        <p class="text-[var(--color-text)] mb-3">Erro de conexão</p>
+                        <p class="text-sm text-red-500">Verifique sua internet e tente novamente</p>
+                        <button onclick="fetchTrackingData(${trackingId}, '${collaboratorName}')" 
+                                class="mt-3 px-3 py-1 text-sm bg-[var(--color-main)] text-white rounded hover:bg-[var(--color-main)]/90">
+                            Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            }
+        });
+    }
+    
+    // Popular lista de horários disponíveis para edição
+    function populateTimeSlotsList(trackingId, collaboratorName, data) {
+        const timeSlotsList = document.getElementById('timeSlotsList');
+        if (!timeSlotsList) return;
+        
+        console.log('🕐 Populando lista de horários com dados:', data);
+        
+        const timeSlots = [
+            { type: 'entry_time_1', name: 'Entrada (Manhã)', icon: 'fa-sun', time: data.entry_time_1, observation: data.entry_time_1_observation },
+            { type: 'return_time_1', name: 'Saída para Almoço', icon: 'fa-utensils', time: data.return_time_1, observation: data.return_time_1_observation },
+            { type: 'entry_time_2', name: 'Volta do Almoço', icon: 'fa-coffee', time: data.entry_time_2, observation: data.entry_time_2_observation },
+            { type: 'return_time_2', name: 'Saída (Final do Dia)', icon: 'fa-moon', time: data.return_time_2, observation: data.return_time_2_observation }
+        ];
+        
+        // Filtrar apenas horários que existem (foram registrados)
+        const availableSlots = timeSlots.filter(slot => slot.time !== null && slot.time !== undefined);
+        
+        timeSlotsList.innerHTML = '';
+        
+        if (availableSlots.length === 0) {
+            // Nenhum horário registrado
+            timeSlotsList.innerHTML = `
+                <div class="text-center py-6">
+                    <i class="fa-solid fa-clock text-2xl text-gray-400 mb-3"></i>
+                    <p class="text-[var(--color-text)] mb-2">Nenhum horário registrado</p>
+                    <p class="text-sm text-gray-500">Este colaborador ainda não possui registros de ponto para esta data.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Mostrar apenas os horários que foram registrados
+        availableSlots.forEach(slot => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full flex items-center justify-between p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group';
+            button.onclick = () => openEditTimeFinishModal(trackingId, collaboratorName, slot.type, slot.name, slot.time, slot.observation);
+            
+            const observationText = slot.observation ? 
+                `<span class="text-xs text-gray-500 block mt-1">"${slot.observation}"</span>` : '';
+            
+            button.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid ${slot.icon} text-[var(--color-main)] text-lg"></i>
+                    <div>
+                        <div class="font-medium text-[var(--color-text)] group-hover:text-gray-900 dark:group-hover:text-gray-100">
+                            ${slot.name}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            Registrado às ${slot.time}
+                        </div>
+                        ${observationText}
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-lg font-semibold text-green-600">${slot.time}</span>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-[var(--color-main)] transition-colors"></i>
+                </div>
+            `;
+            
+            timeSlotsList.appendChild(button);
+        });
+        
+        console.log(`✅ Lista populada com ${availableSlots.length} horários disponíveis para edição`);
+    }
+    
+    // Função para atualizar contador de caracteres do modal de edição
+    function updateCharCounter() {
+        const observationInput = document.getElementById('editObservationInput');
+        const charCounter = document.getElementById('editCharCounter');
+        
+        if (observationInput && charCounter) {
+            const currentLength = observationInput.value.length;
+            charCounter.textContent = `${currentLength}/30`;
+            
+            if (currentLength > 30) {
+                charCounter.className = 'text-xs text-red-500';
+            } else if (currentLength > 25) {
+                charCounter.className = 'text-xs text-yellow-500';
+            } else {
+                charCounter.className = 'text-xs text-gray-500';
+            }
+        }
+    }
+    
+    // Event listener para contador de caracteres do modal
+    document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'editObservationInput') {
+            updateCharCounter();
+        }
+    });
+    
+    // Função para enviar edição (placeholder)
+    // Função para enviar edição via AJAX
+    window.submitTimeEdit = function() {
+        const form = document.getElementById('editTimeForm');
+        if (!form) {
+            console.error('❌ Formulário de edição não encontrado');
+            return;
+        }
+        
+        const formData = new FormData(form);
+        const data = {
+            tracking_id: formData.get('tracking_id'),
+            time_slot_type: formData.get('time_slot_type'),
+            time: formData.get('time'),
+            observation: formData.get('observation') || ''
+        };
+        
+        console.log('💾 Enviando dados para edição:', data);
+        
+        // Validação básica
+        if (!data.tracking_id) {
+            console.error('❌ ID do registro não encontrado');
+            if (window.GlobalAlerts) {
+                window.GlobalAlerts.show('Erro: ID do registro não encontrado', 'error');
+            } else {
+                alert('Erro: ID do registro não encontrado');
+            }
+            return;
+        }
+        
+        if (!data.time_slot_type) {
+            console.error('❌ Tipo de horário não encontrado');
+            if (window.GlobalAlerts) {
+                window.GlobalAlerts.show('Erro: Tipo de horário não encontrado', 'error');
+            } else {
+                alert('Erro: Tipo de horário não encontrado');
+            }
+            return;
+        }
+        
+        if (!data.time) {
+            console.error('❌ Horário não informado');
+            if (window.GlobalAlerts) {
+                window.GlobalAlerts.show('Por favor, informe o horário.', 'warning');
+            } else {
+                alert('Por favor, informe o horário.');
+            }
+            document.getElementById('editTimeInput')?.focus();
+            return;
+        }
+        
+        // Mostrar loading
+        if (window.GlobalLoading) {
+            window.GlobalLoading.show('Salvando alterações...');
+        }
+        
+        // Desabilitar botão de salvar temporariamente
+        const saveButton = document.querySelector('button[onclick="submitTimeEdit()"]');
+        if (saveButton) {
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando...';
+        }
+        
+        // Enviar requisição AJAX
+        fetch('/cadastros/registro-ponto/update', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log('📡 Resposta recebida:', response);
+            return response.json().then(json => ({ status: response.status, json }));
+        })
+        .then(({ status, json }) => {
+            console.log('📊 Dados da resposta:', json);
+            
+            if (status === 200 && json.success) {
+                // Sucesso
+                console.log('✅ Edição realizada com sucesso');
+                
+                if (window.GlobalAlerts) {
+                    window.GlobalAlerts.show(json.message || 'Horário atualizado com sucesso!', 'success');
+                } else {
+                    alert(json.message || 'Horário atualizado com sucesso!');
+                }
+                
+                // Fechar modal
+                window.closeEditTimeFinishModal();
+                
+                // Atualizar tabela
+                performAjaxSearch();
+                
+            } else {
+                // Erro do servidor
+                console.error('❌ Erro na edição:', json);
+                
+                const errorMessage = json.message || 'Erro ao atualizar horário';
+                
+                if (window.GlobalAlerts) {
+                    window.GlobalAlerts.show(errorMessage, 'error');
+                } else {
+                    alert('Erro: ' + errorMessage);
+                }
+                
+                // Se há erros de validação específicos, mostrar o primeiro
+                if (json.errors && typeof json.errors === 'object') {
+                    const firstError = Object.values(json.errors)[0];
+                    if (Array.isArray(firstError) && firstError.length > 0) {
+                        if (window.GlobalAlerts) {
+                            window.GlobalAlerts.show(firstError[0], 'error');
+                        } else {
+                            alert(firstError[0]);
+                        }
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            
+            const errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+            
+            if (window.GlobalAlerts) {
+                window.GlobalAlerts.show(errorMessage, 'error');
+            } else {
+                alert(errorMessage);
+            }
+        })
+        .finally(() => {
+            // Esconder loading
+            if (window.GlobalLoading) {
+                window.GlobalLoading.hide();
+            }
+            
+            // Reabilitar botão de salvar
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.innerHTML = '<i class="fa-solid fa-save mr-1"></i> Salvar Alterações';
+            }
+        });
     };
 
     // Anexar eventos iniciais

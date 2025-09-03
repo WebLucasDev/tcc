@@ -15,9 +15,9 @@
                         Buscar por Nome do Colaborador
                     </label>
                     <div class="relative">
-                        <input type="text" 
-                               id="search" 
-                               name="search" 
+                        <input type="text"
+                               id="search"
+                               name="search"
                                value="{{ request('search') }}"
                                placeholder="Digite o nome do colaborador..."
                                class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent bg-[var(--color-background)] text-[var(--color-text)]"
@@ -34,11 +34,11 @@
 
                 <!-- Filtro por Colaborador -->
                 <div>
-                    <label for="collaborator_id" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                    <label for="filter_collaborator_id" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                         Filtrar por Colaborador
                     </label>
-                    <select id="collaborator_id" 
-                            name="collaborator_id" 
+                    <select id="filter_collaborator_id"
+                            name="collaborator_id"
                             class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent bg-[var(--color-background)] text-[var(--color-text)]">
                         <option value="">-- Todos os colaboradores --</option>
                         @foreach($collaborators as $collaborator)

@@ -34,6 +34,10 @@
                 ])
             @endif
         </div>
+
+        <!-- Modais de Edição -->
+        @include('auth.time-management.time-tracking.partials.modal-edit')
+        @include('auth.time-management.time-tracking.partials.modal-edit-finish')
     </div>
 @endsection
 
