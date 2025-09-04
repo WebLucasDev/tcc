@@ -40,6 +40,10 @@ class CollaboratorController extends Controller
             $query->where('position_id', $request->position_id);
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $sortBy = $request->get('sort_by', 'name');
         $sortDirection = $request->get('sort_direction', 'asc');
 
@@ -114,6 +118,7 @@ class CollaboratorController extends Controller
                 'entry_time_2' => $request->entry_time_2,
                 'return_time_2' => $request->return_time_2,
                 'password' => 'senha123',
+                'status' => $request->status,
             ]);
 
             Log::info('Colaborador criado com sucesso:', ['id' => $collaborator->id]);
@@ -170,6 +175,7 @@ class CollaboratorController extends Controller
                 'return_time_1' => $request->return_time_1,
                 'entry_time_2' => $request->entry_time_2,
                 'return_time_2' => $request->return_time_2,
+                'status' => $request->status,
             ]);
 
             return redirect()->route('collaborator.index')

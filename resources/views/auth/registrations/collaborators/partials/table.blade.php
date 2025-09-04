@@ -54,6 +54,9 @@
                             Cargo
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             Data de Criação
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -88,6 +91,16 @@
                                     <span class="text-sm text-[var(--color-text)]">{{ $collaborator->position->name }}</span>
                                 @else
                                     <span class="text-gray-400 text-sm">Sem cargo</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($collaborator->status)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $collaborator->status->badgeClass() }}">
+                                        <i class="fa-solid {{ $collaborator->status->icon() }} mr-1"></i>
+                                        {{ $collaborator->status->label() }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 text-sm">Indefinido</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] opacity-70 group-hover:text-gray-900 dark:group-hover:text-gray-100 group-hover:opacity-100">

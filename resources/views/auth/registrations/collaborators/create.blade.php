@@ -197,7 +197,7 @@
                             Cargo e Departamento
                         </h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="position_id" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Cargo
@@ -221,6 +221,28 @@
                                             </option>
                                         @endforeach
                                     @endif
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Status
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="status"
+                                    name="status"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
+                                    required>
+                                    <option value="">Selecione o status</option>
+                                    <option value="ativo" {{ old('status', isset($collaborator) ? $collaborator->status->value ?? 'ativo' : 'ativo') == 'ativo' ? 'selected' : '' }}>
+                                        <i class="fa-solid fa-check-circle text-green-500 mr-2"></i>
+                                        Ativo
+                                    </option>
+                                    <option value="inativo" {{ old('status', isset($collaborator) ? $collaborator->status->value ?? '' : '') == 'inativo' ? 'selected' : '' }}>
+                                        <i class="fa-solid fa-times-circle text-red-500 mr-2"></i>
+                                        Inativo
+                                    </option>
                                 </select>
                             </div>
 

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('input[name="search"]');
     const departmentSelect = document.querySelector('select[name="department_id"]');
     const positionSelect = document.querySelector('select[name="position_id"]');
+    const statusSelect = document.querySelector('select[name="status"]');
     const sortBySelect = document.querySelector('select[name="sort_by"]');
     const sortDirectionBtn = document.querySelector('[name="sort_direction"]');
     const tableContainer = document.getElementById('collaborators-table-container');
@@ -67,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         search: searchInput ? searchInput.value : '',
         department_id: departmentSelect ? departmentSelect.value : '',
         position_id: positionSelect ? positionSelect.value : '',
+        status: statusSelect ? statusSelect.value : '',
         sort_by: sortBySelect ? sortBySelect.value : 'name',
         sort_direction: getSortDirection()
     };
@@ -95,6 +97,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (positionSelect) {
         positionSelect.addEventListener('change', function() {
             currentFilters.position_id = this.value;
+            performAjaxSearch();
+        });
+    }
+
+    // Event listener para filtro de status
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            currentFilters.status = this.value;
             performAjaxSearch();
         });
     }
@@ -432,6 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
             search: '',
             department_id: '',
             position_id: '',
+            status: '',
             sort_by: 'name',
             sort_direction: 'asc'
         };
@@ -440,6 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (searchInput) searchInput.value = '';
         if (departmentSelect) departmentSelect.value = '';
         if (positionSelect) positionSelect.value = '';
+        if (statusSelect) statusSelect.value = '';
         if (sortBySelect) sortBySelect.value = 'name';
 
         // Realizar nova busca

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CollaboratorStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,6 +37,7 @@ class CollaboratorModel extends Authenticatable
         'return_time_1',
         'return_time_2',
         'position_id',
+        'status',
     ];
 
     /**
@@ -56,6 +58,7 @@ class CollaboratorModel extends Authenticatable
         'return_time_1' => 'datetime:H:i',
         'return_time_2' => 'datetime:H:i',
         'position_id' => 'integer',
+        'status' => CollaboratorStatusEnum::class,
         'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -177,5 +180,13 @@ class CollaboratorModel extends Authenticatable
               ->orWhere('email', 'like', "%{$term}%")
               ->orWhere('cpf', 'like', "%{$term}%");
         });
+    }
+
+    /**
+     * Scope to filter by status.
+     */
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
     }
 }

@@ -71,6 +71,7 @@ class CollaboratorSeeder extends Seeder
                 'return_time_1' => $returnTime1,
                 'entry_time_2' => $entryTime2,
                 'return_time_2' => $returnTime2,
+                'status' => $faker->randomElement(['ativo', 'ativo', 'ativo', 'inativo']), // 75% ativo, 25% inativo
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
