@@ -48,7 +48,7 @@ class CollaboratorController extends Controller
         $sortBy = $request->get('sort_by', 'name');
         $sortDirection = $request->get('sort_direction', 'asc');
 
-        if (in_array($sortBy, ['name', 'email', 'created_at'])) {
+        if (in_array($sortBy, ['name', 'email', 'admission_date'])) {
             $query->orderBy($sortBy, $sortDirection);
         }
 

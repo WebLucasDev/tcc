@@ -19,7 +19,7 @@
                         class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-[var(--color-background)] text-[var(--color-text)]">
                         <option value="name" {{ request('sort_by', 'name') == 'name' ? 'selected' : '' }}>Nome</option>
                         <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
-                        <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Data de Criação</option>
+                        <option value="admission_date" {{ request('sort_by') == 'admission_date' ? 'selected' : '' }}>Data de Admissão</option>
                     </select>
 
                     <button
@@ -57,7 +57,7 @@
                             Status
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Data de Criação
+                            Data de Admissão
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             Ações
@@ -104,7 +104,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text)] opacity-70 group-hover:text-gray-900 dark:group-hover:text-gray-100 group-hover:opacity-100">
-                                {{ $collaborator->created_at->format('d/m/Y') }}
+                                {{ $collaborator->admission_date ? $collaborator->admission_date->format('d/m/Y') : 'Não informado' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
@@ -179,7 +179,7 @@
                     </div>
 
                     <div class="text-xs text-[var(--color-text)] opacity-50">
-                        Criado em {{ $collaborator->created_at->format('d/m/Y') }}
+                        Admitido em {{ $collaborator->admission_date ? $collaborator->admission_date->format('d/m/Y') : 'Data não informada' }}
                     </div>
                 </div>
             @endforeach

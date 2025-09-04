@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="text-center py-6">
                     <i class="fa-solid fa-clock text-2xl text-gray-400 mb-3"></i>
                     <p class="text-[var(--color-text)] mb-2">Nenhum horário registrado</p>
-                    <p class="text-sm text-gray-500">Este colaborador ainda não possui registros de ponto para esta data.</p>
+                    <p class="text-sm text-gray-500">Este colaborador não possui registros de ponto para esta data.</p>
                 </div>
             `;
             return;
