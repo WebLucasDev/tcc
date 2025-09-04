@@ -6,6 +6,8 @@ use App\Http\Requests\web\timeManagement\timeTracking\TimeTrackingStoreRequest;
 use App\Http\Requests\web\timeManagement\timeTracking\TimeTrackingUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\TimeTrackingModel;
+use App\Enums\TimeTrackingActionEnum;
+use Illuminate\Support\Facades\Log;
 
 class TimeTrackingController extends Controller
 {
@@ -294,7 +296,8 @@ class TimeTrackingController extends Controller
 
             // Preparar dados para atualização
             $updateData = [
-                $timeSlotType => $newTime
+                $timeSlotType => $newTime,
+                'action' => TimeTrackingActionEnum::EDITED->value
             ];
 
             // Adicionar ou remover observação
@@ -329,6 +332,87 @@ class TimeTrackingController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Erro interno do servidor: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cancela um registro de ponto
+     */
+    public function cancel($id)
+    {
+        try {
+            // Buscar o registro de ponto
+            $timeTracking = TimeTrackingModel::with('collaborator')->findOrFail($id);
+
+            Log::info('Cancelando registro:', [
+                'id' => $id,
+                'current_action' => $timeTracking->action,
+                'collaborator' => $timeTracking->collaborator->name
+            ]);
+
+            // Verificar se o registro não está já cancelado
+            if ($timeTracking->action === TimeTrackingActionEnum::CANCELLED->value) {
+                return redirect()->back()
+                    ->with('error', 'Este registro já está cancelado.');
+            }
+
+            // Atualizar o status para cancelado
+            $timeTracking->update([
+                'action' => TimeTrackingActionEnum::CANCELLED->value
+            ]);
+
+            Log::info('Registro cancelado com sucesso:', [
+                'id' => $id,
+                'new_action' => $timeTracking->fresh()->action
+            ]);
+
+            return redirect()->route('time-tracking.index')
+                ->with('success', 'Registro de ponto cancelado com sucesso!');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Registro não encontrado para cancelamento:', ['id' => $id]);
+            return redirect()->back()
+                ->with('error', 'Registro de ponto não encontrado.');
+        } catch (\Exception $e) {
+            Log::error('Erro ao cancelar registro:', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()
+                ->with('error', 'Erro ao cancelar registro: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restaura um registro de ponto cancelado
+     */
+    public function restore($id)
+    {
+        try {
+            // Buscar o registro de ponto
+            $timeTracking = TimeTrackingModel::with('collaborator')->findOrFail($id);
+
+            // Verificar se o registro está cancelado
+            if ($timeTracking->action !== TimeTrackingActionEnum::CANCELLED->value) {
+                return redirect()->back()
+                    ->with('error', 'Apenas registros cancelados podem ser restaurados.');
+            }
+
+            // Atualizar o status para restaurado
+            $timeTracking->update([
+                'action' => TimeTrackingActionEnum::RESTORED->value
+            ]);
+
+            return redirect()->route('time-tracking.index')
+                ->with('success', 'Registro de ponto restaurado com sucesso!');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()
+                ->with('error', 'Registro de ponto não encontrado.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Erro ao restaurar registro: ' . $e->getMessage());
         }
     }
 

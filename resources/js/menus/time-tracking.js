@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             date: date
         });
 
-        fetch(`/cadastros/registro-ponto/next-tracking-info?${params}`, {
+        fetch(`/gestao-ponto/registro-ponto/next-tracking-info?${params}`, {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Atualizar URL sem recarregar a página
-        const newUrl = '/cadastros/registro-ponto' + (params.toString() ? '?' + params.toString() : '');
+        const newUrl = '/gestao-ponto/registro-ponto' + (params.toString() ? '?' + params.toString() : '');
         console.log('URL da requisição:', newUrl);
 
         window.history.pushState({}, '', newUrl);
@@ -429,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Anexar outros eventos
         attachPaginationEvents();
         attachTableEvents();
+        attachActionEvents();
         attachClearFiltersEvent();
     }
 
@@ -501,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         params.set('page', page);
 
-        const url = '/cadastros/registro-ponto' + '?' + params.toString();
+        const url = '/gestao-ponto/registro-ponto' + '?' + params.toString();
         console.log('URL da paginação:', url);
 
         // Atualizar URL sem recarregar a página
@@ -599,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Erro: ' + message);
 
         // TODO: Implementar toast de erro em vez de alert
-        // window.location.href = '/cadastros/registro-ponto?error=' + encodeURIComponent(message);
+        // window.location.href = '/gestao-ponto/registro-ponto?error=' + encodeURIComponent(message);
     }
 
     // Funções globais para os botões
@@ -608,6 +609,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // === FUNÇÕES DE CONTROLE DOS MODAIS DE EDIÇÃO ===
+
+    // Variável para armazenar dados da ação atual
+    let currentActionData = null;
 
     // Abrir modal de seleção de horário
     function openEditTimeSelectModal(trackingId, collaboratorName) {
@@ -732,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Fazer requisição AJAX para buscar dados reais
-        fetch(`/cadastros/registro-ponto/${trackingId}`, {
+        fetch(`/gestao-ponto/registro-ponto/${trackingId}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -944,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Enviar requisição AJAX
-        fetch('/cadastros/registro-ponto/update', {
+        fetch('/gestao-ponto/registro-ponto/update', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -1027,8 +1031,195 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    // === FUNÇÕES DE CONTROLE DO MODAL DE AÇÃO ===
+
+    // Abrir modal de confirmação de ação
+    function openActionConfirmModal(trackingId, collaboratorName, date, action, actionType) {
+        console.log('🔥 Abrindo modal de confirmação de ação:', actionType);
+
+        const modal = document.getElementById('actionConfirmModal');
+        const collaboratorNameElement = document.getElementById('actionCollaboratorName');
+        const dateElement = document.getElementById('actionDate');
+        const modalTitle = document.getElementById('actionModalTitle');
+        const modalIcon = document.getElementById('actionModalIcon');
+        const actionQuestion = document.getElementById('actionQuestion');
+        const actionDescription = document.getElementById('actionDescription');
+        const currentActionBadge = document.getElementById('currentActionBadge');
+        const messageContainer = document.getElementById('actionMessageContainer');
+        const warningIcon = document.getElementById('actionWarningIcon');
+        const confirmButton = document.getElementById('confirmActionButton');
+        const confirmIcon = document.getElementById('confirmActionIcon');
+        const confirmText = document.getElementById('confirmActionText');
+
+        if (!modal) {
+            console.error('❌ Modal de confirmação de ação não encontrado');
+            return;
+        }
+
+        // Armazenar dados da ação
+        currentActionData = {
+            trackingId,
+            collaboratorName,
+            date,
+            currentAction: action,
+            actionType
+        };
+
+        // Configurar conteúdo baseado no tipo de ação
+        if (actionType === 'cancel') {
+            modalTitle.textContent = 'Cancelar Registro';
+            modalIcon.className = 'fa-solid fa-ban text-red-600 mr-2';
+            actionQuestion.textContent = 'Tem certeza que deseja cancelar este registro de ponto?';
+            actionDescription.textContent = 'Esta ação marcará o registro como cancelado. Você poderá restaurá-lo posteriormente se necessário.';
+            messageContainer.className = 'mb-6 p-4 rounded-lg border border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20';
+            warningIcon.className = 'fa-solid fa-exclamation-triangle text-red-600 text-xl mt-1';
+            confirmButton.className = 'px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200';
+            confirmIcon.className = 'fa-solid fa-ban mr-1';
+            confirmText.textContent = 'Cancelar Registro';
+        } else if (actionType === 'restore') {
+            modalTitle.textContent = 'Restaurar Registro';
+            modalIcon.className = 'fa-solid fa-undo text-green-600 mr-2';
+            actionQuestion.textContent = 'Tem certeza que deseja restaurar este registro de ponto?';
+            actionDescription.textContent = 'Esta ação restaurará o registro cancelado, marcando-o como restaurado e tornando-o válido novamente.';
+            messageContainer.className = 'mb-6 p-4 rounded-lg border border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20';
+            warningIcon.className = 'fa-solid fa-info-circle text-green-600 text-xl mt-1';
+            confirmButton.className = 'px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors duration-200';
+            confirmIcon.className = 'fa-solid fa-undo mr-1';
+            confirmText.textContent = 'Restaurar Registro';
+        }
+
+        // Preencher informações do registro
+        if (collaboratorNameElement) collaboratorNameElement.textContent = collaboratorName;
+        if (dateElement) dateElement.textContent = date;
+
+        // Mostrar status atual
+        if (currentActionBadge) {
+            if (action) {
+                // Simular enum para determinar classe e texto
+                let badgeClass, badgeIcon, badgeText;
+                switch (action) {
+                    case 'edited':
+                        badgeClass = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-600';
+                        badgeIcon = 'fa-solid fa-edit mr-1';
+                        badgeText = 'Editado';
+                        break;
+                    case 'cancelled':
+                        badgeClass = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-red-600';
+                        badgeIcon = 'fa-solid fa-ban mr-1';
+                        badgeText = 'Cancelado';
+                        break;
+                    case 'restored':
+                        badgeClass = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-yellow-600';
+                        badgeIcon = 'fa-solid fa-undo mr-1';
+                        badgeText = 'Restaurado';
+                        break;
+                    default:
+                        badgeClass = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-gray-600';
+                        badgeIcon = 'fa-solid fa-circle mr-1';
+                        badgeText = 'Normal';
+                        break;
+                }
+                currentActionBadge.innerHTML = `
+                    <span class="${badgeClass}">
+                        <i class="${badgeIcon}"></i>
+                        ${badgeText}
+                    </span>
+                `;
+            } else {
+                currentActionBadge.innerHTML = `
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-gray-600">
+                        <i class="fa-solid fa-circle mr-1"></i>
+                        Normal
+                    </span>
+                `;
+            }
+        }
+
+        // Mostrar modal
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+
+        console.log('✅ Modal de confirmação de ação aberto');
+    }
+
+    // Fechar modal de confirmação de ação
+    window.closeActionConfirmModal = function() {
+        console.log('🔒 Fechando modal de confirmação de ação');
+        const modal = document.getElementById('actionConfirmModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+            currentActionData = null;
+        }
+    };
+
+    // Executar ação confirmada
+    window.executeAction = function() {
+        if (!currentActionData) {
+            console.error('❌ Dados da ação não encontrados');
+            return;
+        }
+
+        console.log('💾 Executando ação:', currentActionData);
+
+        // Preparar formulário
+        const form = document.getElementById('actionForm');
+        if (!form) {
+            console.error('❌ Formulário de ação não encontrado');
+            return;
+        }
+
+        // Definir action do formulário baseado no tipo
+        if (currentActionData.actionType === 'cancel') {
+            form.action = `/gestao-ponto/registro-ponto/${currentActionData.trackingId}/cancel`;
+        } else if (currentActionData.actionType === 'restore') {
+            form.action = `/gestao-ponto/registro-ponto/${currentActionData.trackingId}/restore`;
+        }
+
+        // Mostrar loading
+        if (window.GlobalLoading) {
+            window.GlobalLoading.show(`${currentActionData.actionType === 'cancel' ? 'Cancelando' : 'Restaurando'} registro...`);
+        }
+
+        // Fechar modal
+        window.closeActionConfirmModal();
+
+        // Submeter formulário
+        form.submit();
+    };
+
+    // Anexar eventos para botões de ação
+    function attachActionEvents() {
+        // Botões de cancelar
+        const cancelButtons = document.querySelectorAll('.cancel-tracking-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const trackingId = this.getAttribute('data-tracking-id');
+                const collaboratorName = this.getAttribute('data-tracking-collaborator');
+                const date = this.getAttribute('data-tracking-date');
+                const action = this.getAttribute('data-tracking-action');
+
+                openActionConfirmModal(trackingId, collaboratorName, date, action, 'cancel');
+            });
+        });
+
+        // Botões de restaurar
+        const restoreButtons = document.querySelectorAll('.restore-tracking-btn');
+        restoreButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const trackingId = this.getAttribute('data-tracking-id');
+                const collaboratorName = this.getAttribute('data-tracking-collaborator');
+                const date = this.getAttribute('data-tracking-date');
+                const action = this.getAttribute('data-tracking-action');
+
+                openActionConfirmModal(trackingId, collaboratorName, date, action, 'restore');
+            });
+        });
+    }
+
     // Anexar eventos iniciais
     attachTableEvents();
+    attachActionEvents();
     attachClearFiltersEvent();
     attachPaginationEvents(); // Anexar eventos de paginação na inicialização
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TimeTrackingStatusEnum;
+use App\Enums\TimeTrackingActionEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
@@ -25,6 +26,7 @@ class TimeTrackingModel extends Model
         'observations',
         'status',
         'total_hours_worked',
+        'action',
     ];
 
     protected $casts = [

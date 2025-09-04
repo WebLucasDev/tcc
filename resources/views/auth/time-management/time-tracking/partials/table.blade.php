@@ -59,6 +59,9 @@
                             Saída
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            Ação
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             Status
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -138,6 +141,28 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                @if($tracking->action)
+                                    @php
+                                        $actionEnum = \App\Enums\TimeTrackingActionEnum::from($tracking->action);
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $actionEnum->color() }}">
+                                        @if($actionEnum === \App\Enums\TimeTrackingActionEnum::EDITED)
+                                            <i class="fa-solid fa-edit mr-1"></i>
+                                        @elseif($actionEnum === \App\Enums\TimeTrackingActionEnum::CANCELLED)
+                                            <i class="fa-solid fa-ban mr-1"></i>
+                                        @elseif($actionEnum === \App\Enums\TimeTrackingActionEnum::RESTORED)
+                                            <i class="fa-solid fa-undo mr-1"></i>
+                                        @endif
+                                        {{ $actionEnum->label() }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-gray-600">
+                                        <i class="fa-solid fa-circle mr-1"></i>
+                                        Normal
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if($tracking->status->value === 'completo')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                         <i class="fa-solid fa-check mr-1"></i>
@@ -164,6 +189,30 @@
                                         data-tracking-collaborator="{{ $tracking->collaborator->name }}">
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
+
+                                    @if($tracking->action !== 'cancelled')
+                                        <button type="button"
+                                            class="text-red-600 hover:text-red-800 transition-colors duration-200 cancel-tracking-btn"
+                                            title="Cancelar"
+                                            data-tracking-id="{{ $tracking->id }}"
+                                            data-tracking-collaborator="{{ $tracking->collaborator->name }}"
+                                            data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}"
+                                            data-tracking-action="{{ $tracking->action }}">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </button>
+                                    @endif
+
+                                    @if($tracking->action === 'cancelled')
+                                        <button type="button"
+                                            class="text-green-600 hover:text-green-800 transition-colors duration-200 restore-tracking-btn"
+                                            title="Restaurar"
+                                            data-tracking-id="{{ $tracking->id }}"
+                                            data-tracking-collaborator="{{ $tracking->collaborator->name }}"
+                                            data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}"
+                                            data-tracking-action="{{ $tracking->action }}">
+                                            <i class="fa-solid fa-undo"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -187,12 +236,28 @@
                                     data-tracking-collaborator="{{ $tracking->collaborator->name }}">
                                 <i class="fa-solid fa-edit text-sm"></i>
                             </button>
-                            <button type="button" class="text-red-600 p-1 delete-tracking-btn"
+
+                            @if($tracking->action !== 'cancelled')
+                                <button type="button"
+                                    class="text-red-600 p-1 cancel-tracking-btn"
                                     data-tracking-id="{{ $tracking->id }}"
                                     data-tracking-collaborator="{{ $tracking->collaborator->name }}"
-                                    data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}">
-                                <i class="fa-solid fa-trash text-sm"></i>
-                            </button>
+                                    data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}"
+                                    data-tracking-action="{{ $tracking->action }}">
+                                    <i class="fa-solid fa-ban text-sm"></i>
+                                </button>
+                            @endif
+
+                            @if($tracking->action === 'cancelled')
+                                <button type="button"
+                                    class="text-green-600 p-1 restore-tracking-btn"
+                                    data-tracking-id="{{ $tracking->id }}"
+                                    data-tracking-collaborator="{{ $tracking->collaborator->name }}"
+                                    data-tracking-date="{{ \Carbon\Carbon::parse($tracking->date)->format('d/m/Y') }}"
+                                    data-tracking-action="{{ $tracking->action }}">
+                                    <i class="fa-solid fa-undo text-sm"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -260,22 +325,40 @@
                     </div>
 
                     <div class="flex items-center justify-between pt-2">
-                        @if($tracking->status->value === 'completo')
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                <i class="fa-solid fa-check mr-1"></i>
-                                Completo
-                            </span>
-                        @elseif($tracking->status->value === 'incompleto')
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                <i class="fa-solid fa-clock mr-1"></i>
-                                Incompleto
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Ausente
-                            </span>
-                        @endif
+                        <div class="flex gap-2">
+                            @if($tracking->status->value === 'completo')
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                    <i class="fa-solid fa-check mr-1"></i>
+                                    Completo
+                                </span>
+                            @elseif($tracking->status->value === 'incompleto')
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                                    <i class="fa-solid fa-clock mr-1"></i>
+                                    Incompleto
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                                    <i class="fa-solid fa-times mr-1"></i>
+                                    Ausente
+                                </span>
+                            @endif
+
+                            @if($tracking->action)
+                                @php
+                                    $actionEnum = \App\Enums\TimeTrackingActionEnum::from($tracking->action);
+                                @endphp
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs {{ $actionEnum->color() }}">
+                                    @if($actionEnum === \App\Enums\TimeTrackingActionEnum::EDITED)
+                                        <i class="fa-solid fa-edit mr-1"></i>
+                                    @elseif($actionEnum === \App\Enums\TimeTrackingActionEnum::CANCELLED)
+                                        <i class="fa-solid fa-ban mr-1"></i>
+                                    @elseif($actionEnum === \App\Enums\TimeTrackingActionEnum::RESTORED)
+                                        <i class="fa-solid fa-undo mr-1"></i>
+                                    @endif
+                                    {{ $actionEnum->label() }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @endforeach
