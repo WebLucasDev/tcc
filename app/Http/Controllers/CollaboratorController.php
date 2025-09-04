@@ -7,6 +7,7 @@ use App\Http\Requests\web\registrations\collaborators\CollaboratorUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
+use App\Models\TimeTrackingModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -191,6 +192,14 @@ class CollaboratorController extends Controller
     {
         try {
             $collaborator = CollaboratorModel::findOrFail($id);
+
+            // Verificar se o colaborador possui registros de ponto
+            $hasTimeTracking = TimeTrackingModel::where('collaborator_id', $collaborator->id)->exists();
+
+            if ($hasTimeTracking) {
+                return redirect()->back()
+                    ->with('error', 'Este colaborador não pode ser excluído pois possui registros de ponto no sistema. Para impedir o acesso, altere o status para "Inativo".');
+            }
 
             $collaborator->delete();
 
