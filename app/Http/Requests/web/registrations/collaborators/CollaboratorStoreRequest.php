@@ -15,6 +15,18 @@ class CollaboratorStoreRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'cpf' => preg_replace('/\D/', '', $this->cpf ?? ''),
+            'zip_code' => preg_replace('/\D/', '', $this->zip_code ?? ''),
+            'phone' => preg_replace('/\D/', '', $this->phone ?? ''),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -24,10 +36,10 @@ class CollaboratorStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:collaborators,email|max:255',
-            'cpf' => 'required|string|size:14|unique:collaborators,cpf',
+            'cpf' => 'required|string|size:11|unique:collaborators,cpf',
             'admission_date' => 'required|date',
-            'phone' => 'required|string|max:20',
-            'zip_code' => 'required|string|size:9',
+            'phone' => 'required|string|min:10|max:11',
+            'zip_code' => 'required|string|size:8',
             'street' => 'required|string|max:255',
             'number' => 'required|string|max:10',
             'neighborhood' => 'required|string|max:100',
@@ -53,14 +65,15 @@ class CollaboratorStoreRequest extends FormRequest
             'email.unique' => 'Este email já está em uso.',
             'email.max' => 'O email não pode ter mais de 255 caracteres.',
             'cpf.required' => 'O CPF é obrigatório.',
-            'cpf.size' => 'O CPF deve ter 14 caracteres (com pontos e hífen).',
+            'cpf.size' => 'O CPF deve ter 11 dígitos numéricos.',
             'cpf.unique' => 'Este CPF já está cadastrado.',
             'admission_date.required' => 'A data de admissão é obrigatória.',
             'admission_date.date' => 'A data de admissão deve ser uma data válida.',
             'phone.required' => 'O telefone é obrigatório.',
-            'phone.max' => 'O telefone não pode ter mais de 20 caracteres.',
+            'phone.min' => 'O telefone deve ter pelo menos 10 dígitos.',
+            'phone.max' => 'O telefone deve ter no máximo 11 dígitos.',
             'zip_code.required' => 'O CEP é obrigatório.',
-            'zip_code.size' => 'O CEP deve ter 9 caracteres (com hífen).',
+            'zip_code.size' => 'O CEP deve ter 8 dígitos numéricos.',
             'street.required' => 'O endereço é obrigatório.',
             'street.max' => 'O endereço não pode ter mais de 255 caracteres.',
             'number.required' => 'O número é obrigatório.',
