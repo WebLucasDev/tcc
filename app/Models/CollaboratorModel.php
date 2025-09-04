@@ -53,10 +53,6 @@ class CollaboratorModel extends Authenticatable
      */
     protected $casts = [
         'admission_date' => 'date',
-        'entry_time_1' => 'datetime:H:i',
-        'entry_time_2' => 'datetime:H:i',
-        'return_time_1' => 'datetime:H:i',
-        'return_time_2' => 'datetime:H:i',
         'position_id' => 'integer',
         'status' => CollaboratorStatusEnum::class,
         'email_verified_at' => 'datetime',
@@ -79,7 +75,7 @@ class CollaboratorModel extends Authenticatable
     {
         return $this->hasMany(TimeTrackingModel::class, 'collaborator_id');
     }
-    
+
     /**
      * Automatically hash the password when setting it.
      */

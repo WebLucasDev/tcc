@@ -112,7 +112,7 @@
                                     type="date"
                                     id="admission_date"
                                     name="admission_date"
-                                    value="{{ old('admission_date', isset($collaborator) ? $collaborator->admission_date : '') }}"
+                                    value="{{ old('admission_date', isset($collaborator) ? $collaborator->admission_date?->format('Y-m-d') : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                     required>
                             </div>
@@ -285,7 +285,7 @@
                                             type="time"
                                             id="entry_time_1"
                                             name="entry_time_1"
-                                            value="{{ old('entry_time_1', isset($collaborator) ? $collaborator->entry_time_1 : '') }}"
+                                            value="{{ old('entry_time_1', isset($collaborator) && $collaborator->entry_time_1 ? substr($collaborator->entry_time_1, 0, 5) : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                             required>
                                     </div>
@@ -299,7 +299,7 @@
                                             type="time"
                                             id="return_time_1"
                                             name="return_time_1"
-                                            value="{{ old('return_time_1', isset($collaborator) ? $collaborator->return_time_1 : '') }}"
+                                            value="{{ old('return_time_1', isset($collaborator) && $collaborator->return_time_1 ? substr($collaborator->return_time_1, 0, 5) : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
                                             required>
                                     </div>
@@ -317,7 +317,7 @@
                                             type="time"
                                             id="entry_time_2"
                                             name="entry_time_2"
-                                            value="{{ old('entry_time_2', isset($collaborator) ? $collaborator->entry_time_2 : '') }}"
+                                            value="{{ old('entry_time_2', isset($collaborator) && $collaborator->entry_time_2 ? substr($collaborator->entry_time_2, 0, 5) : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
                                     </div>
 
@@ -329,7 +329,7 @@
                                             type="time"
                                             id="return_time_2"
                                             name="return_time_2"
-                                            value="{{ old('return_time_2', isset($collaborator) ? $collaborator->return_time_2 : '') }}"
+                                            value="{{ old('return_time_2', isset($collaborator) && $collaborator->return_time_2 ? substr($collaborator->return_time_2, 0, 5) : '') }}"
                                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
                                     </div>
                                 </div>
@@ -359,55 +359,11 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const positionSelect = document.getElementById('position_id');
-            const departmentDisplay = document.getElementById('department_display');
-
-            // Dados dos departamentos para lookup
-            const departments = @json($departments ?? []);
-
-            function updateDepartment() {
-                const selectedOption = positionSelect.options[positionSelect.selectedIndex];
-                const departmentId = selectedOption.getAttribute('data-department-id');
-
-                if (departmentId) {
-                    const department = departments.find(dept => dept.id == departmentId);
-                    departmentDisplay.value = department ? department.name : '';
-                } else {
-                    departmentDisplay.value = '';
-                }
-            }
-
-            positionSelect.addEventListener('change', updateDepartment);
-
-            // Aplicar máscara nos campos
-            if (document.getElementById('cpf')) {
-                document.getElementById('cpf').addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                    e.target.value = value;
-                });
-            }
-
-            if (document.getElementById('phone')) {
-                document.getElementById('phone').addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    value = value.replace(/(\d{2})(\d)/, '($1) $2');
-                    value = value.replace(/(\d{5})(\d)/, '$1-$2');
-                    e.target.value = value;
-                });
-            }
-
-            if (document.getElementById('zip_code')) {
-                document.getElementById('zip_code').addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    value = value.replace(/(\d{5})(\d)/, '$1-$2');
-                    e.target.value = value;
-                });
-            }
-        });
+        window.collaboratorDepartments = @json($departments ?? []);
     </script>
 
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/menus/collaborators.js'])
+@endpush
