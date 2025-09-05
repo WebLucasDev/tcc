@@ -77,6 +77,9 @@ Route::middleware('auth')->group(function () {
 
         Route::prefix('solicitacoes')->group(function () {
             Route::get('/', [SolicitationController::class, 'index'])->name('solicitation.index');
+            Route::patch('/{id}/approve', [SolicitationController::class, 'approve'])->name('solicitation.approve');
+            Route::patch('/{id}/reject', [SolicitationController::class, 'reject'])->name('solicitation.reject');
+            Route::patch('/{id}/cancel', [SolicitationController::class, 'cancel'])->name('solicitation.cancel');
         });
     });
 

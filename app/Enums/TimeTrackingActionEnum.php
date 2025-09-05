@@ -29,18 +29,6 @@ enum TimeTrackingActionEnum: string
     }
 
     /**
-     * Retorna as ações com seus labels
-     */
-    public static function getAllWithLabels(): array
-    {
-        $actions = [];
-        foreach (self::cases() as $case) {
-            $actions[$case->value] = $case->label();
-        }
-        return $actions;
-    }
-
-    /**
      * Retorna a cor CSS para cada ação (para exibição)
      */
     public function color(): string
