@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CollaboratorController;
+use App\Http\Controllers\CompTimeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ForgotPasswordController;
@@ -65,6 +66,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('gestao-ponto')->group(function () {
+
         Route::prefix('registro-ponto')->group(function () {
             Route::get('/', [TimeTrackingController::class , 'index'])->name('time-tracking.index');
             Route::post('/', [TimeTrackingController::class, 'store'])->name('time-tracking.store');
@@ -80,6 +82,10 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{id}/approve', [SolicitationController::class, 'approve'])->name('solicitation.approve');
             Route::patch('/{id}/reject', [SolicitationController::class, 'reject'])->name('solicitation.reject');
             Route::patch('/{id}/cancel', [SolicitationController::class, 'cancel'])->name('solicitation.cancel');
+        });
+
+        Route::prefix('banco-horas')->group(function () {
+            Route::get('/', [CompTimeController::class, 'index'])->name('comp-time.index');
         });
     });
 

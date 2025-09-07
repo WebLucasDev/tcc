@@ -11,6 +11,7 @@ export default defineConfig({
                     'resources/js/loading.js',
                     'resources/js/theme.js',
                     'resources/js/menus/collaborators.js',
+                    'resources/js/menus/comp-time.js',
                     'resources/js/menus/departments.js',
                     'resources/js/menus/login.js',
                     'resources/js/menus/positions.js',
