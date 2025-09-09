@@ -24,7 +24,7 @@
                     name="sort_by"
                     class="px-3 py-2 text-sm border-0 bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] rounded-lg shadow-sm">
                     <option value="created_at" {{ request('sort_by', 'created_at') == 'created_at' ? 'selected' : '' }}>Data de Criação</option>
-                    <option value="colaborator_name" {{ request('sort_by') == 'colaborator_name' ? 'selected' : '' }}>Nome do Colaborador</option>
+                    <option value="collaborator_name" {{ request('sort_by') == 'collaborator_name' ? 'selected' : '' }}>Nome do Colaborador</option>
                     <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
                 </select>
 
@@ -55,7 +55,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="relative">
                                         <div class="w-12 h-12 bg-gradient-to-br from-[var(--color-main)] to-red-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-lg">
-                                            {{ strtoupper(substr($solicitation->colaborator->name, 0, 2)) }}
+                                            {{ strtoupper(substr($solicitation->collaborator->name, 0, 2)) }}
                                         </div>
                                         <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 shadow-sm">
                                             <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
@@ -71,10 +71,10 @@
                                 <!-- Informações do colaborador -->
                                 <div class="min-w-0 flex-1">
                                     <h4 class="text-base font-bold text-[var(--color-text)] hover:text-[var(--color-main)] transition-colors duration-300">
-                                        {{ $solicitation->colaborator->name }}
+                                        {{ $solicitation->collaborator->name }}
                                     </h4>
                                     <div class="flex items-center gap-3 mt-1">
-                                        <span class="text-xs text-[var(--color-text)] opacity-60">{{ $solicitation->colaborator->email }}</span>
+                                        <span class="text-xs text-[var(--color-text)] opacity-60">{{ $solicitation->collaborator->email }}</span>
                                         <span class="text-xs text-[var(--color-text)] opacity-50 bg-[var(--color-background)] border border-gray-200 dark:border-gray-600 px-2 py-1 rounded-lg">
                                             {{ $solicitation->created_at->format('d/m/Y H:i') }}
                                         </span>
@@ -98,17 +98,17 @@
                                     <div class="flex gap-2" onclick="event.stopPropagation();">
                                         <button type="button"
                                                 class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                                                onclick="openActionModal('approve', {{ $solicitation->id }}, '{{ addslashes($solicitation->colaborator->name) }}')">
+                                                onclick="openActionModal('approve', {{ $solicitation->id }}, '{{ addslashes($solicitation->collaborator->name) }}')">
                                             <i class="fa-solid fa-check mr-1"></i>Aprovar
                                         </button>
                                         <button type="button"
                                                 class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                                                onclick="openActionModal('reject', {{ $solicitation->id }}, '{{ addslashes($solicitation->colaborator->name) }}')">
+                                                onclick="openActionModal('reject', {{ $solicitation->id }}, '{{ addslashes($solicitation->collaborator->name) }}')">
                                             <i class="fa-solid fa-times mr-1"></i>Rejeitar
                                         </button>
                                         <button type="button"
                                                 class="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                                                onclick="openActionModal('cancel', {{ $solicitation->id }}, '{{ addslashes($solicitation->colaborator->name) }}')">
+                                                onclick="openActionModal('cancel', {{ $solicitation->id }}, '{{ addslashes($solicitation->collaborator->name) }}')">
                                             <i class="fa-solid fa-ban mr-1"></i>Cancelar
                                         </button>
                                     </div>

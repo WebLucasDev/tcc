@@ -7,6 +7,7 @@ enum TimeTrackingStatusEnum: string
     case COMPLETO = 'completo';
     case INCOMPLETO = 'incompleto';
     case AUSENTE = 'ausente';
+    case PENDENTE = 'pendente';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum TimeTrackingStatusEnum: string
             self::COMPLETO => 'Completo',
             self::INCOMPLETO => 'Incompleto',
             self::AUSENTE => 'Ausente',
+            self::PENDENTE => 'Pendente',
         };
     }
 
@@ -23,6 +25,7 @@ enum TimeTrackingStatusEnum: string
             self::COMPLETO => 'success',
             self::INCOMPLETO => 'warning',
             self::AUSENTE => 'danger',
+            self::PENDENTE => 'info',
         };
     }
 
@@ -32,6 +35,7 @@ enum TimeTrackingStatusEnum: string
             self::COMPLETO->value => self::COMPLETO->label(),
             self::INCOMPLETO->value => self::INCOMPLETO->label(),
             self::AUSENTE->value => self::AUSENTE->label(),
+            self::PENDENTE->value => self::PENDENTE->label(),
         ];
     }
 }

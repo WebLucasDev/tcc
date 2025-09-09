@@ -167,10 +167,18 @@ class CompTimeController extends Controller
                         $tracking = $timeTrackings->get($dayKey);
 
                         $dayWorkedMinutes = 0;
-                        if ($tracking && !$day->isWeekend()) {
-                            // Apenas dias úteis contam para CLT
+                        if ($tracking) {
+                            // CORREÇÃO: Contabilizar TODOS os dias trabalhados (incluindo finais de semana)
                             $dayWorkedMinutes = $tracking->total_hours_worked ?? 0;
-                            $weekWorkedMinutes += $dayWorkedMinutes;
+                            
+                            // Para fins de semana: todo tempo trabalhado é hora extra
+                            if ($day->isWeekend()) {
+                                // Finais de semana: 100% do tempo é hora extra (adiciona ao banco)
+                                $weekWorkedMinutes += $dayWorkedMinutes;
+                            } else {
+                                // Dias úteis: conta normalmente para a carga semanal
+                                $weekWorkedMinutes += $dayWorkedMinutes;
+                            }
                         }
 
                         $weekDays[] = [
@@ -181,10 +189,11 @@ class CompTimeController extends Controller
                             'day_name' => $day->locale('pt_BR')->dayName
                         ];
 
-                        // Adicionar aos dias recentes para exibição
-                        if ($tracking && !$day->isWeekend()) {
-                            // Calcular diferença em relação ao padrão diário (para compatibilidade com view)
-                            $standardDailyMinutes = $this->calculateStandardDailyMinutes($collaborator);
+                                                // Adicionar aos dias recentes para exibição
+                        if ($tracking) {
+                            // CORREÇÃO: Incluir TODOS os dias trabalhados (incluindo finais de semana)
+                            // Calcular diferença em relação ao padrão diário
+                            $standardDailyMinutes = $day->isWeekend() ? 0 : $this->calculateStandardDailyMinutes($collaborator);
                             $differenceMinutes = $dayWorkedMinutes - $standardDailyMinutes;
 
                             $recentDays[] = [
@@ -193,8 +202,9 @@ class CompTimeController extends Controller
                                 'worked_minutes' => $dayWorkedMinutes,
                                 'standard_minutes' => $standardDailyMinutes,
                                 'difference_minutes' => $differenceMinutes,
-                                'week_start' => $weekStart->copy(),
-                                'week_end' => $weekEnd->copy()
+                                'status' => $tracking->status,
+                                'is_weekend' => $day->isWeekend(),
+                                'day_name' => $day->locale('pt_BR')->dayName
                             ];
                         }
                     }
@@ -205,7 +215,7 @@ class CompTimeController extends Controller
 
                 // Só calcula banco de horas se houver pelo menos um registro na semana
                 $hasAnyRecord = collect($weekDays)->contains(function($day) {
-                    return $day['tracking'] !== null && !$day['is_weekend'];
+                    return $day['tracking'] !== null; // CORREÇÃO: Incluir qualquer dia trabalhado (útil ou fim de semana)
                 });
 
                 if ($hasAnyRecord) {
@@ -276,26 +286,29 @@ class CompTimeController extends Controller
         $workDays = [];
         $workDaysCount = 0;
 
-        // Primeiro, processar apenas os dias com registros
+        // Primeiro, processar todos os dias com registros (incluindo finais de semana)
         foreach ($timeTrackings as $tracking) {
             $trackingDate = Carbon::parse($tracking->date);
 
-            // Pular fins de semana
-            if (!$trackingDate->isWeekend()) {
-                $workDaysCount++;
-                $workedMinutes = $tracking->total_hours_worked ?? 0;
-                $totalWorkedMinutes += $workedMinutes;
-                $totalStandardMinutes += $standardDailyMinutes;
+            // CORREÇÃO: Incluir TODOS os dias trabalhados, incluindo finais de semana
+            $workDaysCount++;
+            $workedMinutes = $tracking->total_hours_worked ?? 0;
+            $totalWorkedMinutes += $workedMinutes;
+            
+            // Para dias úteis, usar carga padrão. Para finais de semana, carga padrão = 0
+            $dayStandardMinutes = $trackingDate->isWeekend() ? 0 : $standardDailyMinutes;
+            $totalStandardMinutes += $dayStandardMinutes;
 
-                $workDays[] = [
-                    'date' => $trackingDate,
-                    'tracking' => $tracking,
-                    'worked_minutes' => $workedMinutes,
-                    'standard_minutes' => $standardDailyMinutes,
-                    'difference_minutes' => $workedMinutes - $standardDailyMinutes,
-                    'status' => $tracking->status
-                ];
-            }
+            $workDays[] = [
+                'date' => $trackingDate,
+                'tracking' => $tracking,
+                'worked_minutes' => $workedMinutes,
+                'standard_minutes' => $dayStandardMinutes,
+                'difference_minutes' => $workedMinutes - $dayStandardMinutes,
+                'status' => $tracking->status,
+                'is_weekend' => $trackingDate->isWeekend(),
+                'day_name' => $trackingDate->locale('pt_BR')->dayName
+            ];
         }
 
         // Calcular saldo do banco de horas

@@ -85,14 +85,6 @@
                     </li>
                 </ul>
             </li>
-
-            <li>
-                <a href="#"
-                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
-                    <i class="fa-solid fa-table-list w-5 h-5 mr-3"></i>
-                    <span class="sidebar-text">Relatórios</span>
-                </a>
-            </li>
         </ul>
     </nav>
 

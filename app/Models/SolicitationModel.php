@@ -19,7 +19,7 @@ class SolicitationModel extends Model
         'reason',
         'admin_comment',
         'time_tracking_id',
-        'colaborator_id'
+        'collaborator_id'
     ];
 
     protected function casts(): array
@@ -44,8 +44,8 @@ class SolicitationModel extends Model
     /**
      * Relacionamento com o colaborador que fez a solicitação
      */
-    public function colaborator(): BelongsTo
+    public function collaborator(): BelongsTo
     {
-        return $this->belongsTo(CollaboratorModel::class, 'colaborator_id');
+        return $this->belongsTo(CollaboratorModel::class, 'collaborator_id');
     }
 }
