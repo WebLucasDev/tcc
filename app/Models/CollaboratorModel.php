@@ -32,11 +32,8 @@ class CollaboratorModel extends Authenticatable
         'street',
         'neighborhood',
         'number',
-        'entry_time_1',
-        'entry_time_2',
-        'return_time_1',
-        'return_time_2',
         'position_id',
+        'work_hours_id',
         'status',
     ];
 
@@ -66,6 +63,14 @@ class CollaboratorModel extends Authenticatable
     public function position()
     {
         return $this->belongsTo(PositionModel::class, 'position_id');
+    }
+
+    /**
+     * Get the work hours schedule that owns the collaborator.
+     */
+    public function workHours()
+    {
+        return $this->belongsTo(WorkHoursModel::class, 'work_hours_id');
     }
 
     /**
