@@ -74,7 +74,7 @@ class ForgotPasswordController extends Controller
             return redirect()->route('login.index')->with('error', 'Token inválido ou expirado.');
         }
 
-        return view('login.forgot-password', compact('token'));
+        return view('public.login.forgot-password', compact('token'));
     }
 
     public function processReset(ProcessResetRequest $request)

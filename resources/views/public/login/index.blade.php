@@ -18,7 +18,7 @@
         <x-error/>
         <x-success/>
 
-        @include('login.partials.message-recover-password')
+        @include('public.login.partials.message-recover-password')
 
         <div class="flex flex-col max-w-md p-6 sm:p-10 border rounded-md border-[var(--color-main)] shadow-2xl/55">
             <div class="flex flex-col justify-center items-center mb-8">
@@ -56,7 +56,7 @@
         </div>
 
     </div>
-    @include('login.partials.modal-forgot-password')
+    @include('public.login.partials.modal-forgot-password')
 
 </body>
 

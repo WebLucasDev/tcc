@@ -13,7 +13,7 @@ use App\Http\Controllers\WorkHoursController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('public.welcome.index');
 });
 
 Route::middleware('guest')->group(function () {
@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
         });
 
-        Route::prefix('jornada-trabalho')->group(function () {
+        Route::prefix('jornadas-trabalho')->group(function () {
             Route::get('/', [WorkHoursController::class, 'index'])->name('work-hours.index');
             Route::get('/create', [WorkHoursController::class, 'create'])->name('work-hours.create');
             Route::post('/', [WorkHoursController::class, 'store'])->name('work-hours.store');
