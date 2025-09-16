@@ -67,6 +67,11 @@ Route::middleware('auth')->group(function () {
 
         Route::prefix('jornada-trabalho')->group(function () {
             Route::get('/', [WorkHoursController::class, 'index'])->name('work-hours.index');
+            Route::get('/create', [WorkHoursController::class, 'create'])->name('work-hours.create');
+            Route::post('/', [WorkHoursController::class, 'store'])->name('work-hours.store');
+            Route::get('/{id}/edit', [WorkHoursController::class, 'edit'])->name('work-hours.edit');
+            Route::put('/{id}', [WorkHoursController::class, 'update'])->name('work-hours.update');
+            Route::delete('/{id}', [WorkHoursController::class, 'destroy'])->name('work-hours.destroy');
         });
     });
 
