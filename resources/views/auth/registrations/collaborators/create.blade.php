@@ -203,7 +203,7 @@
                                     Cargo
                                     <span class="text-red-500">*</span>
                                 </label>
-                                <select
+                                                                <select
                                     id="position_id"
                                     name="position_id"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
@@ -213,11 +213,9 @@
                                         @foreach($positions as $position)
                                             <option value="{{ $position->id }}"
                                                     data-department-id="{{ $position->department_id }}"
+                                                    data-department-name="{{ $position->department ? $position->department->name : '' }}"
                                                     {{ old('position_id', isset($collaborator) ? $collaborator->position_id : '') == $position->id ? 'selected' : '' }}>
                                                 {{ $position->name }}
-                                                @if($position->department)
-                                                    - {{ $position->department->name }}
-                                                @endif
                                             </option>
                                         @endforeach
                                     @endif
@@ -254,8 +252,9 @@
                                     type="text"
                                     id="department_display"
                                     name="department_display"
+                                    value="{{ old('department_display', isset($collaborator) && $collaborator->position && $collaborator->position->department ? $collaborator->position->department->name : '') }}"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-[var(--color-text)] cursor-not-allowed"
-                                    placeholder="Será preenchido automaticamente"
+                                    placeholder="Selecione um cargo primeiro"
                                     readonly>
                                 <p class="text-xs text-[var(--color-text)] opacity-60 mt-1">
                                     <i class="fa-solid fa-info-circle mr-1"></i>

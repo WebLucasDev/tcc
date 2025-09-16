@@ -206,12 +206,13 @@
                     Limpar filtros
                 </button>
             @else
-                <button
+                <a
+                    href="{{ route('collaborator.create') }}"
                     id="btn-new-collaborator-empty"
                     class="inline-flex items-center gap-2 bg-[var(--color-main)] hover:bg-[var(--color-main-dark)] text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                     <i class="fa-solid fa-plus"></i>
                     Criar primeiro colaborador
-                </button>
+                </a>
             @endif
         </div>
     @endif

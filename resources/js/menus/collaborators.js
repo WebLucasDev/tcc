@@ -1,5 +1,8 @@
 // Collaborators page functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form masks and department logic if we're on create/edit page
+    initializeFormFunctionality();
+
     // Cache dos elementos
     const searchInput = document.querySelector('input[name="search"]');
     const departmentSelect = document.querySelector('select[name="department_id"]');
@@ -495,3 +498,109 @@ document.addEventListener('DOMContentLoaded', function() {
         highlightSearchTerm(initialSearchTerm);
     }
 });
+
+// Form functionality for create/edit pages
+function initializeFormFunctionality() {
+    // Apply input masks
+    applyInputMasks();
+
+    // Initialize department selection logic
+    initializeDepartmentLogic();
+}
+
+// Function to apply input masks
+function applyInputMasks() {
+    const cpfInput = document.getElementById('cpf');
+    const phoneInput = document.getElementById('phone');
+    const zipCodeInput = document.getElementById('zip_code');
+
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Prevent paste of invalid content
+        cpfInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }, 10);
+        });
+    }
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+            value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Prevent paste of invalid content
+        phoneInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+                value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+                e.target.value = value;
+            }, 10);
+        });
+    }
+
+    if (zipCodeInput) {
+        zipCodeInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Prevent paste of invalid content
+        zipCodeInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            }, 10);
+        });
+    }
+}
+
+// Function to initialize department selection logic
+function initializeDepartmentLogic() {
+    const positionSelect = document.getElementById('position_id');
+    const departmentDisplay = document.getElementById('department_display');
+
+    if (positionSelect && departmentDisplay) {
+        // Update department on position change
+        positionSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const departmentName = selectedOption.getAttribute('data-department-name');
+
+            if (departmentName && departmentName !== '') {
+                departmentDisplay.value = departmentName;
+                departmentDisplay.placeholder = '';
+            } else {
+                departmentDisplay.value = '';
+                departmentDisplay.placeholder = 'Selecione um cargo primeiro';
+            }
+        });
+
+        // Trigger initial update if there's already a selected position
+        if (positionSelect.value) {
+            const selectedOption = positionSelect.options[positionSelect.selectedIndex];
+            const departmentName = selectedOption.getAttribute('data-department-name');
+
+            if (departmentName && departmentName !== '') {
+                departmentDisplay.value = departmentName;
+                departmentDisplay.placeholder = '';
+            }
+        }
+    }
+}

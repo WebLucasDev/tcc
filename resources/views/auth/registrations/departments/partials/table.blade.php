@@ -160,12 +160,13 @@
                     Limpar filtros
                 </button>
             @else
-                <button
+                <a
+                    href="{{ route('department.create') }}"
                     id="btn-new-department-empty"
                     class="inline-flex items-center gap-2 bg-[var(--color-main)] hover:bg-[var(--color-main-dark)] text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                     <i class="fa-solid fa-plus"></i>
                     Criar primeiro departamento
-                </button>
+                </a>
             @endif
         </div>
     @endif
