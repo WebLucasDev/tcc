@@ -47,6 +47,13 @@
                             Departamentos
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('work-hours.index') }}"
+                            class="flex items-center px-4 py-2 rounded-lg text-sm text-[var(--color-text)] hover:text-[var(--color-main)] hover:bg-gray-100/10">
+                            <i class="fa-solid fa-business-time w-4 h-4 mr-3"></i>
+                            Jornadas de Trabalho
+                        </a>
+                    </li>
                 </ul>
             </li>
 

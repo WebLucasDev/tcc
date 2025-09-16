@@ -306,7 +306,7 @@
                             </div>
 
                             <div class="space-y-4">
-                                <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Segundo Turno (Opcional)</h4>
+                                <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Segundo Turno</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="entry_time_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">

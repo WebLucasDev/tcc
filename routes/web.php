@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\SolicitationController;
 use App\Http\Controllers\TimeTrackingController;
+use App\Http\Controllers\WorkHoursController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -62,6 +63,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}/edit', [DepartmentController::class, 'edit'])->name('department.edit');
             Route::put('/{id}', [DepartmentController::class, 'update'])->name('department.update');
             Route::delete('/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
+        });
+
+        Route::prefix('jornada-trabalho')->group(function () {
+            Route::get('/', [WorkHoursController::class, 'index'])->name('work-hours.index');
         });
     });
 
