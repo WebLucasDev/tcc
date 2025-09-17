@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    @vite(['resources/css/app.css', 'resources/js/welcome.js'])
+    @vite(['resources/css/app.css', 'resources/css/welcome.css', 'resources/js/welcome.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -14,537 +14,413 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="/imgs/favicon.ico" type="image/x-icon">
     <title>Metre Ponto - Sistema de Registro de Ponto Eletrônico</title>
-
-    <style>
-        :root {
-            --primary-color: #E13E16;
-            --primary-dark: #B82F0E;
-            --primary-light: #FF6B4A;
-            --gradient-start: #E13E16;
-            --gradient-end: #FF6B4A;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif !important;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        /* Splash Screen Styles */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 1;
-            visibility: visible;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .splash-screen.fade-out {
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(1.1);
-        }
-
-        .splash-logo {
-            width: 120px;
-            height: auto;
-            margin-bottom: 2rem;
-            animation: logoFloat 3s ease-in-out infinite;
-            filter: brightness(0) invert(1);
-        }
-
-        .splash-text {
-            color: white;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            animation: textGlow 2s ease-in-out infinite alternate;
-        }
-
-        .splash-tagline {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.2rem;
-            font-weight: 300;
-            text-align: center;
-            max-width: 400px;
-            line-height: 1.5;
-            animation: fadeInUp 1s ease-out 0.5s both;
-        }
-
-        .loading-animation {
-            margin-top: 3rem;
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes textGlow {
-            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
-            to { text-shadow: 0 0 30px rgba(255, 255, 255, 0.8); }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .main-content.visible {
-            opacity: 1;
-        }
-
-        .hero-section {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            position: relative;
-            overflow: hidden;
-            will-change: transform;
-        }
-
-        .hero-bg-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23E13E16' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .floating-particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            background: var(--primary-color);
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-            will-change: transform;
-        }
-
-        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: -2s; }
-        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: -4s; }
-        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: -6s; }
-        .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: -8s; }
-        .particle:nth-child(5) { width: 2px; height: 2px; left: 50%; animation-delay: -10s; }
-        .particle:nth-child(6) { width: 4px; height: 4px; left: 60%; animation-delay: -12s; }
-        .particle:nth-child(7) { width: 6px; height: 6px; left: 70%; animation-delay: -14s; }
-        .particle:nth-child(8) { width: 3px; height: 3px; left: 80%; animation-delay: -16s; }
-        .particle:nth-child(9) { width: 5px; height: 5px; left: 90%; animation-delay: -18s; }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
-        }
-
-        .section-reveal {
-            opacity: 0;
-            transform: translateY(60px);
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: opacity, transform;
-        }
-
-        .section-reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(225, 62, 22, 0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-    </style>
 </head>
-<body class="antialiased">
+<body class="bg-gray-50 overflow-x-hidden">
     <!-- Splash Screen -->
-    <div id="splashScreen" class="splash-screen">
-        <img src="/imgs/logo.svg" alt="Metre Ponto" class="splash-logo">
-        <h1 class="splash-text">Metre Ponto</h1>
-        <p class="splash-tagline">Sistema Inteligente de Registro de Ponto Eletrônico</p>
-        <div class="loading-animation"></div>
+    <div id="splash-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700">
+        <div class="text-center">
+            <img src="/imgs/logo.svg" alt="Logo Metre Sistemas">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 opacity-0" id="splash-title">Metre Ponto</h1>
+            <p class="text-xl text-orange-100 opacity-0" id="splash-subtitle">Sistema de Registro de Ponto Eletrônico</p>
+            <div class="mt-8 opacity-0" id="splash-loader">
+                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-white"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div id="mainContent" class="main-content">
-        <!-- Navigation -->
-        <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(229, 231, 235, 0.5);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-3">
-                        <img src="/imgs/logo.svg" alt="Metre Ponto" class="w-8 h-8 sm:w-10 sm:h-10">
-                        <span class="text-xl sm:text-2xl font-bold text-gray-800">Metre Ponto</span>
+    <!-- Canvas para efeitos de mouse -->
+    <canvas id="canvas-effects" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md shadow-lg transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-clock text-3xl text-orange-600"></i>
+                    <span class="text-2xl font-bold text-gray-800">Metre Ponto</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#sobre" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="sobre">Sobre</a>
+                    <a href="#aplicativo" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="aplicativo">Aplicativo</a>
+                    <a href="#painel" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="painel">Painel Admin</a>
+                    <a href="#acesso" class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 smooth-scroll">Acesse Agora</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-800 text-2xl" id="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="md:hidden mt-4 pb-4 hidden" id="mobile-menu">
+                <div class="flex flex-col space-y-4">
+                    <a href="#sobre" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="sobre">Sobre</a>
+                    <a href="#aplicativo" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="aplicativo">Aplicativo</a>
+                    <a href="#painel" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="painel">Painel Admin</a>
+                    <a href="#acesso" class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 text-center smooth-scroll">Acesse Agora</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden parallax-container">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700 opacity-90"></div>
+        <div class="absolute inset-0 bg-black/20"></div>
+
+        <!-- Parallax Background Elements -->
+        <div class="absolute inset-0 parallax-bg" data-speed="0.5">
+            <div class="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        </div>
+
+        <div class="relative z-10 text-center text-white px-6 max-w-4xl">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 opacity-0 transform translate-y-10" id="hero-title">
+                Metre Ponto
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-orange-100 opacity-0 transform translate-y-10" id="hero-subtitle">
+                O sistema mais moderno de controle de ponto eletrônico
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center opacity-0 transform translate-y-10" id="hero-buttons">
+                <button class="bg-white text-orange-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-play mr-2"></i>Começar Agora
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-info-circle mr-2"></i>Saiba Mais
+                </button>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce cursor-pointer smooth-scroll" onclick="document.getElementById('sobre').scrollIntoView({behavior: 'smooth', block: 'start'});">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Sobre Section -->
+    <section id="sobre" class="py-20 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in">Sobre o Metre Ponto</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">
+                    Uma solução completa e moderna para o controle de ponto eletrônico,
+                    oferecendo praticidade tanto para colaboradores quanto para gestores.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                    <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-mobile-alt text-2xl text-white"></i>
                     </div>
-                    <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                        <a href="#features" class="text-gray-600 hover:text-orange-600 transition-colors font-medium">Recursos</a>
-                        <a href="#mobile-app" class="text-gray-600 hover:text-orange-600 transition-colors font-medium">App Mobile</a>
-                        <a href="#admin-panel" class="text-gray-600 hover:text-orange-600 transition-colors font-medium">Painel Admin</a>
-                        <a href="{{ route('login.index') }}" class="btn-primary text-white px-4 py-2 lg:px-6 lg:py-2 rounded-lg font-semibold transition-all hover:shadow-lg">
-                            Acessar Sistema
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">App Mobile</h3>
+                    <p class="text-gray-600">
+                        Aplicativo intuitivo para colaboradores registrarem seus horários de forma rápida e segura.
+                    </p>
+                </div>
+
+                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                    <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-chart-line text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Relatórios</h3>
+                    <p class="text-gray-600">
+                        Relatórios detalhados e análises em tempo real para uma gestão eficiente de recursos humanos.
+                    </p>
+                </div>
+
+                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                    <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Segurança</h3>
+                    <p class="text-gray-600">
+                        Máxima segurança dos dados com criptografia avançada e conformidade com a LGPD.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Aplicativo Section -->
+    <section id="aplicativo" class="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="fade-in">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">Aplicativo Mobile</h2>
+                    <p class="text-xl text-gray-300 mb-8">
+                        Developed with cutting-edge technology, our mobile app provides a seamless experience
+                        for employees to clock in and out with just a few taps.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-fingerprint text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Autenticação Biométrica</h4>
+                                <p class="text-gray-400">Segurança máxima com reconhecimento biométrico</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Geolocalização</h4>
+                                <p class="text-gray-400">Registro de ponto baseado em localização</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-sync text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Sincronização em Tempo Real</h4>
+                                <p class="text-gray-400">Dados sempre atualizados e sincronizados</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4 mt-8">
+                        <a href="#" class="bg-black rounded-lg px-6 py-3 flex items-center space-x-3 hover:bg-gray-900 transition-colors">
+                            <i class="fab fa-apple text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Download na</div>
+                                <div class="text-lg font-semibold">App Store</div>
+                            </div>
+                        </a>
+                        <a href="#" class="bg-black rounded-lg px-6 py-3 flex items-center space-x-3 hover:bg-gray-900 transition-colors">
+                            <i class="fab fa-google-play text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Baixar no</div>
+                                <div class="text-lg font-semibold">Google Play</div>
+                            </div>
                         </a>
                     </div>
-                    <button class="md:hidden text-gray-600">
-                        <i class="fas fa-bars text-xl"></i>
+                </div>
+
+                <div class="relative fade-in">
+                    <div class="relative mx-auto w-80 h-96 bg-gray-900 rounded-3xl p-2 shadow-2xl">
+                        <div class="w-full h-full bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-mobile-alt text-6xl text-white mb-4"></i>
+                                <p class="text-white text-lg">Interface do App</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-orange-600 rounded-full opacity-20 animate-ping"></div>
+                    <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-orange-600 rounded-full opacity-30"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Painel Administrativo Section -->
+    <section id="painel" class="py-20 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="relative fade-in">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 shadow-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-white text-lg font-semibold">Dashboard Admin</h4>
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">Colaboradores Online</span>
+                                    <span class="text-green-400 font-bold">127</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full w-3/4"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">Pontos Hoje</span>
+                                    <span class="text-blue-400 font-bold">1,247</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full w-5/6"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <div class="grid grid-cols-3 gap-4 text-center">
+                                    <div>
+                                        <div class="text-2xl font-bold text-white">98%</div>
+                                        <div class="text-gray-400 text-sm">Precisão</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-white">24/7</div>
+                                        <div class="text-gray-400 text-sm">Uptime</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-white">5ms</div>
+                                        <div class="text-gray-400 text-sm">Latência</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fade-in">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Painel Administrativo</h2>
+                    <p class="text-xl text-gray-600 mb-8">
+                        Interface web completa para gestores controlarem e analisarem todos os aspectos
+                        do controle de ponto da empresa.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Gestão de Colaboradores</h4>
+                                <p class="text-gray-600">Cadastro, edição e controle completo de funcionários</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Relatórios Avançados</h4>
+                                <p class="text-gray-600">Dashboards interativos e relatórios personalizados</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cog text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Configurações Flexíveis</h4>
+                                <p class="text-gray-600">Personalização completa de horários e políticas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="bg-orange-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg mt-8">
+                        <i class="fas fa-external-link-alt mr-2"></i>Acessar Painel
                     </button>
                 </div>
             </div>
-        </nav>
+        </div>
+    </section>
 
-        <!-- Hero Section -->
-        <section class="hero-section min-h-screen flex items-center justify-center relative overflow-hidden">
-            <div class="hero-bg-pattern"></div>
-            <div class="floating-particles">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
+    <!-- Acesse Agora Section -->
+    <section id="acesso" class="py-20 bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div class="max-w-4xl mx-auto fade-in">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6">Pronto para Começar?</h2>
+                <p class="text-xl md:text-2xl text-orange-100 mb-12">
+                    Transforme a gestão de ponto da sua empresa hoje mesmo.
+                    Teste gratuitamente por 30 dias, sem compromisso.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-8 mb-12">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2">30</div>
+                        <div class="text-orange-200">Dias Grátis</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2">24/7</div>
+                        <div class="text-orange-200">Suporte</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2">99.9%</div>
+                        <div class="text-orange-200">Disponibilidade</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-white text-orange-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-rocket mr-2"></i>Começar Teste Grátis
+                    </button>
+                    <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-phone mr-2"></i>Falar com Vendas
+                    </button>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white relative z-10">
-                <div class="max-w-4xl mx-auto">
-                    <img src="/imgs/logo.svg" alt="Metre Ponto" class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 filter brightness-0 invert">
-                    <h1 class="text-4xl sm:text-6xl lg:text-8xl font-black mb-4 sm:mb-6 leading-tight">
-                        <span class="block">Metre</span>
-                        <span class="block gradient-text">Ponto</span>
-                    </h1>
-                    <p class="text-lg sm:text-xl lg:text-2xl mb-6 sm:mb-8 text-gray-300 leading-relaxed max-w-3xl mx-auto px-4">
-                        Revolucione o controle de ponto da sua empresa com nossa solução inteligente,
-                        moderna e completamente integrada.
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <i class="fas fa-clock text-3xl text-orange-600"></i>
+                        <span class="text-2xl font-bold">Metre Ponto</span>
+                    </div>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        Sistema completo de controle de ponto eletrônico, desenvolvido para oferecer
+                        praticidade e segurança na gestão de recursos humanos.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
-                        <a href="{{ route('login.index') }}" class="btn-primary text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all hover:shadow-2xl inline-flex items-center justify-center w-full sm:w-auto">
-                            <i class="fas fa-play mr-2 sm:mr-3"></i>
-                            Começar Agora
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f text-xl"></i>
                         </a>
-                        <button onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" class="border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-white hover:text-gray-800 transition-all inline-flex items-center justify-center w-full sm:w-auto">
-                            <i class="fas fa-info-circle mr-2 sm:mr-3"></i>
-                            Saiba Mais
-                        </button>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
                     </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Produto</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Aplicativo Mobile</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Painel Admin</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Relatórios</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrações</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Suporte</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Central de Ajuda</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Documentação</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contato</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="scroll-indicator">
-                <i class="fas fa-chevron-down text-xl sm:text-2xl mb-2"></i>
-                <p class="text-xs sm:text-sm">Role para baixo</p>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p class="text-gray-400">
+                    © 2025 Metre Ponto. Todos os direitos reservados.
+                </p>
             </div>
-        </section>
-
-        <!-- Features Section -->
-        <section id="features" class="py-16 sm:py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12 sm:mb-16 section-reveal">
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
-                        Por que escolher o <span class="gradient-text">Metre Ponto</span>?
-                    </h2>
-                    <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
-                        Uma solução completa que combina tecnologia avançada com simplicidade de uso
-                    </p>
-                </div>
-
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-                    <div class="card-hover bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100 section-reveal">
-                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-6" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);">
-                            <i class="fas fa-clock text-white text-xl sm:text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">Registro Inteligente</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Sistema automatizado de registro de ponto com geolocalização e validação em tempo real.
-                        </p>
-                    </div>
-
-                    <div class="card-hover bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100 section-reveal">
-                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-6" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);">
-                            <i class="fas fa-mobile-alt text-white text-xl sm:text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">App Mobile</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Aplicativo intuitivo para colaboradores registrarem ponto e fazerem solicitações.
-                        </p>
-                    </div>
-
-                    <div class="card-hover bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100 sm:col-span-2 lg:col-span-1 section-reveal">
-                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-6" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);">
-                            <i class="fas fa-chart-line text-white text-xl sm:text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">Dashboard Analítico</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            Relatórios completos e análises avançadas para melhor gestão de recursos humanos.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Mobile App Section -->
-        <section id="mobile-app" class="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                    <div class="section-reveal order-2 lg:order-1">
-                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
-                            App Mobile <span class="gradient-text">Revolucionário</span>
-                        </h2>
-                        <p class="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-                            Desenvolvido em React Native para proporcionar a melhor experiência aos seus colaboradores.
-                        </p>
-
-                        <div class="space-y-4 sm:space-y-6">
-                            <div class="flex items-start space-x-3 sm:space-x-4">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: var(--primary-color);">
-                                    <i class="fas fa-map-marker-alt text-white text-sm sm:text-base"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-2">Registro com Geolocalização</h4>
-                                    <p class="text-sm sm:text-base text-gray-600">Validação automática da localização do colaborador no momento do registro.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start space-x-3 sm:space-x-4">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: var(--primary-color);">
-                                    <i class="fas fa-edit text-white text-sm sm:text-base"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-2">Solicitações de Ajuste</h4>
-                                    <p class="text-sm sm:text-base text-gray-600">Facilite pedidos de correção de horários e dados cadastrais diretamente pelo app.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start space-x-3 sm:space-x-4">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: var(--primary-color);">
-                                    <i class="fas fa-history text-white text-sm sm:text-base"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-2">Histórico Completo</h4>
-                                    <p class="text-sm sm:text-base text-gray-600">Visualização detalhada do banco de horas e histórico de registros.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-reveal order-1 lg:order-2 flex justify-center">
-                        <div class="relative">
-                            <div class="w-64 h-80 sm:w-80 sm:h-96 rounded-3xl p-1 shadow-2xl" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);">
-                                <div class="w-full h-full bg-white rounded-3xl flex items-center justify-center">
-                                    <i class="fas fa-mobile-alt text-6xl sm:text-8xl text-gray-300"></i>
-                                </div>
-                            </div>
-                            <div class="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-16 h-16 sm:w-24 sm:h-24 bg-white rounded-full shadow-lg flex items-center justify-center">
-                                <i class="fas fa-check text-base sm:text-2xl" style="color: var(--primary-color);"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Panel Section -->
-        <section id="admin-panel" class="py-16 sm:py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                    <div class="section-reveal order-2 lg:order-1">
-                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 sm:p-8 shadow-2xl">
-                            <div class="flex items-center justify-between mb-4 sm:mb-6">
-                                <img src="/imgs/logo.svg" alt="Metre Ponto" class="w-8 h-8 sm:w-10 sm:h-10 filter brightness-0 invert">
-                                <div class="flex space-x-1 sm:space-x-2">
-                                    <div class="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></div>
-                                    <div class="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
-                                    <div class="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-3 sm:space-y-4">
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-chart-pie" style="color: var(--primary-color);"></i>
-                                    <span>Dashboard Executivo</span>
-                                </div>
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-users" style="color: var(--primary-color);"></i>
-                                    <span>Gestão de Colaboradores</span>
-                                </div>
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-building" style="color: var(--primary-color);"></i>
-                                    <span>Controle de Departamentos</span>
-                                </div>
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-clock" style="color: var(--primary-color);"></i>
-                                    <span>Registro de Ponto</span>
-                                </div>
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-file-alt" style="color: var(--primary-color);"></i>
-                                    <span>Solicitações</span>
-                                </div>
-                                <div class="flex items-center space-x-2 sm:space-x-3 text-white text-sm sm:text-base">
-                                    <i class="fas fa-piggy-bank" style="color: var(--primary-color);"></i>
-                                    <span>Banco de Horas</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-reveal order-1 lg:order-2">
-                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6">
-                            Painel <span class="gradient-text">Administrativo</span>
-                        </h2>
-                        <p class="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-                            Dashboard completo para gestores com todas as ferramentas necessárias para uma administração eficiente.
-                        </p>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                            <div class="bg-gray-50 p-4 sm:p-6 rounded-xl">
-                                <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">Dashboard</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm">Análises completas e métricas em tempo real</p>
-                            </div>
-                            <div class="bg-gray-50 p-4 sm:p-6 rounded-xl">
-                                <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">Cadastros</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm">Gestão de cargos, colaboradores e departamentos</p>
-                            </div>
-                            <div class="bg-gray-50 p-4 sm:p-6 rounded-xl">
-                                <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">Gestão de Ponto</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm">Controle total sobre registros e solicitações</p>
-                            </div>
-                            <div class="bg-gray-50 p-4 sm:p-6 rounded-xl">
-                                <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">Relatórios</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm">Banco de horas e relatórios personalizados</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="py-16 sm:py-20" style="background: linear-gradient(to right, var(--primary-color), var(--primary-light));">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="section-reveal">
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-                        Pronto para revolucionar sua empresa?
-                    </h2>
-                    <p class="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-                        Junte-se às empresas que já modernizaram seu controle de ponto com o Metre Ponto.
-                    </p>
-                    <a href="{{ route('login.index') }}" class="bg-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-100 transition-all inline-flex items-center shadow-lg hover:shadow-xl" style="color: var(--primary-color);">
-                        <i class="fas fa-rocket mr-2 sm:mr-3"></i>
-                        Comece sua transformação digital
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="bg-gray-900 text-white py-8 sm:py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex items-center space-x-2 sm:space-x-3 mb-4 md:mb-0">
-                        <img src="/imgs/logo.svg" alt="Metre Ponto" class="w-8 h-8 sm:w-10 sm:h-10 filter brightness-0 invert">
-                        <span class="text-xl sm:text-2xl font-bold">Metre Ponto</span>
-                    </div>
-                    <div class="text-gray-400 text-sm sm:text-base text-center md:text-right">
-                        <p>&copy; {{ date('Y') }} Metre Ponto. Todos os direitos reservados.</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
 </body>
 </html>

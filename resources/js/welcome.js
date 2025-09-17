@@ -1,379 +1,455 @@
+// Splash Screen Animation
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize landing page
-    initSplashScreen();
-    initScrollAnimations();
-    initNavigation();
-    initParticleEffects();
+    const splashScreen = document.getElementById('splash-screen');
+    const splashIcon = document.getElementById('splash-icon');
+    const splashTitle = document.getElementById('splash-title');
+    const splashSubtitle = document.getElementById('splash-subtitle');
+    const splashLoader = document.getElementById('splash-loader');
+
+    // Animate splash elements
+    setTimeout(() => {
+        splashIcon.style.opacity = '1';
+        splashIcon.style.transform = 'scale(1.1)';
+    }, 300);
+
+    setTimeout(() => {
+        splashTitle.style.opacity = '1';
+        splashTitle.style.transform = 'translateY(0)';
+    }, 800);
+
+    setTimeout(() => {
+        splashSubtitle.style.opacity = '1';
+        splashSubtitle.style.transform = 'translateY(0)';
+    }, 1200);
+
+    setTimeout(() => {
+        splashLoader.style.opacity = '1';
+    }, 1500);
+
+    // Hide splash screen
+    setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        splashScreen.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+            initializeMainAnimations();
+        }, 500);
+    }, 3000);
 });
 
-// Splash Screen Controller
-function initSplashScreen() {
-    const splashScreen = document.getElementById('splashScreen');
-    const mainContent = document.getElementById('mainContent');
+// Canvas Mouse Effects
+function initCanvasEffects() {
+    const canvas = document.getElementById('canvas-effects');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: 0, y: 0 };
 
-    // Show splash screen for 3 seconds
-    setTimeout(() => {
-        // Add fade out animation to splash screen
-        splashScreen.classList.add('fade-out');
+    // Resize canvas
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
 
-        // Show main content after splash fade out
-        setTimeout(() => {
-            mainContent.classList.add('visible');
-            splashScreen.style.display = 'none';
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-            // Trigger entrance animations
-            triggerEntranceAnimations();
+    // Particle class
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.life = 1.0;
+            this.decay = Math.random() * 0.02 + 0.01;
+            this.size = Math.random() * 3 + 1;
+        }
 
-            // Initialize reveal animations after content is visible
-            setTimeout(() => {
-                initRevealAnimations();
-            }, 100);
-        }, 800);
-    }, 3000);
-}
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+            this.size *= 0.98;
+        }
 
-// Initialize reveal animations
-function initRevealAnimations() {
-    const revealElements = document.querySelectorAll('.section-reveal');
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = '#E13E16';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
 
-    console.log(`Found ${revealElements.length} elements to animate`);
-
-    // Create intersection observer with better settings
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                console.log('Animating element:', entry.target);
-
-                // Add delay for staggered animations
-                const delay = entry.target.dataset.delay || 0;
-                setTimeout(() => {
-                    entry.target.classList.add('visible');
-                }, delay);
-
-                // Stop observing once animated
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
-    });
-
-    // Observe all elements and add staggered delays
-    revealElements.forEach((element, index) => {
-        // Reset any existing visible class
-        element.classList.remove('visible');
-
-        // Add staggered delay
-        const baseDelay = Math.floor(index / 3) * 200; // Group delays
-        const itemDelay = (index % 3) * 100; // Individual delays within groups
-        element.dataset.delay = baseDelay + itemDelay;
-
-        observer.observe(element);
-        console.log(`Observing element ${index} with delay ${element.dataset.delay}ms`);
-    });
-}
-
-// Scroll-based animations
-function initScrollAnimations() {
-    let ticking = false;
-
-    // Optimized scroll handler with throttling
-    function handleScroll() {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                const scrolled = window.pageYOffset;
-                const windowHeight = window.innerHeight;
-
-                // Parallax effect for hero section
-                const heroSection = document.querySelector('.hero-section');
-                if (heroSection && scrolled < windowHeight) {
-                    const heroOffset = scrolled * 0.5;
-                    heroSection.style.transform = `translateY(${heroOffset}px)`;
-                }
-
-                // Animate particles based on scroll
-                const particles = document.querySelectorAll('.particle');
-                particles.forEach((particle, index) => {
-                    if (scrolled < windowHeight * 2) {
-                        const speed = (index + 1) * 0.05; // Reduced speed for smoother effect
-                        const particleOffset = scrolled * speed;
-                        particle.style.transform = `translateY(${particleOffset}px) rotate(${particleOffset * 0.5}deg)`;
-                    }
-                });
-
-                // Update navigation style
-                updateNavigationStyle(scrolled);
-
-                ticking = false;
-            });
-            ticking = true;
+        isDead() {
+            return this.life <= 0 || this.size <= 0.1;
         }
     }
 
-    // Add scroll listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Mouse move handler
+    document.addEventListener('mousemove', function(e) {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
 
-    // Initial call
-    handleScroll();
-}
+        // Add particles on mouse move
+        if (particles.length < 100) {
+            particles.push(new Particle(mouse.x, mouse.y));
+        }
+    });
 
-// Update navigation style based on scroll
-function updateNavigationStyle(scrolled) {
-    const nav = document.querySelector('nav');
-    if (!nav) return;
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (scrolled > 100) {
-        nav.classList.add('scrolled');
-        nav.style.background = 'rgba(255, 255, 255, 0.95)';
-        nav.style.backdropFilter = 'blur(20px)';
-        nav.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-    } else {
-        nav.classList.remove('scrolled');
-        nav.style.background = 'rgba(255, 255, 255, 0.9)';
-        nav.style.backdropFilter = 'blur(12px)';
-        nav.style.boxShadow = 'none';
+        // Update and draw particles
+        particles = particles.filter(particle => {
+            particle.update();
+            particle.draw();
+            return !particle.isDead();
+        });
+
+        requestAnimationFrame(animate);
     }
+
+    animate();
 }
 
-// Navigation interactions
-function initNavigation() {
-    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+// Parallax Effects
+function initParallax() {
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.parallax-bg');
 
-    // Smooth scrolling for navigation links
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+        parallaxElements.forEach(element => {
+            const speed = element.dataset.speed || 0.5;
+            const yPos = -(scrolled * speed);
+            element.style.transform = `translate3d(0, ${yPos}px, 0)`;
+        });
+    });
+}
+
+// Smooth Scrolling
+function initSmoothScroll() {
+    document.querySelectorAll('.smooth-scroll').forEach(link => {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetId = link.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
 
-            if (targetSection) {
-                const headerOffset = 80; // Account for fixed navigation
-                const elementPosition = targetSection.offsetTop;
-                const offsetPosition = elementPosition - headerOffset;
-
+            if (targetElement) {
+                const offsetTop = targetElement.offsetTop - 80; // Account for fixed navbar
                 window.scrollTo({
-                    top: offsetPosition,
+                    top: offsetTop,
                     behavior: 'smooth'
                 });
             }
         });
     });
-
-    // Mobile menu toggle (if needed in future)
-    const mobileMenuBtn = document.querySelector('.md\\:hidden button');
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            console.log('Mobile menu clicked');
-        });
-    }
 }
 
-// Enhanced particle effects
-function initParticleEffects() {
-    const particlesContainer = document.querySelector('.floating-particles');
+// Intersection Observer for Fade In Animations
+function initFadeInAnimations() {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
 
-    if (!particlesContainer) return;
-
-    // Create additional dynamic particles
-    function createParticle() {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-
-        // Random properties
-        const size = Math.random() * 6 + 2;
-        const left = Math.random() * 100;
-        const animationDuration = Math.random() * 20 + 15;
-        const delay = Math.random() * 5;
-
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${left}%`;
-        particle.style.animationDuration = `${animationDuration}s`;
-        particle.style.animationDelay = `${delay}s`;
-
-        particlesContainer.appendChild(particle);
-
-        // Remove particle after animation
-        setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
             }
-        }, (animationDuration + delay) * 1000);
-    }
+        });
+    }, observerOptions);
 
-    // Create particles periodically
-    setInterval(createParticle, 2000);
+    // Observe all elements with fade-in class
+    document.querySelectorAll('.fade-in').forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(element);
+    });
 }
 
-// Entrance animations for hero section
-function triggerEntranceAnimations() {
-    const heroElements = [
-        '.hero-section img',
-        '.hero-section h1',
-        '.hero-section p',
-        '.hero-section .flex'
-    ];
+// Mobile Menu Toggle
+function initMobileMenu() {
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = menuToggle.querySelector('i');
 
-    heroElements.forEach((selector, index) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            setTimeout(() => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(30px)';
-                element.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    menuToggle.addEventListener('click', function() {
+        if (mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.remove('hidden');
+            menuIcon.classList.remove('fa-bars');
+            menuIcon.classList.add('fa-times');
+        } else {
+            mobileMenu.classList.add('hidden');
+            menuIcon.classList.remove('fa-times');
+            menuIcon.classList.add('fa-bars');
+        }
+    });
 
-                requestAnimationFrame(() => {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
-                });
-            }, index * 200);
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+        link.addEventListener('click', function() {
+            mobileMenu.classList.add('hidden');
+            menuIcon.classList.remove('fa-times');
+            menuIcon.classList.add('fa-bars');
+        });
+    });
+}
+
+// Navbar Scroll Effect
+function initNavbarScrollEffect() {
+    const navbar = document.getElementById('navbar');
+
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('bg-white/95');
+            navbar.classList.remove('bg-white/90');
+        } else {
+            navbar.classList.remove('bg-white/95');
+            navbar.classList.add('bg-white/90');
         }
     });
 }
 
-// Button hover effects
-document.addEventListener('mouseover', (e) => {
-    if (e.target.classList.contains('btn-primary')) {
-        e.target.style.transform = 'translateY(-2px)';
-        e.target.style.boxShadow = '0 10px 20px rgba(225, 62, 22, 0.3)';
+// Hero Section Animations
+function initHeroAnimations() {
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const heroButtons = document.getElementById('hero-buttons');
+
+    setTimeout(() => {
+        heroTitle.style.opacity = '1';
+        heroTitle.style.transform = 'translateY(0)';
+    }, 200);
+
+    setTimeout(() => {
+        heroSubtitle.style.opacity = '1';
+        heroSubtitle.style.transform = 'translateY(0)';
+    }, 600);
+
+    setTimeout(() => {
+        heroButtons.style.opacity = '1';
+        heroButtons.style.transform = 'translateY(0)';
+    }, 1000);
+}
+
+// Typing Effect for Hero Title (alternative animation)
+function initTypingEffect() {
+    const heroTitle = document.getElementById('hero-title');
+    const text = 'Metre Ponto';
+    let index = 0;
+
+    function typeChar() {
+        if (index < text.length) {
+            heroTitle.textContent = text.slice(0, index + 1);
+            index++;
+            setTimeout(typeChar, 100);
+        }
     }
-});
 
-document.addEventListener('mouseout', (e) => {
-    if (e.target.classList.contains('btn-primary')) {
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = '';
-    }
-});
+    // Uncomment to use typing effect instead of fade in
+    // setTimeout(typeChar, 500);
+}
 
-// Card hover effects
-const cards = document.querySelectorAll('.card-hover');
-cards.forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-10px) scale(1.02)';
-        card.style.boxShadow = '0 25px 50px rgba(225, 62, 22, 0.15)';
+// Counter Animation for Statistics
+function initCounterAnimation() {
+    const counters = document.querySelectorAll('[data-count]');
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = parseInt(counter.dataset.count);
+                const duration = 2000; // 2 seconds
+                const steps = 60;
+                const increment = target / steps;
+                let current = 0;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    counter.textContent = Math.floor(current);
+                }, duration / steps);
+
+                observer.unobserve(counter);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => observer.observe(counter));
+}
+
+// Active Section Navigation
+function initActiveNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const sectionId = entry.target.getAttribute('id');
+
+                // Remove active class from all nav links
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Add active class to current section's nav link
+                const activeLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        });
+    }, {
+        rootMargin: '-20% 0px -70% 0px', // Trigger when section is 20% from top
+        threshold: 0.1
     });
 
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0) scale(1)';
-        card.style.boxShadow = '';
-    });
-});
-
-// Scroll indicator click
-document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
-    document.getElementById('features').scrollIntoView({
-        behavior: 'smooth'
-    });
-});
-
-// Add dynamic gradient animation
-function animateGradients() {
-    const gradientElements = document.querySelectorAll('.gradient-text');
-
-    gradientElements.forEach(element => {
-        let hue = 0;
-        setInterval(() => {
-            hue = (hue + 1) % 360;
-            const color1 = `hsl(${hue}, 70%, 50%)`;
-            const color2 = `hsl(${(hue + 60) % 360}, 70%, 60%)`;
-            element.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
-            element.style.webkitBackgroundClip = 'text';
-            element.style.webkitTextFillColor = 'transparent';
-        }, 100);
+    // Observe all sections
+    sections.forEach(section => {
+        observer.observe(section);
     });
 }
 
-// Initialize gradient animations after content is visible
-setTimeout(() => {
-    if (document.getElementById('mainContent').classList.contains('visible')) {
-        // animateGradients(); // Uncomment for dynamic gradient effect
-    }
-}, 4000);
-
-// Performance optimization - throttle scroll events
-let ticking = false;
-
-function throttleScroll() {
-    if (!ticking) {
-        requestAnimationFrame(() => {
-            // Scroll-based animations here
-            ticking = false;
+// Scroll Indicator Click Handler
+function initScrollIndicator() {
+    const scrollIndicator = document.querySelector('.animate-bounce');
+    if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', function() {
+            const sobreSection = document.getElementById('sobre');
+            if (sobreSection) {
+                sobreSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         });
-        ticking = true;
+
+        // Add hover effect
+        scrollIndicator.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(-50%) scale(1.1)';
+        });
+
+        scrollIndicator.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(-50%) scale(1)';
+        });
     }
 }
+// Add Hover Effects to Cards
+function initCardHoverEffects() {
+    const cards = document.querySelectorAll('.hover\\:shadow-lg');
 
-window.addEventListener('scroll', throttleScroll);
-
-// Add loading states for images
-document.addEventListener('DOMContentLoaded', () => {
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        img.addEventListener('load', () => {
-            img.style.opacity = '1';
-            img.style.transform = 'scale(1)';
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
         });
 
-        img.style.opacity = '0';
-        img.style.transform = 'scale(0.9)';
-        img.style.transition = 'all 0.3s ease';
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
     });
-});
+}// Floating Animation for Elements
+function initFloatingAnimation() {
+    const floatingElements = document.querySelectorAll('.animate-float');
 
-// Add ripple effect to buttons
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('btn-primary')) {
-        const button = e.target;
-        const rect = button.getBoundingClientRect();
-        const ripple = document.createElement('span');
+    floatingElements.forEach((element, index) => {
+        element.style.animationDelay = `${index * 0.5}s`;
+        element.style.animation = 'float 6s ease-in-out infinite';
+    });
+}
 
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.classList.add('ripple');
-
-        button.appendChild(ripple);
-
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    }
-});
-
-// Add CSS for ripple effect
+// Add CSS for floating animation
 const style = document.createElement('style');
 style.textContent = `
-    .btn-primary {
-        position: relative;
-        overflow: hidden;
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
     }
 
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(0);
-        animation: ripple-animation 0.6s linear;
-        pointer-events: none;
-    }
-
-    @keyframes ripple-animation {
-        to {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-
-    nav.scrolled {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    .hero-title, .hero-subtitle, .hero-buttons {
+        transition: opacity 0.8s ease, transform 0.8s ease;
     }
 `;
 document.head.appendChild(style);
+
+// Loading States for Buttons
+function initButtonLoadingStates() {
+    const buttons = document.querySelectorAll('button');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Carregando...';
+            this.disabled = true;
+
+            // Simulate loading (remove in production)
+            setTimeout(() => {
+                this.innerHTML = originalContent;
+                this.disabled = false;
+            }, 2000);
+        });
+    });
+}
+
+// Initialize all animations and effects
+function initializeMainAnimations() {
+    initCanvasEffects();
+    initParallax();
+    initSmoothScroll();
+    initFadeInAnimations();
+    initMobileMenu();
+    initNavbarScrollEffect();
+    initHeroAnimations();
+    initCounterAnimation();
+    initCardHoverEffects();
+    initFloatingAnimation();
+    initActiveNavigation();
+    initScrollIndicator();
+
+    // Optional: Uncomment for button loading states
+    // initButtonLoadingStates();
+}// Performance optimization: Use passive event listeners
+const addPassiveEventListener = (element, event, handler) => {
+    element.addEventListener(event, handler, { passive: true });
+};
+
+// Optimize scroll events
+let ticking = false;
+function updateOnScroll() {
+    // Parallax and navbar effects are handled here
+    ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(updateOnScroll);
+        ticking = true;
+    }
+}, { passive: true });
+
+// Preload critical resources
+function preloadResources() {
+    const criticalImages = [
+        '/imgs/favicon.ico'
+        // Add other critical images here
+    ];
+
+    criticalImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+}
+
+// Initialize preloading
+preloadResources();
