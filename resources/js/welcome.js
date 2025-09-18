@@ -1,15 +1,15 @@
 // Splash Screen Animation
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
-    const splashIcon = document.getElementById('splash-icon');
+    const splashLogo = document.getElementById('splash-logo');
     const splashTitle = document.getElementById('splash-title');
     const splashSubtitle = document.getElementById('splash-subtitle');
     const splashLoader = document.getElementById('splash-loader');
 
     // Animate splash elements
     setTimeout(() => {
-        splashIcon.style.opacity = '1';
-        splashIcon.style.transform = 'scale(1.1)';
+        splashLogo.style.opacity = '1';
+        splashLogo.style.transform = 'scale(1.1)';
     }, 300);
 
     setTimeout(() => {
@@ -222,7 +222,6 @@ function initNavbarScrollEffect() {
 function initHeroAnimations() {
     const heroTitle = document.getElementById('hero-title');
     const heroSubtitle = document.getElementById('hero-subtitle');
-    const heroButtons = document.getElementById('hero-buttons');
 
     setTimeout(() => {
         heroTitle.style.opacity = '1';
@@ -233,11 +232,6 @@ function initHeroAnimations() {
         heroSubtitle.style.opacity = '1';
         heroSubtitle.style.transform = 'translateY(0)';
     }, 600);
-
-    setTimeout(() => {
-        heroButtons.style.opacity = '1';
-        heroButtons.style.transform = 'translateY(0)';
-    }, 1000);
 }
 
 // Typing Effect for Hero Title (alternative animation)
@@ -377,7 +371,7 @@ style.textContent = `
         50% { transform: translateY(-20px); }
     }
 
-    .hero-title, .hero-subtitle, .hero-buttons {
+    .hero-title, .hero-subtitle {
         transition: opacity 0.8s ease, transform 0.8s ease;
     }
 `;

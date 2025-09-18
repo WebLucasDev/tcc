@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,19 +12,25 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="shortcut icon" href="/imgs/favicon.ico" type="image/x-icon">
     <title>Metre Ponto - Sistema de Registro de Ponto Eletrônico</title>
 </head>
+
 <body class="bg-gray-50 overflow-x-hidden">
     <!-- Splash Screen -->
-    <div id="splash-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700">
-        <div class="text-center">
-            <img src="/imgs/logo.svg" alt="Logo Metre Sistemas">
+    <div id="splash-screen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700">
+        <div class="flex flex-col items-center justify-center text-center">
+            <img src="/imgs/logo.svg" alt="Logo Metre Sistemas" id="splash-logo" class="mb-4">
             <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 opacity-0" id="splash-title">Metre Ponto</h1>
-            <p class="text-xl text-orange-100 opacity-0" id="splash-subtitle">Sistema de Registro de Ponto Eletrônico</p>
+            <p class="text-xl text-orange-100 opacity-0" id="splash-subtitle">Sistema de Registro de Ponto Eletrônico
+            </p>
             <div class="mt-8 opacity-0" id="splash-loader">
-                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-white"></div>
+                <div
+                    class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-white">
+                </div>
             </div>
         </div>
     </div>
@@ -32,20 +39,29 @@
     <canvas id="canvas-effects" class="fixed inset-0 z-0 pointer-events-none"></canvas>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md shadow-lg transition-all duration-300" id="navbar">
+    <nav class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md shadow-lg transition-all duration-300"
+        id="navbar">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <i class="fas fa-clock text-3xl text-orange-600"></i>
+                    <img src="/imgs/logo.svg" alt="Logo Metre Sistemas" class="h-8 w-8">
                     <span class="text-2xl font-bold text-gray-800">Metre Ponto</span>
                 </div>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#sobre" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="sobre">Sobre</a>
-                    <a href="#aplicativo" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="aplicativo">Aplicativo</a>
-                    <a href="#painel" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="painel">Painel Admin</a>
-                    <a href="#acesso" class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 smooth-scroll">Acesse Agora</a>
+                    <a href="#sobre"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="sobre">Sobre</a>
+                    <a href="#aplicativo"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="aplicativo">Aplicativo</a>
+                    <a href="#painel"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="painel">Painel Admin</a>
+                    <a href="{{ route('login.index') }}"
+                        class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 transform hover:scale-105">Acesse
+                        Agora</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -57,10 +73,18 @@
             <!-- Mobile Menu -->
             <div class="md:hidden mt-4 pb-4 hidden" id="mobile-menu">
                 <div class="flex flex-col space-y-4">
-                    <a href="#sobre" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="sobre">Sobre</a>
-                    <a href="#aplicativo" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="aplicativo">Aplicativo</a>
-                    <a href="#painel" class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll" data-section="painel">Painel Admin</a>
-                    <a href="#acesso" class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 text-center smooth-scroll">Acesse Agora</a>
+                    <a href="#sobre"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="sobre">Sobre</a>
+                    <a href="#aplicativo"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="aplicativo">Aplicativo</a>
+                    <a href="#painel"
+                        class="nav-link text-gray-700 hover:text-orange-600 transition-colors duration-300 smooth-scroll"
+                        data-section="painel">Painel Admin</a>
+                    <a href="{{ route('login.index') }}"
+                        class="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-all duration-300 text-center">Acesse
+                        Agora</a>
                 </div>
             </div>
         </div>
@@ -83,20 +107,13 @@
                 Metre Ponto
             </h1>
             <p class="text-xl md:text-2xl mb-8 text-orange-100 opacity-0 transform translate-y-10" id="hero-subtitle">
-                O sistema mais moderno de controle de ponto eletrônico
+                Controle de Ponto Eletrônico Simplificado e Eficiente
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center opacity-0 transform translate-y-10" id="hero-buttons">
-                <button class="bg-white text-orange-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-play mr-2"></i>Começar Agora
-                </button>
-                <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition-all duration-300 transform hover:scale-105">
-                    <i class="fas fa-info-circle mr-2"></i>Saiba Mais
-                </button>
-            </div>
         </div>
 
         <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce cursor-pointer smooth-scroll" onclick="document.getElementById('sobre').scrollIntoView({behavior: 'smooth', block: 'start'});">
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce cursor-pointer smooth-scroll"
+            onclick="document.getElementById('sobre').scrollIntoView({behavior: 'smooth', block: 'start'});">
             <i class="fas fa-chevron-down text-2xl"></i>
         </div>
     </section>
@@ -107,13 +124,14 @@
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in">Sobre o Metre Ponto</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">
-                    Uma solução completa e moderna para o controle de ponto eletrônico,
-                    oferecendo praticidade tanto para colaboradores quanto para gestores.
+                    Uma solução moderna para o controle de ponto eletrônico,
+                    oferecendo praticidade tanto para os colaboradores quanto para os gestores.
                 </p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                <div
+                    class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
                     <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-mobile-alt text-2xl text-white"></i>
                     </div>
@@ -123,23 +141,27 @@
                     </p>
                 </div>
 
-                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                <div
+                    class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
                     <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-chart-line text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Relatórios</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Painel Administrativo</h3>
                     <p class="text-gray-600">
-                        Relatórios detalhados e análises em tempo real para uma gestão eficiente de recursos humanos.
+                        Painel web completo para gestores monitorarem e gerenciarem o ponto dos colaboradores.
+                        Com ele o gestor pode acompanhar em tempo real os registros de ponto, gerenciar horários e
+                        turnos, além de visualizar banco de horas para fins de conformidade.
                     </p>
                 </div>
 
-                <div class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                <div
+                    class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 fade-in">
                     <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-shield-alt text-2xl text-white"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-4">Segurança</h3>
                     <p class="text-gray-600">
-                        Máxima segurança dos dados com criptografia avançada e conformidade com a LGPD.
+                        Segurança dos dados com criptografia CSRF, autenticação biométrica e conformidade com LGPD.
                     </p>
                 </div>
             </div>
@@ -147,17 +169,13 @@
     </section>
 
     <!-- Aplicativo Section -->
-    <section id="aplicativo" class="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+    <section id="aplicativo"
+        class="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="container mx-auto px-6 relative z-10">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="fade-in">
                     <h2 class="text-4xl md:text-5xl font-bold mb-6">Aplicativo Mobile</h2>
-                    <p class="text-xl text-gray-300 mb-8">
-                        Developed with cutting-edge technology, our mobile app provides a seamless experience
-                        for employees to clock in and out with just a few taps.
-                    </p>
-
                     <div class="space-y-6">
                         <div class="flex items-center space-x-4">
                             <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
@@ -189,35 +207,20 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="flex space-x-4 mt-8">
-                        <a href="#" class="bg-black rounded-lg px-6 py-3 flex items-center space-x-3 hover:bg-gray-900 transition-colors">
-                            <i class="fab fa-apple text-2xl"></i>
-                            <div>
-                                <div class="text-xs">Download na</div>
-                                <div class="text-lg font-semibold">App Store</div>
-                            </div>
-                        </a>
-                        <a href="#" class="bg-black rounded-lg px-6 py-3 flex items-center space-x-3 hover:bg-gray-900 transition-colors">
-                            <i class="fab fa-google-play text-2xl"></i>
-                            <div>
-                                <div class="text-xs">Baixar no</div>
-                                <div class="text-lg font-semibold">Google Play</div>
-                            </div>
-                        </a>
-                    </div>
                 </div>
 
                 <div class="relative fade-in">
                     <div class="relative mx-auto w-80 h-96 bg-gray-900 rounded-3xl p-2 shadow-2xl">
-                        <div class="w-full h-full bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl flex items-center justify-center">
+                        <div
+                            class="w-full h-full bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl flex items-center justify-center">
                             <div class="text-center">
                                 <i class="fas fa-mobile-alt text-6xl text-white mb-4"></i>
                                 <p class="text-white text-lg">Interface do App</p>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-orange-600 rounded-full opacity-20 animate-ping"></div>
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-orange-600 rounded-full opacity-20 animate-ping">
+                    </div>
                     <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-orange-600 rounded-full opacity-30"></div>
                 </div>
             </div>
@@ -318,48 +321,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <button class="bg-orange-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg mt-8">
-                        <i class="fas fa-external-link-alt mr-2"></i>Acessar Painel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Acesse Agora Section -->
-    <section id="acesso" class="py-20 bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700 text-white relative overflow-hidden">
-        <div class="absolute inset-0 bg-black/20"></div>
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <div class="max-w-4xl mx-auto fade-in">
-                <h2 class="text-4xl md:text-6xl font-bold mb-6">Pronto para Começar?</h2>
-                <p class="text-xl md:text-2xl text-orange-100 mb-12">
-                    Transforme a gestão de ponto da sua empresa hoje mesmo.
-                    Teste gratuitamente por 30 dias, sem compromisso.
-                </p>
-
-                <div class="grid md:grid-cols-3 gap-8 mb-12">
-                    <div class="text-center">
-                        <div class="text-4xl font-bold mb-2">30</div>
-                        <div class="text-orange-200">Dias Grátis</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold mb-2">24/7</div>
-                        <div class="text-orange-200">Suporte</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold mb-2">99.9%</div>
-                        <div class="text-orange-200">Disponibilidade</div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button class="bg-white text-orange-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-rocket mr-2"></i>Começar Teste Grátis
-                    </button>
-                    <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-phone mr-2"></i>Falar com Vendas
-                    </button>
                 </div>
             </div>
         </div>
@@ -379,39 +340,34 @@
                         praticidade e segurança na gestão de recursos humanos.
                     </p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-facebook-f text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <a href="http://linkedin.com/company/metresistemas/posts/?feedView=all" target="_blank"
+                            class="text-gray-400 hover:text-white transition-colors">
                             <i class="fab fa-linkedin-in text-xl"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <a href="https://www.instagram.com/metresistemas/" target="_blank"
+                            class="text-gray-400 hover:text-white transition-colors">
                             <i class="fab fa-instagram text-xl"></i>
                         </a>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-lg font-semibold mb-4">Produto</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Aplicativo Mobile</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Painel Admin</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Relatórios</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Integrações</a></li>
-                    </ul>
-                </div>
+                    <h4 class="text-lg font-semibold mb-4">Desenvolvido por:</h4>
+                    <img src="https://avatars.githubusercontent.com/u/94983682?v=4" alt="Lucas Venancio"
+                        class="h-20 w-20 mt-2 rounded-full">
+                    <p class="mt-2 text-gray-400">Lucas Venancio</p>
+                    <p class="text-gray-400 text-sm">Desenvolvedor Full Stack</p>
 
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Suporte</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Central de Ajuda</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Documentação</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Contato</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
-                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="https://www.linkedin.com/in/lucasvenancio-dev/" target="_blank"
+                            class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                        <a href="https://www.instagram.com/luca1_venancio/" target="_blank"
+                            class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -423,4 +379,5 @@
         </div>
     </footer>
 </body>
+
 </html>
