@@ -9,7 +9,7 @@ class WorkHoursController extends Controller
 {
     public function index(Request $request)
     {
-        $query = WorkHoursModel::query();
+        $query = WorkHoursModel::withCount('collaborators');
 
         if ($request->filled('search')) {
             $search = $request->search;
