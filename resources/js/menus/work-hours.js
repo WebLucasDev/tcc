@@ -147,54 +147,104 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateContent(data) {
         if (tableContainer) {
             tableContainer.innerHTML = data.html;
+
+            // Forçar re-aplicação do tema após inserção do HTML
+            applyThemeToNewContent(tableContainer);
         }
 
         if (paginationContainer) {
             paginationContainer.innerHTML = data.pagination;
+
+            // Aplicar tema na paginação também
+            applyThemeToNewContent(paginationContainer);
         }
 
-        if (statisticsContainer && data.statistics) {
+        // Atualizar estatísticas
+        if (data.statistics && statisticsContainer) {
             updateStatistics(data.statistics);
         }
 
-        if (window.applyThemeToNewContent) {
-            window.applyThemeToNewContent(tableContainer);
-            window.applyThemeToNewContent(paginationContainer);
-        }
-
+        // Reanexar eventos após atualizar o conteúdo
         attachDeleteEvents();
         attachPaginationEvents();
+        attachSortingEvents();
+    }
+
+    // Função para anexar eventos de ordenação
+    function attachSortingEvents() {
+        const newSortBySelect = document.querySelector('select[name="sort_by"]');
+        const newSortDirectionBtn = document.querySelector('[name="sort_direction"]');
+
+        // Event listener para mudança de campo de ordenação
+        if (newSortBySelect) {
+            newSortBySelect.addEventListener('change', function() {
+                currentFilters.sort_by = this.value;
+                performAjaxSearch();
+            });
+        }
+
+        // Event listener para mudança de direção da ordenação
+        if (newSortDirectionBtn) {
+            newSortDirectionBtn.addEventListener('click', function() {
+                const currentDirection = this.getAttribute('value');
+                const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+                this.setAttribute('value', newDirection);
+                currentFilters.sort_direction = newDirection;
+                performAjaxSearch();
+            });
+        }
     }
 
     // Função para atualizar estatísticas
     function updateStatistics(statistics) {
-        const totalElement = document.querySelector('.stat-total .text-2xl');
-        const activeElement = document.querySelector('.stat-active .text-2xl');
-        const inactiveElement = document.querySelector('.stat-inactive .text-2xl');
+        const totalElement = document.getElementById('total-work-hours');
+        const activeElement = document.getElementById('active-work-hours');
+        const inactiveElement = document.getElementById('inactive-work-hours');
 
         if (totalElement) totalElement.textContent = statistics.total;
         if (activeElement) activeElement.textContent = statistics.active;
         if (inactiveElement) inactiveElement.textContent = statistics.inactive;
     }
 
+    // Função para aplicar tema ao conteúdo novo
+    function applyThemeToNewContent(container) {
+        // Trigger do sistema de tema se existir
+        if (window.ThemeManager && window.ThemeManager.applyTheme) {
+            window.ThemeManager.applyTheme();
+        }
+
+        // Aplicar tema baseado em variáveis CSS customizadas
+        if (window.applyThemeToNewContent) {
+            window.applyThemeToNewContent(container);
+        }
+    }
+
     // Função para atualizar botão de ordenação
     function updateSortButton() {
-        if (sortDirectionBtn) {
+        const currentSortDirectionBtn = document.querySelector('[name="sort_direction"]');
+        const currentSortBySelect = document.querySelector('select[name="sort_by"]');
+
+        if (currentSortDirectionBtn) {
             const direction = currentFilters.sort_direction;
-            const icon = sortDirectionBtn.querySelector('i');
+            const icon = currentSortDirectionBtn.querySelector('i');
+            currentSortDirectionBtn.setAttribute('value', direction);
             if (icon) {
                 icon.className = `fa-solid fa-sort-${direction === 'asc' ? 'up' : 'down'}`;
             }
+        }
+
+        if (currentSortBySelect) {
+            currentSortBySelect.value = currentFilters.sort_by;
         }
     }
 
     // Função para atualizar resumo dos resultados
     function updateResultsSummary() {
         if (resultsSummary) {
-            const hasFilters = Object.values(currentFilters).some(value => 
+            const hasFilters = Object.values(currentFilters).some(value =>
                 value && value !== 'name' && value !== 'asc'
             );
-            
+
             if (hasFilters) {
                 resultsSummary.style.display = 'inline';
             } else {
@@ -227,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parent.tagName !== 'SCRIPT') {
                 const regex = new RegExp(`(${searchTerm})`, 'gi');
                 const highlightedText = node.textContent.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
-                
+
                 if (highlightedText !== node.textContent) {
                     const wrapper = document.createElement('span');
                     wrapper.innerHTML = highlightedText;
@@ -357,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar eventos
     attachDeleteEvents();
     attachPaginationEvents();
+    attachSortingEvents();
 });
 
 // Função para alternar a exibição dos campos de horário por dia
@@ -406,7 +457,7 @@ function calculateWeeklyHours() {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     const weeklyHoursElement = document.getElementById('weekly-hours');
-    
+
     if (weeklyHoursElement) {
         weeklyHoursElement.textContent = `Total: ${hours}h${minutes > 0 ? ` ${minutes}min` : ''} semanais`;
     }

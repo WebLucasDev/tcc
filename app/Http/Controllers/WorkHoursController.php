@@ -20,7 +20,7 @@ class WorkHoursController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->whereRaw("status = ?", [$request->status]);
         }
 
         $sortBy = $request->get('sort_by', 'name');
@@ -32,9 +32,28 @@ class WorkHoursController extends Controller
 
         $workHours = $query->paginate(10)->withQueryString();
 
-        $allWorkHours = WorkHoursModel::all();
-        $activeCount = $allWorkHours->where('status->value', 'ativo')->count();
-        $inactiveCount = $allWorkHours->where('status->value', 'inativo')->count();
+        // Calcular estatísticas com base na busca atual
+        $filteredQuery = WorkHoursModel::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $filteredQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $filteredQuery->whereRaw("status = ?", [$request->status]);
+        }
+
+        $filteredWorkHours = $filteredQuery->get();
+        $activeCount = $filteredWorkHours->filter(function ($workHour) {
+            return $workHour->status->value === 'ativo';
+        })->count();
+        $inactiveCount = $filteredWorkHours->filter(function ($workHour) {
+            return $workHour->status->value === 'inativo';
+        })->count();
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
