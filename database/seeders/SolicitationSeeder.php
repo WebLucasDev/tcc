@@ -16,132 +16,217 @@ class SolicitationSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🔄 Iniciando criação de solicitações para o colaborador ID 1...');
+        $this->command->info('🔄 Iniciando criação de solicitações...');
 
         // Limpar dados existentes
         SolicitationModel::truncate();
 
-        // Verificar se o colaborador existe
-        $collaborator = CollaboratorModel::find(1);
-        if (!$collaborator) {
-            $this->command->error('❌ Colaborador ID 1 não encontrado');
+        // Pegar alguns colaboradores aleatórios (máximo 8)
+        $collaborators = CollaboratorModel::inRandomOrder()->limit(8)->get();
+
+        if ($collaborators->isEmpty()) {
+            $this->command->error('❌ Nenhum colaborador encontrado');
             return;
         }
 
-        // Buscar alguns registros de time tracking do colaborador 1 para referenciar
-        $timeTrackings = TimeTrackingModel::where('collaborator_id', 1)
-            ->whereNotNull('entry_time_1')
-            ->limit(3)
-            ->get();
+        $totalCreated = 0;
 
-        $this->command->info("📊 Encontrados {$timeTrackings->count()} registros de time tracking para o colaborador");
+        foreach ($collaborators as $collaborator) {
+            $this->command->info("Processando colaborador: {$collaborator->name}");
 
-        if ($timeTrackings->count() >= 2) {
-            // Primeira solicitação - Correção do período da MANHÃ (entry_time_1 e return_time_1)
-            SolicitationModel::create([
-                'collaborator_id' => 1,
-                'time_tracking_id' => $timeTrackings[0]->id,
-                'status' => SolicitationStatusEnum::PENDING,
-                'old_time_start' => $timeTrackings[0]->entry_time_1, // Entrada da manhã
-                'old_time_finish' => $timeTrackings[0]->return_time_1, // Saída da manhã (almoço)
-                'new_time_start' => Carbon::parse($timeTrackings[0]->entry_time_1)->addMinutes(30), // 30 min depois
-                'new_time_finish' => Carbon::parse($timeTrackings[0]->return_time_1)->addMinutes(30), // Compensar no almoço
-                'reason' => 'Atraso no período da manhã devido a trânsito intenso na data ' . $timeTrackings[0]->date->format('d/m/Y') . '. Solicito ajuste no horário de entrada da manhã com compensação no horário de saída para o almoço.',
-                'admin_comment' => null,
-                'created_at' => Carbon::now()->subDays(2),
-                'updated_at' => Carbon::now()->subDays(2),
-            ]);
+            // Buscar registros de ponto do colaborador (máximo 2 por colaborador)
+            $timeTrackings = TimeTrackingModel::where('collaborator_id', $collaborator->id)
+                ->where('status', 'completo')
+                ->whereNotNull('entry_time_1')
+                ->whereNotNull('return_time_1')
+                ->inRandomOrder()
+                ->limit(2)
+                ->get();
 
-            // Segunda solicitação - Correção do período da TARDE (entry_time_2 e return_time_2)
-            SolicitationModel::create([
-                'collaborator_id' => 1,
-                'time_tracking_id' => $timeTrackings[1]->id,
-                'status' => SolicitationStatusEnum::PENDING,
-                'old_time_start' => $timeTrackings[1]->entry_time_2, // Retorno do almoço
-                'old_time_finish' => $timeTrackings[1]->return_time_2, // Saída final
-                'new_time_start' => $timeTrackings[1]->entry_time_2, // Manter retorno do almoço
-                'new_time_finish' => Carbon::parse($timeTrackings[1]->return_time_2)->subMinutes(60), // Sair 1h antes
-                'reason' => 'Necessidade de sair 1 hora mais cedo no período da tarde do dia ' . $timeTrackings[1]->date->format('d/m/Y') . ' por compromisso médico. Mantenho o horário de retorno do almoço normal.',
-                'admin_comment' => null,
-                'created_at' => Carbon::now()->subDays(1),
-                'updated_at' => Carbon::now()->subDays(1),
-            ]);
+            if ($timeTrackings->count() > 0) {
+                // Criar 1-2 solicitações por colaborador
+                $numSolicitations = min(2, $timeTrackings->count());
 
-            $this->command->info('✅ Criadas 2 solicitações pendentes para o colaborador ID 1 com time tracking real');
-        } else {
-            $this->command->warn('⚠️  Poucos registros de time tracking encontrados. Criando solicitações genéricas...');
+                for ($i = 0; $i < $numSolicitations; $i++) {
+                    $timeTracking = $timeTrackings[$i];
+                    $status = collect([
+                        SolicitationStatusEnum::PENDING,
+                        SolicitationStatusEnum::PENDING,
+                        SolicitationStatusEnum::APPROVED,
+                        SolicitationStatusEnum::REJECTED
+                    ])->random();
+
+                    // Determinar tipo de solicitação aleatoriamente
+                    $solicitationType = collect(['morning', 'afternoon', 'full_shift'])->random();
+
+                    $solicitation = $this->createSolicitation($collaborator, $timeTracking, $status, $solicitationType);
+
+                    if ($solicitation) {
+                        $totalCreated++;
+                    }
+                }
+            }
         }
-
-        // Adicionar uma terceira solicitação para período da manhã de outro dia
-        if ($timeTrackings->count() >= 3) {
-            SolicitationModel::create([
-                'collaborator_id' => 1,
-                'time_tracking_id' => $timeTrackings[2]->id,
-                'status' => SolicitationStatusEnum::PENDING,
-                'old_time_start' => $timeTrackings[2]->entry_time_1, // Entrada da manhã
-                'old_time_finish' => $timeTrackings[2]->return_time_1, // Saída para almoço
-                'new_time_start' => Carbon::parse($timeTrackings[2]->entry_time_1)->subMinutes(15), // Chegar 15 min antes
-                'new_time_finish' => Carbon::parse($timeTrackings[2]->return_time_1)->subMinutes(15), // Sair 15 min antes para almoço
-                'reason' => 'Solicito ajuste no período da manhã do dia ' . $timeTrackings[2]->date->format('d/m/Y') . ' para entrar 15 minutos mais cedo e sair para o almoço também 15 minutos mais cedo por motivos pessoais.',
-                'admin_comment' => null,
-                'created_at' => Carbon::now()->subHours(12),
-                'updated_at' => Carbon::now()->subHours(12),
-            ]);
-        } else {
-            // Criar solicitação genérica para período da tarde
-            SolicitationModel::create([
-                'collaborator_id' => 1,
-                'time_tracking_id' => null,
-                'status' => SolicitationStatusEnum::PENDING,
-                'old_time_start' => Carbon::createFromTime(13, 0), // Retorno do almoço
-                'old_time_finish' => Carbon::createFromTime(17, 0), // Saída final
-                'new_time_start' => Carbon::createFromTime(13, 0), // Manter retorno
-                'new_time_finish' => Carbon::createFromTime(16, 30), // Sair 30 min antes
-                'reason' => 'Solicitação genérica de ajuste no período da tarde por motivos pessoais.',
-                'admin_comment' => null,
-                'created_at' => Carbon::now()->subHours(12),
-                'updated_at' => Carbon::now()->subHours(12),
-            ]);
-        }
-
-        $totalSolicitations = SolicitationModel::count();
 
         $this->command->newLine();
-        $this->command->info('🎯 Resumo das solicitações criadas:');
-        $this->command->line('   - Colaborador: ' . $collaborator->name . ' (ID: 1)');
-        $this->command->line('   - Status: Pendente (para testes)');
-        $this->command->line('   - Quantidade: ' . $totalSolicitations . ' solicitações');
-        $this->command->line('   - Enum utilizado: SolicitationStatusEnum::PENDING');
-        $this->command->line('   - Regra: Apenas períodos consecutivos (manhã OU tarde)');
+        $this->command->info("✅ {$totalCreated} solicitações criadas com sucesso!");
 
-        // Exibir detalhes das solicitações
-        $solicitations = SolicitationModel::with('collaborator')->get();
-        foreach ($solicitations as $index => $solicitation) {
-            $period = $this->determinePeriod($solicitation);
-            $this->command->line('   ' . ($index + 1) . '. Time Tracking: ' . ($solicitation->time_tracking_id ?? 'Genérica') . ' - Período: ' . $period);
-            $this->command->line('      Motivo: ' . substr($solicitation->reason, 0, 60) . '...');
-        }
+        // Exibir resumo
+        $this->showSummary();
     }
 
     /**
-     * Determina se a solicitação é para período da manhã ou tarde
+     * Cria uma solicitação baseada no tipo especificado
      */
-    private function determinePeriod($solicitation): string
+    private function createSolicitation($collaborator, $timeTracking, $status, $type)
     {
-        if ($solicitation->old_time_start && $solicitation->old_time_finish) {
-            $startHour = $solicitation->old_time_start->hour;
-            $finishHour = $solicitation->old_time_finish->hour;
+        $reasons = [
+            'morning' => [
+                'Atraso devido ao trânsito intenso. Solicito compensação no horário.',
+                'Consulta médica no período da manhã. Necessário ajuste de horário.',
+                'Problema no transporte público. Peço para regularizar o ponto.',
+                'Compromisso familiar urgente na manhã do dia.'
+            ],
+            'afternoon' => [
+                'Necessidade de sair mais cedo por compromisso médico.',
+                'Reunião na escola do filho. Preciso sair antes do horário.',
+                'Consulta médica familiar. Solicito saída antecipada.',
+                'Compromisso pessoal inadiável no final da tarde.'
+            ],
+            'full_shift' => [
+                'Trabalho externo durante todo o expediente. Solicito ajuste completo.',
+                'Treinamento fora da empresa. Necessário correção dos horários.',
+                'Atendimento a cliente externo durante todo o dia.',
+                'Home office por motivos pessoais. Peço regularização do ponto.'
+            ]
+        ];
 
-            // Se ambos os horários são antes das 13h, é período da manhã
-            if ($startHour < 13 && $finishHour <= 13) {
-                return 'Manhã (entry_time_1 → return_time_1)';
-            }
-            // Se ambos são após as 12h, é período da tarde
-            else if ($startHour >= 12 && $finishHour > 13) {
-                return 'Tarde (entry_time_2 → return_time_2)';
-            }
+        $data = [
+            'collaborator_id' => $collaborator->id,
+            'time_tracking_id' => $timeTracking->id,
+            'status' => $status,
+            'reason' => collect($reasons[$type])->random(),
+            'created_at' => Carbon::now()->subDays(rand(1, 30)),
+            'updated_at' => Carbon::now()->subDays(rand(0, 5)),
+        ];
+
+        // Definir horários baseado no tipo
+        switch ($type) {
+            case 'morning':
+                // Apenas período da manhã (entry_time_1 → return_time_1)
+                $data['old_time_start'] = $timeTracking->entry_time_1;
+                $data['old_time_finish'] = $timeTracking->return_time_1;
+
+                // Garantir que o novo horário de entrada seja antes da saída
+                $newEntry = Carbon::parse($timeTracking->entry_time_1)->addMinutes(rand(15, 60));
+                $newExit = Carbon::parse($timeTracking->return_time_1)->addMinutes(rand(0, 30));
+
+                // Se a nova entrada ficar depois da saída, ajustar
+                if ($newEntry->gte($newExit)) {
+                    $newExit = $newEntry->copy()->addMinutes(rand(30, 120));
+                }
+
+                $data['new_time_start'] = $newEntry;
+                $data['new_time_finish'] = $newExit;
+                break;
+
+            case 'afternoon':
+                // Apenas período da tarde (entry_time_2 → return_time_2)
+                if ($timeTracking->entry_time_2 && $timeTracking->return_time_2) {
+                    $data['old_time_start'] = $timeTracking->entry_time_2;
+                    $data['old_time_finish'] = $timeTracking->return_time_2;
+
+                    // Para tarde, geralmente é saída antecipada
+                    $data['new_time_start'] = $timeTracking->entry_time_2; // Manter entrada
+                    $data['new_time_finish'] = Carbon::parse($timeTracking->return_time_2)->subMinutes(rand(30, 120));
+
+                    // Garantir que a saída seja depois da entrada
+                    if (Carbon::parse($data['new_time_finish'])->lte(Carbon::parse($data['new_time_start']))) {
+                        $data['new_time_finish'] = Carbon::parse($data['new_time_start'])->addMinutes(60);
+                    }
+                } else {
+                    // Se não tem turno da tarde, usar manhã mas com ajuste menor
+                    $data['old_time_start'] = $timeTracking->entry_time_1;
+                    $data['old_time_finish'] = $timeTracking->return_time_1;
+                    $data['new_time_start'] = $timeTracking->entry_time_1;
+                    $data['new_time_finish'] = Carbon::parse($timeTracking->return_time_1)->subMinutes(rand(15, 45));
+
+                    // Garantir que a saída seja depois da entrada
+                    if (Carbon::parse($data['new_time_finish'])->lte(Carbon::parse($data['new_time_start']))) {
+                        $data['new_time_finish'] = Carbon::parse($data['new_time_start'])->addMinutes(30);
+                    }
+                }
+                break;
+
+            case 'full_shift':
+                // Turno completo: da entrada da manhã até a saída final
+                $data['old_time_start'] = $timeTracking->entry_time_1;
+                $data['old_time_finish'] = $timeTracking->return_time_2 ?? $timeTracking->return_time_1;
+
+                // Pequenos ajustes no turno completo
+                $newEntry = Carbon::parse($timeTracking->entry_time_1)->addMinutes(rand(-30, 30));
+                $newExit = Carbon::parse($data['old_time_finish'])->addMinutes(rand(-30, 60));
+
+                // Garantir que entrada seja antes da saída
+                if ($newEntry->gte($newExit)) {
+                    $newExit = $newEntry->copy()->addMinutes(rand(240, 480)); // 4-8 horas depois
+                }
+
+                $data['new_time_start'] = $newEntry;
+                $data['new_time_finish'] = $newExit;
+                break;
         }
 
-        return 'Indefinido';
+        // Adicionar comentário do admin se aprovado/rejeitado
+        if ($status === SolicitationStatusEnum::APPROVED) {
+            $data['admin_comment'] = collect([
+                'Solicitação aprovada. Ajuste realizado conforme solicitado.',
+                'Justificativa aceita. Ponto regularizado.',
+                'Aprovado mediante comprovante apresentado.',
+                'Situação regularizada conforme política da empresa.'
+            ])->random();
+        } elseif ($status === SolicitationStatusEnum::REJECTED) {
+            $data['admin_comment'] = collect([
+                'Solicitação negada. Não há justificativa suficiente.',
+                'Falta documentação comprobatória para aprovação.',
+                'Política da empresa não permite este tipo de ajuste.',
+                'Prazo para solicitação expirado.'
+            ])->random();
+        }
+
+        return SolicitationModel::create($data);
+    }
+
+    /**
+     * Exibe resumo das solicitações criadas
+     */
+    private function showSummary()
+    {
+        $solicitations = SolicitationModel::with('collaborator')->get();
+
+        $this->command->info('📊 Resumo das solicitações:');
+
+        $statusCounts = [
+            'pending' => $solicitations->where('status', SolicitationStatusEnum::PENDING)->count(),
+            'approved' => $solicitations->where('status', SolicitationStatusEnum::APPROVED)->count(),
+            'rejected' => $solicitations->where('status', SolicitationStatusEnum::REJECTED)->count(),
+        ];
+
+        $this->command->line("   🟡 Pendentes: {$statusCounts['pending']}");
+        $this->command->line("   🟢 Aprovadas: {$statusCounts['approved']}");
+        $this->command->line("   🔴 Rejeitadas: {$statusCounts['rejected']}");
+
+        $this->command->newLine();
+        foreach ($solicitations as $index => $solicitation) {
+            $status = match($solicitation->status) {
+                SolicitationStatusEnum::PENDING => '🟡 Pendente',
+                SolicitationStatusEnum::APPROVED => '🟢 Aprovada',
+                SolicitationStatusEnum::REJECTED => '🔴 Rejeitada',
+                default => '⚪ Desconhecido'
+            };
+
+            $this->command->line("   " . ($index + 1) . ". {$solicitation->collaborator->name} - {$status}");
+            $this->command->line("      Motivo: " . substr($solicitation->reason, 0, 50) . "...");
+        }
     }
 }

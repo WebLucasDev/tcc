@@ -167,14 +167,26 @@ class WorkHoursModel extends Model
                 if ($this->{$day . '_entry_1'} && $this->{$day . '_exit_1'}) {
                     $entry1 = Carbon::parse($this->{$day . '_entry_1'});
                     $exit1 = Carbon::parse($this->{$day . '_exit_1'});
-                    $totalMinutes += $exit1->diffInMinutes($entry1);
+                    
+                    // Para horários noturnos (saída no dia seguinte)
+                    if ($exit1->lessThan($entry1)) {
+                        $exit1->addDay();
+                    }
+                    
+                    $totalMinutes += $entry1->diffInMinutes($exit1);
                 }
 
                 // Segundo turno
                 if ($this->{$day . '_entry_2'} && $this->{$day . '_exit_2'}) {
                     $entry2 = Carbon::parse($this->{$day . '_entry_2'});
                     $exit2 = Carbon::parse($this->{$day . '_exit_2'});
-                    $totalMinutes += $exit2->diffInMinutes($entry2);
+                    
+                    // Para horários noturnos (saída no dia seguinte)
+                    if ($exit2->lessThan($entry2)) {
+                        $exit2->addDay();
+                    }
+                    
+                    $totalMinutes += $entry2->diffInMinutes($exit2);
                 }
             }
         }
@@ -197,17 +209,29 @@ class WorkHoursModel extends Model
         if ($this->{$day . '_entry_1'} && $this->{$day . '_exit_1'}) {
             $entry1 = Carbon::parse($this->{$day . '_entry_1'});
             $exit1 = Carbon::parse($this->{$day . '_exit_1'});
-            $totalMinutes += $exit1->diffInMinutes($entry1);
+            
+            // Para horários noturnos (saída no dia seguinte)
+            if ($exit1->lessThan($entry1)) {
+                $exit1->addDay();
+            }
+            
+            $totalMinutes += $entry1->diffInMinutes($exit1);
         }
 
         // Segundo turno
         if ($this->{$day . '_entry_2'} && $this->{$day . '_exit_2'}) {
             $entry2 = Carbon::parse($this->{$day . '_entry_2'});
             $exit2 = Carbon::parse($this->{$day . '_exit_2'});
-            $totalMinutes += $exit2->diffInMinutes($entry2);
+            
+            // Para horários noturnos (saída no dia seguinte)
+            if ($exit2->lessThan($entry2)) {
+                $exit2->addDay();
+            }
+            
+            $totalMinutes += $entry2->diffInMinutes($exit2);
         }
 
-        return round($totalMinutes / 60, 2);
+        return round($totalMinutes / 60, 2); // Converter para horas com 2 casas decimais
     }
 
     /**

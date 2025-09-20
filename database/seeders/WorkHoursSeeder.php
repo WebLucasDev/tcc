@@ -147,11 +147,7 @@ class WorkHoursSeeder extends Seeder
             'description' => 'Jornada noturna para operações 24h',
             'status' => WorkHoursStatusEnum::ACTIVE,
 
-            // Domingo a Quinta (cobrindo a noite)
-            'sunday_active' => true,
-            'sunday_entry_1' => '22:00',
-            'sunday_exit_1' => '06:00',
-
+            // Segunda a Sexta (22h às 06h do dia seguinte)
             'monday_active' => true,
             'monday_entry_1' => '22:00',
             'monday_exit_1' => '06:00',
@@ -167,6 +163,10 @@ class WorkHoursSeeder extends Seeder
             'thursday_active' => true,
             'thursday_entry_1' => '22:00',
             'thursday_exit_1' => '06:00',
+
+            'friday_active' => true,
+            'friday_entry_1' => '22:00',
+            'friday_exit_1' => '06:00',
         ]);
 
         // Jornada Flexível
@@ -203,27 +203,26 @@ class WorkHoursSeeder extends Seeder
             'description' => 'Jornada para estagiários de 20 horas semanais',
             'status' => WorkHoursStatusEnum::ACTIVE,
 
-            // Segunda, Quarta e Sexta
+            // Segunda a Sexta - meio período tarde
             'monday_active' => true,
             'monday_entry_1' => '14:00',
             'monday_exit_1' => '18:00',
+
+            'tuesday_active' => true,
+            'tuesday_entry_1' => '14:00',
+            'tuesday_exit_1' => '18:00',
 
             'wednesday_active' => true,
             'wednesday_entry_1' => '14:00',
             'wednesday_exit_1' => '18:00',
 
-            'friday_active' => true,
-            'friday_entry_1' => '14:00',
-            'friday_exit_1' => '18:00',
-
-            // Terça e Quinta (meio período)
-            'tuesday_active' => true,
-            'tuesday_entry_1' => '14:00',
-            'tuesday_exit_1' => '18:00',
-
             'thursday_active' => true,
             'thursday_entry_1' => '14:00',
             'thursday_exit_1' => '18:00',
+
+            'friday_active' => true,
+            'friday_entry_1' => '14:00',
+            'friday_exit_1' => '18:00',
         ]);
 
         // Jornada Inativa (para demonstrar status)
@@ -270,6 +269,60 @@ class WorkHoursSeeder extends Seeder
             'sunday_exit_1' => '12:00',
             'sunday_entry_2' => '13:00',
             'sunday_exit_2' => '17:00',
+        ]);
+
+        // Jornada Home Office Flexível
+        WorkHoursModel::create([
+            'name' => 'Home Office Flexível',
+            'description' => 'Jornada flexível para trabalho remoto com 40h semanais',
+            'status' => WorkHoursStatusEnum::ACTIVE,
+
+            'monday_active' => true,
+            'monday_entry_1' => '09:00',
+            'monday_exit_1' => '18:00',
+
+            'tuesday_active' => true,
+            'tuesday_entry_1' => '09:00',
+            'tuesday_exit_1' => '18:00',
+
+            'wednesday_active' => true,
+            'wednesday_entry_1' => '09:00',
+            'wednesday_exit_1' => '18:00',
+
+            'thursday_active' => true,
+            'thursday_entry_1' => '09:00',
+            'thursday_exit_1' => '18:00',
+
+            'friday_active' => true,
+            'friday_entry_1' => '09:00',
+            'friday_exit_1' => '17:00',
+        ]);
+
+        // Jornada Executiva
+        WorkHoursModel::create([
+            'name' => 'Executivo/Gerencial',
+            'description' => 'Jornada para cargos executivos com flexibilidade de horários',
+            'status' => WorkHoursStatusEnum::ACTIVE,
+
+            'monday_active' => true,
+            'monday_entry_1' => '08:30',
+            'monday_exit_1' => '18:30',
+
+            'tuesday_active' => true,
+            'tuesday_entry_1' => '08:30',
+            'tuesday_exit_1' => '18:30',
+
+            'wednesday_active' => true,
+            'wednesday_entry_1' => '08:30',
+            'wednesday_exit_1' => '18:30',
+
+            'thursday_active' => true,
+            'thursday_entry_1' => '08:30',
+            'thursday_exit_1' => '18:30',
+
+            'friday_active' => true,
+            'friday_entry_1' => '08:30',
+            'friday_exit_1' => '17:30',
         ]);
     }
 }

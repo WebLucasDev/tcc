@@ -20,6 +20,11 @@ class DepartmentSeeder extends Seeder
             ['name' => 'Comercial'],
             ['name' => 'Administrativo'],
             ['name' => 'Implantação'],
+            ['name' => 'DevOps e Infraestrutura'],
+            ['name' => 'Segurança da Informação'],
+            ['name' => 'Dados e Analytics'],
+            ['name' => 'UX/UI Design'],
+            ['name' => 'Produto e Inovação'],
         ];
 
         foreach ($departments as $department) {
@@ -40,6 +45,11 @@ class DepartmentSeeder extends Seeder
             'Comercial' => ['Analista Comercial'],
             'Administrativo' => ['Auxiliar Administrativo'],
             'Implantação' => ['Analista de Implantação'],
+            'DevOps e Infraestrutura' => [],
+            'Segurança da Informação' => [],
+            'Dados e Analytics' => [],
+            'UX/UI Design' => [],
+            'Produto e Inovação' => [],
         ];
 
         foreach ($assignments as $departmentName => $positionNames) {

@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
-            CollaboratorSeeder::class,
             WorkHoursSeeder::class,
+            CollaboratorSeeder::class,
             TimeTrackingSeeder::class,
             SolicitationSeeder::class,
         ]);

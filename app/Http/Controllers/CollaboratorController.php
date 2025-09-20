@@ -145,6 +145,7 @@ class CollaboratorController extends Controller
 
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::with('department')->orderBy('name')->get();
+        $workHours = WorkHoursModel::where('status', 'ativo')->orderBy('name')->get();
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
