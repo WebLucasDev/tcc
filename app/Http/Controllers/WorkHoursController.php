@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\WorkHoursModel;
+use App\Http\Requests\web\registrations\workHours\WorkHoursStoreRequest;
+use App\Http\Requests\web\registrations\workHours\WorkHoursUpdateRequest;
 use Illuminate\Http\Request;
 
 class WorkHoursController extends Controller
@@ -97,24 +99,150 @@ class WorkHoursController extends Controller
         return view('auth.registrations.work-hours.create', compact('breadcrumbs', 'days'));
     }
 
-    public function store()
+    public function store(WorkHoursStoreRequest $request)
     {
+        try {
+            $data = $request->validated();
 
+            // Processar dados dos dias da semana
+            $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+            foreach ($days as $day) {
+                // Se o dia não está ativo, garantir que os horários sejam null
+                if (!isset($data[$day . '_active']) || !$data[$day . '_active']) {
+                    $data[$day . '_active'] = false;
+                    $data[$day . '_entry_1'] = null;
+                    $data[$day . '_exit_1'] = null;
+                    $data[$day . '_entry_2'] = null;
+                    $data[$day . '_exit_2'] = null;
+                } else {
+                    $data[$day . '_active'] = true;
+                    // Limpar horários vazios
+                    if (empty($data[$day . '_entry_1']) || empty($data[$day . '_exit_1'])) {
+                        $data[$day . '_entry_1'] = null;
+                        $data[$day . '_exit_1'] = null;
+                    }
+                    if (empty($data[$day . '_entry_2']) || empty($data[$day . '_exit_2'])) {
+                        $data[$day . '_entry_2'] = null;
+                        $data[$day . '_exit_2'] = null;
+                    }
+                }
+            }
+
+            $workHour = WorkHoursModel::create($data);
+
+            return redirect()
+                ->route('work-hours.index')
+                ->with('success', 'Jornada de trabalho criada com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao criar jornada de trabalho. Tente novamente.');
+        }
     }
 
-    public function edit()
+    public function edit($id)
     {
+        $workHour = WorkHoursModel::findOrFail($id);
 
+        $days = [
+            'monday' => 'Segunda-feira',
+            'tuesday' => 'Terça-feira',
+            'wednesday' => 'Quarta-feira',
+            'thursday' => 'Quinta-feira',
+            'friday' => 'Sexta-feira',
+            'saturday' => 'Sábado',
+            'sunday' => 'Domingo'
+        ];
+
+        $breadcrumbs = [
+            ['label' => 'Cadastros', 'url' => null],
+            ['label' => 'Jornadas de Trabalho', 'url' => route('work-hours.index')],
+            ['label' => 'Editar Jornada', 'url' => null],
+        ];
+
+        return view('auth.registrations.work-hours.create', compact('breadcrumbs', 'days', 'workHour'));
     }
 
-    public function update()
+    public function update(WorkHoursUpdateRequest $request, $id)
     {
+        try {
+            $workHour = WorkHoursModel::findOrFail($id);
+            $data = $request->validated();
 
+            // Validação manual de unicidade do nome
+            $existingWorkHour = WorkHoursModel::where('name', $data['name'])
+                ->where('id', '!=', $id)
+                ->first();
+
+            if ($existingWorkHour) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['name' => 'Já existe uma jornada com este nome.']);
+            }
+
+            // Processar dados dos dias da semana
+            $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+            foreach ($days as $day) {
+                // Se o dia não está ativo, garantir que os horários sejam null
+                if (!isset($data[$day . '_active']) || !$data[$day . '_active']) {
+                    $data[$day . '_active'] = false;
+                    $data[$day . '_entry_1'] = null;
+                    $data[$day . '_exit_1'] = null;
+                    $data[$day . '_entry_2'] = null;
+                    $data[$day . '_exit_2'] = null;
+                } else {
+                    $data[$day . '_active'] = true;
+                    // Limpar horários vazios
+                    if (empty($data[$day . '_entry_1']) || empty($data[$day . '_exit_1'])) {
+                        $data[$day . '_entry_1'] = null;
+                        $data[$day . '_exit_1'] = null;
+                    }
+                    if (empty($data[$day . '_entry_2']) || empty($data[$day . '_exit_2'])) {
+                        $data[$day . '_entry_2'] = null;
+                        $data[$day . '_exit_2'] = null;
+                    }
+                }
+            }
+
+            $workHour->update($data);
+
+            return redirect()
+                ->route('work-hours.index')
+                ->with('success', 'Jornada de trabalho atualizada com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar jornada de trabalho. Tente novamente.');
+        }
     }
 
-    public function destroy()
+    public function destroy($id)
     {
+        try {
+            $workHour = WorkHoursModel::findOrFail($id);
 
+            // Verificar se a jornada está sendo usada por colaboradores
+            if ($workHour->collaborators()->count() > 0)     {
+                return redirect()
+                    ->route('work-hours.index')
+                    ->with('error', 'Não é possível excluir esta jornada de trabalho pois ela está sendo utilizada por colaboradores.');
+            }
+
+            $workHour->delete();
+
+            return redirect()
+                ->route('work-hours.index')
+                ->with('success', 'Jornada de trabalho excluída com sucesso!');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('work-hours.index')
+                ->with('error', 'Erro ao excluir jornada de trabalho. Tente novamente.');
+        }
     }
 
 }

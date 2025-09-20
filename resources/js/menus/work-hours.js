@@ -2,6 +2,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form functionality for create/edit pages
     initializeFormFunctionality();
+    
+    // Initialize day toggle functionality
+    initializeDayToggle();
 
     // Cache dos elementos
     const searchInput = document.querySelector('input[name="search"]');
@@ -486,4 +489,32 @@ function initializeFormFunctionality() {
 
     // Calcular na inicialização se houver dados
     calculateWeeklyHours();
+}
+
+// Função para inicializar o toggle dos dias da semana
+function initializeDayToggle() {
+    // Event delegation para os checkboxes dos dias
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.classList.contains('day-toggle')) {
+            const day = e.target.getAttribute('data-day');
+            toggleDayInputs(day);
+        }
+    });
+    
+    // Inicializar estado dos campos baseado nos checkboxes já marcados
+    const dayToggles = document.querySelectorAll('.day-toggle');
+    dayToggles.forEach(toggle => {
+        const day = toggle.getAttribute('data-day');
+        const inputs = document.getElementById(day + '_inputs');
+        
+        if (toggle.checked) {
+            if (inputs) {
+                inputs.classList.remove('hidden');
+            }
+        } else {
+            if (inputs) {
+                inputs.classList.add('hidden');
+            }
+        }
+    });
 }

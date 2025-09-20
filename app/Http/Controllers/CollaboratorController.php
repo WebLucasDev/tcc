@@ -7,6 +7,7 @@ use App\Http\Requests\web\registrations\collaborators\CollaboratorUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
+use App\Models\WorkHoursModel;
 use App\Models\TimeTrackingModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +89,7 @@ class CollaboratorController extends Controller
     {
         $departments = DepartmentModel::orderBy('name')->get();
         $positions = PositionModel::with('department')->orderBy('name')->get();
+        $workHours = WorkHoursModel::where('status', 'ativo')->orderBy('name')->get();
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
@@ -95,31 +97,28 @@ class CollaboratorController extends Controller
             ['label' => 'Novo Colaborador', 'url' => null],
         ];
 
-        return view('auth.registrations.collaborators.create', compact('breadcrumbs', 'departments', 'positions'));
+        return view('auth.registrations.collaborators.create', compact('breadcrumbs', 'departments', 'positions', 'workHours'));
     }
 
     public function store(CollaboratorStoreRequest $request)
     {
         try {
-            Log::info('Dados recebidos para criar colaborador:', $request->all());
+            Log::info('Dados recebidos para criar colaborador:', $request->validated());
 
             $collaborator = CollaboratorModel::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'cpf' => $request->cpf,
-                'admission_date' => $request->admission_date,
-                'phone' => $request->phone,
-                'zip_code' => $request->zip_code,
-                'street' => $request->street,
-                'number' => $request->number,
-                'neighborhood' => $request->neighborhood,
-                'position_id' => $request->position_id,
-                'entry_time_1' => $request->entry_time_1,
-                'return_time_1' => $request->return_time_1,
-                'entry_time_2' => $request->entry_time_2,
-                'return_time_2' => $request->return_time_2,
+                'name' => $request->validated()['name'],
+                'email' => $request->validated()['email'],
+                'cpf' => $request->validated()['cpf'],
+                'admission_date' => $request->validated()['admission_date'],
+                'phone' => $request->validated()['phone'],
+                'zip_code' => $request->validated()['zip_code'],
+                'street' => $request->validated()['street'],
+                'number' => $request->validated()['number'],
+                'neighborhood' => $request->validated()['neighborhood'],
+                'position_id' => $request->validated()['position_id'],
+                'work_hours_id' => $request->validated()['work_hours_id'],
                 'password' => 'senha123',
-                'status' => $request->status,
+                'status' => $request->validated()['status'],
             ]);
 
             Log::info('Colaborador criado com sucesso:', ['id' => $collaborator->id]);
@@ -153,7 +152,7 @@ class CollaboratorController extends Controller
             ['label' => 'Editar Colaborador', 'url' => null],
         ];
 
-        return view('auth.registrations.collaborators.create', compact('collaborator', 'breadcrumbs', 'departments', 'positions'));
+        return view('auth.registrations.collaborators.create', compact('collaborator', 'breadcrumbs', 'departments', 'positions', 'workHours'));
     }
 
     public function update(CollaboratorUpdateRequest $request, $id)
@@ -162,21 +161,18 @@ class CollaboratorController extends Controller
             $collaborator = CollaboratorModel::findOrFail($id);
 
             $collaborator->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'cpf' => $request->cpf,
-                'admission_date' => $request->admission_date,
-                'phone' => $request->phone,
-                'zip_code' => $request->zip_code,
-                'street' => $request->street,
-                'number' => $request->number,
-                'neighborhood' => $request->neighborhood,
-                'position_id' => $request->position_id,
-                'entry_time_1' => $request->entry_time_1,
-                'return_time_1' => $request->return_time_1,
-                'entry_time_2' => $request->entry_time_2,
-                'return_time_2' => $request->return_time_2,
-                'status' => $request->status,
+                'name' => $request->validated()['name'],
+                'email' => $request->validated()['email'],
+                'cpf' => $request->validated()['cpf'],
+                'admission_date' => $request->validated()['admission_date'],
+                'phone' => $request->validated()['phone'],
+                'zip_code' => $request->validated()['zip_code'],
+                'street' => $request->validated()['street'],
+                'number' => $request->validated()['number'],
+                'neighborhood' => $request->validated()['neighborhood'],
+                'position_id' => $request->validated()['position_id'],
+                'work_hours_id' => $request->validated()['work_hours_id'],
+                'status' => $request->validated()['status'],
             ]);
 
             return redirect()->route('collaborator.index')

@@ -264,72 +264,65 @@
                         </div>
                     </div>
 
-                    <!-- Horários -->
+                    <!-- Jornada de Trabalho -->
                     <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
                         <h3 class="text-lg font-semibold text-[var(--color-text)] mb-4">
                             <i class="fa-solid fa-clock text-[var(--color-main)] mr-2"></i>
-                            Horários de Trabalho
+                            Jornada de Trabalho
                         </h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Primeiro Turno</h4>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="entry_time_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                            Entrada 1
-                                            <span class="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            type="time"
-                                            id="entry_time_1"
-                                            name="entry_time_1"
-                                            value="{{ old('entry_time_1', isset($collaborator) && $collaborator->entry_time_1 ? substr($collaborator->entry_time_1, 0, 5) : '') }}"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
-                                            required>
-                                    </div>
+                            <div>
+                                <label for="work_hours_id" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Jornada de Trabalho
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="work_hours_id"
+                                    name="work_hours_id"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
+                                    required>
+                                    <option value="">Selecione uma jornada de trabalho</option>
+                                    @if(isset($workHours))
+                                        @foreach($workHours as $workHour)
+                                            <option value="{{ $workHour->id }}"
+                                                    data-weekly-hours="{{ $workHour->total_weekly_hours }}"
+                                                    data-description="{{ $workHour->description }}"
+                                                    {{ old('work_hours_id', isset($collaborator) ? $collaborator->work_hours_id : '') == $workHour->id ? 'selected' : '' }}>
+                                                {{ $workHour->name }} - {{ $workHour->total_weekly_hours }}h semanais
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('work_hours_id')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                                    <div>
-                                        <label for="return_time_1" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                            Saída 1
-                                            <span class="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            type="time"
-                                            id="return_time_1"
-                                            name="return_time_1"
-                                            value="{{ old('return_time_1', isset($collaborator) && $collaborator->return_time_1 ? substr($collaborator->return_time_1, 0, 5) : '') }}"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
-                                            required>
+                            <div>
+                                <label class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Resumo da Jornada
+                                </label>
+                                <div id="work-hours-summary" class="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                    <div class="text-sm text-[var(--color-text)] opacity-70">
+                                        <i class="fa-solid fa-info-circle mr-2"></i>
+                                        Selecione uma jornada de trabalho para ver o resumo
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="space-y-4">
-                                <h4 class="text-sm font-medium text-[var(--color-text)] opacity-80">Segundo Turno</h4>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="entry_time_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                            Entrada 2
-                                        </label>
-                                        <input
-                                            type="time"
-                                            id="entry_time_2"
-                                            name="entry_time_2"
-                                            value="{{ old('entry_time_2', isset($collaborator) && $collaborator->entry_time_2 ? substr($collaborator->entry_time_2, 0, 5) : '') }}"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
-                                    </div>
-
-                                    <div>
-                                        <label for="return_time_2" class="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                            Saída 2
-                                        </label>
-                                        <input
-                                            type="time"
-                                            id="return_time_2"
-                                            name="return_time_2"
-                                            value="{{ old('return_time_2', isset($collaborator) && $collaborator->return_time_2 ? substr($collaborator->return_time_2, 0, 5) : '') }}"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200">
+                        <div class="mt-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <i class="fa-solid fa-lightbulb text-blue-500 mt-0.5"></i>
+                                    <div class="text-sm text-blue-700 dark:text-blue-300">
+                                        <p class="font-medium mb-1">Sobre as Jornadas de Trabalho:</p>
+                                        <ul class="list-disc list-inside space-y-1 text-xs">
+                                            <li>As jornadas de trabalho definem os horários e dias da semana que o colaborador deve trabalhar</li>
+                                            <li>Você pode gerenciar jornadas em <a href="{{ route('work-hours.index') }}" class="underline hover:text-blue-600">Cadastros > Jornadas de Trabalho</a></li>
+                                            <li>O sistema calculará automaticamente as horas trabalhadas baseado na jornada selecionada</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -359,6 +352,50 @@
 
     <script>
         window.collaboratorDepartments = @json($departments ?? []);
+        window.workHoursData = @json($workHours ?? []);
+
+        // Função para atualizar o resumo da jornada de trabalho
+        document.addEventListener('DOMContentLoaded', function() {
+            const workHoursSelect = document.getElementById('work_hours_id');
+            const summaryDiv = document.getElementById('work-hours-summary');
+
+            if (workHoursSelect && summaryDiv) {
+                workHoursSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+
+                    if (this.value && selectedOption) {
+                        const weeklyHours = selectedOption.getAttribute('data-weekly-hours');
+                        const description = selectedOption.getAttribute('data-description');
+
+                        summaryDiv.innerHTML = `
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-clock text-[var(--color-main)]"></i>
+                                    <span class="font-medium text-[var(--color-text)]">${selectedOption.text}</span>
+                                </div>
+                                <div class="text-sm text-[var(--color-text)] opacity-70">
+                                    <i class="fa-solid fa-calendar-week text-green-600 mr-1"></i>
+                                    <strong>${weeklyHours}h</strong> semanais
+                                </div>
+                                ${description ? `<div class="text-xs text-[var(--color-text)] opacity-60 mt-2">${description}</div>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        summaryDiv.innerHTML = `
+                            <div class="text-sm text-[var(--color-text)] opacity-70">
+                                <i class="fa-solid fa-info-circle mr-2"></i>
+                                Selecione uma jornada de trabalho para ver o resumo
+                            </div>
+                        `;
+                    }
+                });
+
+                // Disparar evento change se já houver um valor selecionado (para edição)
+                if (workHoursSelect.value) {
+                    workHoursSelect.dispatchEvent(new Event('change'));
+                }
+            }
+        });
     </script>
 
 @endsection

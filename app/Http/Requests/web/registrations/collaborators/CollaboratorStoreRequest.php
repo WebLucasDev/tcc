@@ -44,11 +44,8 @@ class CollaboratorStoreRequest extends FormRequest
             'number' => 'required|string|max:10',
             'neighborhood' => 'required|string|max:100',
             'position_id' => 'required|exists:positions,id',
+            'work_hours_id' => 'required|exists:work_hours,id',
             'status' => 'required|in:ativo,inativo',
-            'entry_time_1' => 'required|date_format:H:i',
-            'return_time_1' => 'required|date_format:H:i|after:entry_time_1',
-            'entry_time_2' => 'nullable|date_format:H:i',
-            'return_time_2' => 'nullable|date_format:H:i|after:entry_time_2',
         ];
     }
 
@@ -82,16 +79,10 @@ class CollaboratorStoreRequest extends FormRequest
             'neighborhood.max' => 'O bairro não pode ter mais de 100 caracteres.',
             'position_id.required' => 'O cargo é obrigatório.',
             'position_id.exists' => 'O cargo selecionado não existe.',
+            'work_hours_id.required' => 'O horário de trabalho é obrigatório.',
+            'work_hours_id.exists' => 'O horário de trabalho selecionado não existe.',
             'status.required' => 'O status é obrigatório.',
             'status.in' => 'O status deve ser "ativo" ou "inativo".',
-            'entry_time_1.required' => 'O horário de entrada é obrigatório.',
-            'entry_time_1.date_format' => 'O horário de entrada deve ter o formato HH:MM.',
-            'return_time_1.required' => 'O horário de saída é obrigatório.',
-            'return_time_1.date_format' => 'O horário de saída deve ter o formato HH:MM.',
-            'return_time_1.after' => 'O horário de saída deve ser posterior ao horário de entrada.',
-            'entry_time_2.date_format' => 'O horário de entrada 2 deve ter o formato HH:MM.',
-            'return_time_2.date_format' => 'O horário de saída 2 deve ter o formato HH:MM.',
-            'return_time_2.after' => 'O horário de saída 2 deve ser posterior ao horário de entrada 2.',
         ];
     }
 }
