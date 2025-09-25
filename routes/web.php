@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\CompTimeController;
+use App\Http\Controllers\CompTimeEmployessController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardEmployessController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\RegistrationsEmployessController;
 use App\Http\Controllers\SolicitationController;
 use App\Http\Controllers\TimeTrackingController;
 use App\Http\Controllers\WorkHoursController;
@@ -102,15 +105,15 @@ Route::middleware('auth')->group(function () {
     Route::prefix('sistema-colaboradores')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
-
+            Route::get('/', [DashboardEmployessController::class, 'index'])->name('system-for-employees.dashboard.index');
         });
 
         Route::prefix('cadastro')->group(function () {
-
+            Route::get('/', [RegistrationsEmployessController::class, 'index'])->name('system-for-employees.registrations.index');
         });
 
         Route::prefix('banco-horas')->group(function () {
-
+            Route::get('/', [CompTimeEmployessController::class, 'index'])->name('system-for-employees.comp-time.index');
         });
     });
 
