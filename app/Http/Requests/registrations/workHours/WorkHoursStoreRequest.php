@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\web\registrations\workHours;
+namespace App\Http\Requests\registrations\workHours;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WorkHoursUpdateRequest extends FormRequest
+class WorkHoursStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class WorkHoursUpdateRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:work_hours,name',
             'description' => 'nullable|string|max:1000',
             'status' => 'required|in:ativo,inativo',
         ];
@@ -53,7 +53,7 @@ class WorkHoursUpdateRequest extends FormRequest
             'description.max' => 'A descrição não pode ter mais de 1000 caracteres.',
             'status.required' => 'O status é obrigatório.',
             'status.in' => 'O status deve ser "ativo" ou "inativo".',
-            
+
             // Mensagens para horários
             '*.date_format' => 'O horário deve estar no formato HH:MM.',
             '*.required_with' => 'Este campo é obrigatório quando o horário correspondente é informado.',

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\WorkHoursModel;
-use App\Http\Requests\web\registrations\workHours\WorkHoursStoreRequest;
-use App\Http\Requests\web\registrations\workHours\WorkHoursUpdateRequest;
+use App\Http\Requests\registrations\workHours\WorkHoursStoreRequest;
+use App\Http\Requests\registrations\workHours\WorkHoursUpdateRequest;
 use Illuminate\Http\Request;
 
 class WorkHoursController extends Controller

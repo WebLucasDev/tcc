@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\web\registrations\positions\PositionStoreRequest;
-use App\Http\Requests\web\registrations\positions\PositionUpdateRequest;
+use App\Http\Requests\registrations\positions\PositionStoreRequest;
+use App\Http\Requests\registrations\positions\PositionUpdateRequest;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
 use Illuminate\Http\Request;

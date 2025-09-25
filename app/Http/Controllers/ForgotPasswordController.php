@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\web\login\SendRequest;
-use App\Http\Requests\web\login\ProcessResetRequest;
+use App\Http\Requests\login\SendRequest;
+use App\Http\Requests\login\ProcessResetRequest;
 use App\Models\User;
 use App\Mail\ForgotPasswordMail;
 use Illuminate\Http\Request;

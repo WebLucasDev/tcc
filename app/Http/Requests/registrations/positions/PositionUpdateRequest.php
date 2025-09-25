@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\web\registrations\positions;
+namespace App\Http\Requests\registrations\positions;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PositionStoreRequest extends FormRequest
+class PositionUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,8 +21,10 @@ class PositionStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $positionId = $this->route('id');
+
         return [
-            'name' => 'required|string|max:255|unique:positions,name',
+            'name' => 'required|string|max:255|unique:positions,name,' . $positionId,
             'department_id' => 'nullable|exists:departments,id',
         ];
     }

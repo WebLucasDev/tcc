@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\web\registrations\collaborators\CollaboratorStoreRequest;
-use App\Http\Requests\web\registrations\collaborators\CollaboratorUpdateRequest;
+use App\Http\Requests\registrations\collaborators\CollaboratorStoreRequest;
+use App\Http\Requests\registrations\collaborators\CollaboratorUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;

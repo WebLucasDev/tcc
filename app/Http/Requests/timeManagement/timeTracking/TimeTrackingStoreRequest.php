@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\web\timeManagement\timeTracking;
+namespace App\Http\Requests\timeManagement\timeTracking;
 
 use Illuminate\Foundation\Http\FormRequest;
 

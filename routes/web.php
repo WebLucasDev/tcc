@@ -99,5 +99,20 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    Route::prefix('sistema-colaboradores')->group(function () {
+
+        Route::prefix('dashboard')->group(function () {
+
+        });
+
+        Route::prefix('cadastro')->group(function () {
+
+        });
+
+        Route::prefix('banco-horas')->group(function () {
+
+        });
+    });
+
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\web\registrations\departments\DepartmentStoreRequest;
-use App\Http\Requests\web\registrations\departments\DepartmentUpdateRequest;
+use App\Http\Requests\registrations\departments\DepartmentStoreRequest;
+use App\Http\Requests\registrations\departments\DepartmentUpdateRequest;
 use App\Models\DepartmentModel;
 use Illuminate\Http\Request;
 

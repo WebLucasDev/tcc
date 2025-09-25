@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\web\registrations\workHours;
+namespace App\Http\Requests\registrations\workHours;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WorkHoursStoreRequest extends FormRequest
+class WorkHoursUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class WorkHoursStoreRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => 'required|string|max:255|unique:work_hours,name',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'status' => 'required|in:ativo,inativo',
         ];
