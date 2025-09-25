@@ -88,6 +88,27 @@
                             </div>
 
                             <div>
+                                <label for="password" class="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    Senha
+                                    @if(isset($collaborator))
+                                        <span class="text-sm text-gray-500">(deixe em branco para manter a atual)</span>
+                                    @else
+                                        <span class="text-red-500">*</span>
+                                    @endif
+                                </label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-main)] focus:border-transparent transition-all duration-200"
+                                    placeholder="Digite a senha"
+                                    @if(!isset($collaborator)) required @endif>
+                                @error('password')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
                                 <label for="phone" class="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     Telefone
                                     <span class="text-red-500">*</span>

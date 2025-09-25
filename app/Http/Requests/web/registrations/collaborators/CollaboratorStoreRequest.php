@@ -36,6 +36,7 @@ class CollaboratorStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:collaborators,email|max:255',
+            'password' => 'required|string|min:6|max:255',
             'cpf' => 'required|string|size:11|unique:collaborators,cpf',
             'admission_date' => 'required|date',
             'phone' => 'required|string|min:10|max:11',
@@ -61,6 +62,10 @@ class CollaboratorStoreRequest extends FormRequest
             'email.email' => 'O email deve ter um formato válido.',
             'email.unique' => 'Este email já está em uso.',
             'email.max' => 'O email não pode ter mais de 255 caracteres.',
+            'password.required' => 'A senha é obrigatória.',
+            'password.string' => 'A senha deve ser um texto válido.',
+            'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
+            'password.max' => 'A senha não pode ter mais de 255 caracteres.',
             'cpf.required' => 'O CPF é obrigatório.',
             'cpf.size' => 'O CPF deve ter 11 dígitos numéricos.',
             'cpf.unique' => 'Este CPF já está cadastrado.',

@@ -108,6 +108,7 @@ class CollaboratorController extends Controller
             $collaborator = CollaboratorModel::create([
                 'name' => $request->validated()['name'],
                 'email' => $request->validated()['email'],
+                'password' => $request->validated()['password'],
                 'cpf' => $request->validated()['cpf'],
                 'admission_date' => $request->validated()['admission_date'],
                 'phone' => $request->validated()['phone'],
@@ -117,7 +118,6 @@ class CollaboratorController extends Controller
                 'neighborhood' => $request->validated()['neighborhood'],
                 'position_id' => $request->validated()['position_id'],
                 'work_hours_id' => $request->validated()['work_hours_id'],
-                'password' => 'senha123',
                 'status' => $request->validated()['status'],
             ]);
 
@@ -161,7 +161,7 @@ class CollaboratorController extends Controller
         try {
             $collaborator = CollaboratorModel::findOrFail($id);
 
-            $collaborator->update([
+            $updateData = [
                 'name' => $request->validated()['name'],
                 'email' => $request->validated()['email'],
                 'cpf' => $request->validated()['cpf'],
@@ -174,7 +174,14 @@ class CollaboratorController extends Controller
                 'position_id' => $request->validated()['position_id'],
                 'work_hours_id' => $request->validated()['work_hours_id'],
                 'status' => $request->validated()['status'],
-            ]);
+            ];
+
+            // Só atualiza a senha se ela foi fornecida
+            if (!empty($request->validated()['password'])) {
+                $updateData['password'] = $request->validated()['password'];
+            }
+
+            $collaborator->update($updateData);
 
             return redirect()->route('collaborator.index')
                 ->with('success', 'Colaborador atualizado com sucesso!');
