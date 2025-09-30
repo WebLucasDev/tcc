@@ -33,7 +33,7 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware('user.auth')->group(function () {
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -101,7 +101,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [CompTimeController::class, 'index'])->name('comp-time.index');
         });
     });
+});
 
+Route::middleware('collaborator.auth')->group(function () {
     Route::prefix('sistema-colaboradores')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
@@ -116,6 +118,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [CompTimeEmployessController::class, 'index'])->name('system-for-employees.comp-time.index');
         });
     });
-
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

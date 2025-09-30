@@ -17,10 +17,18 @@
         @include('layouts.partials.loading')
 
         <div class="flex min-h-screen bg-[var(--color-background)]">
-            @include('layouts.partials.sidebar')
+            @if(Auth::guard('collaborator')->check())
+                @include('layouts.partials.sidebar-collaborator')
+            @else
+                @include('layouts.partials.sidebar-user')
+            @endif
 
             <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300 ease-in-out">
-                @include('layouts.partials.header')
+                @if(Auth::guard('collaborator')->check())
+                    @include('layouts.partials.header-collaborator')
+                @else
+                    @include('layouts.partials.header-user')
+                @endif
 
                 <main class="flex-1 overflow-y-auto p-6">
                     @yield('content')

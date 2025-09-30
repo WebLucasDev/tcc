@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\login;
 
+use App\Models\CollaboratorModel;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -22,9 +24,36 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|max:255|exists:users,email',
+            'email' => 'required|email|max:255',
             'password' => 'required|string|min:6'
         ];
+    }
+
+    /**
+     * Validate that the email exists in either users or collaborators table
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $email = $this['email'];
+            
+            if ($email) {
+                $userExists = User::where('email', $email)->exists();
+                $collaboratorExists = CollaboratorModel::where('email', $email)->exists();
+                
+                if (!$userExists && !$collaboratorExists) {
+                    $validator->errors()->add('email', 'Credenciais inválidas.');
+                }
+                
+                // Verifica se o colaborador está ativo
+                if ($collaboratorExists) {
+                    $collaborator = CollaboratorModel::where('email', $email)->first();
+                    if ($collaborator && $collaborator->status !== \App\Enums\CollaboratorStatusEnum::ACTIVE) {
+                        $validator->errors()->add('email', 'Sua conta está inativa. Entre em contato com o administrador.');
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -35,11 +64,27 @@ class LoginRequest extends FormRequest
         return [
             'email.required' => 'O campo email é obrigatório.',
             'email.email' => 'Por favor, insira um email válido.',
-            'email.exists' => 'Credenciais inválidas.',
             'password.required' => 'O campo senha é obrigatório.',
             'password.string' => 'Credenciais inválidas.',
             'password.min' => 'Credenciais inválidas.',
         ];
     }
 
+    /**
+     * Determine if the email belongs to a collaborator
+     */
+    public function isCollaborator(): bool
+    {
+        $email = $this['email'];
+        return $email ? CollaboratorModel::where('email', $email)->exists() : false;
+    }
+
+    /**
+     * Determine if the email belongs to a user (manager)
+     */
+    public function isUser(): bool
+    {
+        $email = $this['email'];
+        return $email ? User::where('email', $email)->exists() : false;
+    }
 }
