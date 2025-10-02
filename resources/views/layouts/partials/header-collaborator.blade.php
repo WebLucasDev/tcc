@@ -41,13 +41,6 @@
     </div>
 
     <div class="flex items-center space-x-5">
-        <!-- Botão de bater ponto rápido -->
-        <button
-            class="bg-[var(--color-main)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-main)]/80 transition-all duration-300 flex items-center">
-            <i class="fa-solid fa-clock mr-2"></i>
-            Bater Ponto
-        </button>
-
         <button
             onclick="toggleTheme()"
             class="p-2 hover:bg-[var(--color-text)] text-[var(--color-text)] hover:text-[var(--color-main)] rounded-full transition-all duration-300">

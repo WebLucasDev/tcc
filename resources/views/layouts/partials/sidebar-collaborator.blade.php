@@ -16,26 +16,10 @@
             </li>
 
             <li>
-                <a href="{{ route('system-for-employees.registrations.index') }}"
-                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
-                    <i class="fa-solid fa-user-edit w-5 h-5 mr-3"></i>
-                    <span class="sidebar-text">Meus Dados</span>
-                </a>
-            </li>
-
-            <li>
                 <a href="#"
                     class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
                     <i class="fa-solid fa-clock w-5 h-5 mr-3"></i>
                     <span class="sidebar-text">Bater Ponto</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#"
-                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
-                    <i class="fa-solid fa-history w-5 h-5 mr-3"></i>
-                    <span class="sidebar-text">Histórico de Ponto</span>
                 </a>
             </li>
 
@@ -52,6 +36,14 @@
                     class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
                     <i class="fa-solid fa-calendar-check w-5 h-5 mr-3"></i>
                     <span class="sidebar-text">Banco de Horas</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('system-for-employees.registrations.index') }}"
+                    class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
+                    <i class="fa-solid fa-user-edit w-5 h-5 mr-3"></i>
+                    <span class="sidebar-text">Meus Dados</span>
                 </a>
             </li>
 
