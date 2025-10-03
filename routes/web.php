@@ -11,7 +11,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegistrationsEmployessController;
 use App\Http\Controllers\SolicitationController;
+use App\Http\Controllers\SolicitationEmployeesController;
 use App\Http\Controllers\TimeTrackingController;
+use App\Http\Controllers\TimeTrackingEmployeesController;
 use App\Http\Controllers\WorkHoursController;
 use Illuminate\Support\Facades\Route;
 
@@ -110,12 +112,21 @@ Route::middleware('collaborator.auth')->group(function () {
             Route::get('/', [DashboardEmployessController::class, 'index'])->name('system-for-employees.dashboard.index');
         });
 
-        Route::prefix('cadastro')->group(function () {
-            Route::get('/', [RegistrationsEmployessController::class, 'index'])->name('system-for-employees.registrations.index');
+        Route::prefix('bater-ponto')->group(function () {
+            Route::get('/', [TimeTrackingEmployeesController::class, 'index'])->name('system-for-employees.time-tracking.index');
+        });
+
+        Route::prefix('solicitations')->group(function () {
+            Route::get('/', [SolicitationEmployeesController::class, 'index'])->name('system-for-employees.solicitation.index');
         });
 
         Route::prefix('banco-horas')->group(function () {
             Route::get('/', [CompTimeEmployessController::class, 'index'])->name('system-for-employees.comp-time.index');
+        });
+
+        Route::prefix('cadastro')->group(function () {
+            Route::get('/', [RegistrationsEmployessController::class, 'index'])->name('system-for-employees.registrations.index');
+            Route::put('/', [RegistrationsEmployessController::class, 'update'])->name('system-for-employees.registrations.update');
         });
     });
 });
