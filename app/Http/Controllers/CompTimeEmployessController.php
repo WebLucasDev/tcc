@@ -8,6 +8,6 @@ class CompTimeEmployessController extends Controller
 {
     public function index()
     {
-        return view('auth.system-for-employees.comp-time-employess.index');
+        return view('auth.system-for-employees.comp-time-employees.index');
     }
 }

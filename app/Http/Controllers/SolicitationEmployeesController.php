@@ -8,6 +8,6 @@ class SolicitationEmployeesController extends Controller
 {
     public function index()
     {
-        
+        return view('auth.system-for-employees.solicitation-employees.index');
     }
 }

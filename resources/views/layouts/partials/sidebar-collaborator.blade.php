@@ -16,7 +16,7 @@
             </li>
 
             <li>
-                <a href="#"
+                <a href="{{ route('system-for-employees.time-tracking.index') }}"
                     class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
                     <i class="fa-solid fa-clock w-5 h-5 mr-3"></i>
                     <span class="sidebar-text">Bater Ponto</span>
@@ -24,7 +24,7 @@
             </li>
 
             <li>
-                <a href="#"
+                <a href="{{ route('system-for-employees.solicitation.index') }}"
                     class="menu-item flex items-center px-4 py-3 rounded-lg text-[var(--color-text)] hover:text-[var(--color-main)]">
                     <i class="fa-solid fa-file-alt w-5 h-5 mr-3"></i>
                     <span class="sidebar-text">Solicitações</span>

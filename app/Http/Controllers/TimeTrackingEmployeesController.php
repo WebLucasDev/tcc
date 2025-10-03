@@ -8,6 +8,6 @@ class TimeTrackingEmployeesController extends Controller
 {
     public function index()
     {
-        
+        return view('auth.system-for-employees.time-tracking-employees.index');
     }
 }

@@ -9,7 +9,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\RegistrationsEmployessController;
+use App\Http\Controllers\RegistrationsEmployeesController;
 use App\Http\Controllers\SolicitationController;
 use App\Http\Controllers\SolicitationEmployeesController;
 use App\Http\Controllers\TimeTrackingController;
@@ -125,8 +125,8 @@ Route::middleware('collaborator.auth')->group(function () {
         });
 
         Route::prefix('cadastro')->group(function () {
-            Route::get('/', [RegistrationsEmployessController::class, 'index'])->name('system-for-employees.registrations.index');
-            Route::put('/', [RegistrationsEmployessController::class, 'update'])->name('system-for-employees.registrations.update');
+            Route::get('/', [RegistrationsEmployeesController::class, 'index'])->name('system-for-employees.registrations.index');
+            Route::put('/', [RegistrationsEmployeesController::class, 'update'])->name('system-for-employees.registrations.update');
         });
     });
 });

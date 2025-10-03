@@ -6,14 +6,14 @@ use App\Http\Requests\forEmployees\registrations\RegistrationsEmployeesUpdateReq
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class RegistrationsEmployessController extends Controller
+class RegistrationsEmployeesController extends Controller
 {
     public function index()
     {
         $collaborator = Auth::guard('collaborator')->user();
         $collaborator->load(['position', 'workHours']);
 
-        return view('auth.system-for-employees.registrations-employess.index', compact('collaborator'));
+        return view('auth.system-for-employees.registrations-employees.index', compact('collaborator'));
     }
 
     public function update(RegistrationsEmployeesUpdateRequest $request)
