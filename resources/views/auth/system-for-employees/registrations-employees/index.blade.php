@@ -19,15 +19,6 @@
         </p>
     </div>
 
-    @if(session('error'))
-    <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-        <p class="text-red-700 dark:text-red-400">
-            <i class="fa-solid fa-exclamation-circle mr-2"></i>
-            {{ session('error') }}
-        </p>
-    </div>
-    @endif
-
     <!-- Informações Básicas (Somente Visualização) -->
     <div class="bg-[var(--color-background)] rounded-xl shadow-lg p-6 border border-[var(--color-text)]/10">
         <h2 class="text-xl font-semibold text-[var(--color-main)] mb-6">

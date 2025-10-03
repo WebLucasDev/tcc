@@ -21,7 +21,10 @@ export default defineConfig({
                     'resources/js/menus/solicitations.js',
                     'resources/js/menus/time-tracking.js',
                     'resources/js/menus/work-hours.js',
+                    'resources/js/menus/for-employees/comp-time.js',
                     'resources/js/menus/for-employees/registrations.js',
+                    'resources/js/menus/for-employees/solicitations.js',
+                    'resources/js/menus/for-employees/time-tracking.js'
                 ],
             refresh: true,
         }),
