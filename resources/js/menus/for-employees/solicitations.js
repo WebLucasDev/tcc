@@ -157,24 +157,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== PREVENIR MÚLTIPLAS SUBMISSÕES NO MODAL DE CANCELAMENTO ====================
     const cancelForm = document.getElementById('formCancel');
-    
+
     if (cancelForm) {
         cancelForm.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
-            
+
             if (!submitBtn) return;
-            
+
             // Verificar se o botão já está desabilitado
             if (submitBtn.disabled) {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Desabilitar o botão e mudar o visual
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             submitBtn.style.pointerEvents = 'none';
-            
+
             // Mostrar indicador de carregamento
             submitBtn.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>

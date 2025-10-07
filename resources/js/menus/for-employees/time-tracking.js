@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== PREVENIR MÚLTIPLAS SUBMISSÕES ====================
     const timeTrackingForm = document.getElementById('time-tracking-form');
     const submitBtn = document.getElementById('submit-btn');
-    
+
     if (timeTrackingForm && submitBtn) {
         timeTrackingForm.addEventListener('submit', function(e) {
             // Verificar se o botão já está desabilitado
@@ -10,20 +10,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Desabilitar o botão e mudar o visual
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            
+
             // Salvar HTML original
             const originalHTML = submitBtn.innerHTML;
-            
+
             // Mostrar indicador de carregamento
             submitBtn.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 Registrando...
             `;
-            
+
             // Prevenir múltiplos cliques
             submitBtn.style.pointerEvents = 'none';
         });
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         form.action = `/sistema-colaboradores/bater-ponto/${trackingId}/cancel`;
         modal.classList.remove('hidden');
-        
+
         // Resetar o botão de submit (caso tenha sido desabilitado antes)
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         form.action = `/sistema-colaboradores/bater-ponto/${trackingId}/restore`;
         modal.classList.remove('hidden');
-        
+
         // Resetar o botão de submit (caso tenha sido desabilitado antes)
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
@@ -268,20 +268,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cancelForm) {
         cancelForm.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
-            
+
             if (!submitBtn) return;
-            
+
             // Verificar se o botão já está desabilitado
             if (submitBtn.disabled) {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Desabilitar o botão e mudar o visual
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             submitBtn.style.pointerEvents = 'none';
-            
+
             // Mostrar indicador de carregamento
             submitBtn.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>
@@ -294,20 +294,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (restoreForm) {
         restoreForm.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
-            
+
             if (!submitBtn) return;
-            
+
             // Verificar se o botão já está desabilitado
             if (submitBtn.disabled) {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Desabilitar o botão e mudar o visual
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             submitBtn.style.pointerEvents = 'none';
-            
+
             // Mostrar indicador de carregamento
             submitBtn.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>

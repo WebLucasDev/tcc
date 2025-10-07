@@ -9,43 +9,43 @@ let currentTrackingData = null;
 document.addEventListener('DOMContentLoaded', function() {
     // ==================== PREVENIR MÚLTIPLAS SUBMISSÕES ====================
     const solicitationForm = document.querySelector('form[action*="solicitations"]');
-    
+
     if (solicitationForm) {
         solicitationForm.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
-            
+
             if (!submitBtn) return;
-            
+
             // Verificar se o botão já está desabilitado
             if (submitBtn.disabled) {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Validação básica antes de desabilitar
             const timeTrackingId = document.getElementById('time_tracking_id');
             const period = document.getElementById('period');
             const newTimeStart = document.getElementById('new_time_start');
             const newTimeFinish = document.getElementById('new_time_finish');
             const reason = document.getElementById('reason');
-            
-            if (!timeTrackingId?.value || !period?.value || !newTimeStart?.value || 
+
+            if (!timeTrackingId?.value || !period?.value || !newTimeStart?.value ||
                 !newTimeFinish?.value || !reason?.value) {
                 // Deixar a validação HTML5 funcionar
                 return;
             }
-            
+
             // Desabilitar o botão e mudar o visual
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             submitBtn.classList.remove('hover:bg-[var(--color-main)]/90', 'hover:shadow-xl');
-            
+
             // Mostrar indicador de carregamento
             submitBtn.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>
                 Enviando Solicitação...
             `;
-            
+
             // Prevenir múltiplos cliques
             submitBtn.style.pointerEvents = 'none';
         });
