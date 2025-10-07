@@ -114,6 +114,12 @@ Route::middleware('collaborator.auth')->group(function () {
 
         Route::prefix('bater-ponto')->group(function () {
             Route::get('/', [TimeTrackingEmployeesController::class, 'index'])->name('system-for-employees.time-tracking.index');
+            Route::post('/', [TimeTrackingEmployeesController::class, 'store'])->name('system-for-employees.time-tracking.store');
+            Route::get('/next-tracking-info', [TimeTrackingEmployeesController::class, 'getNextTrackingInfo'])->name('system-for-employees.time-tracking.next-info');
+            Route::get('/{id}', [TimeTrackingEmployeesController::class, 'show'])->name('system-for-employees.time-tracking.show');
+            Route::patch('/update', [TimeTrackingEmployeesController::class, 'update'])->name('system-for-employees.time-tracking.update');
+            Route::patch('/{id}/cancel', [TimeTrackingEmployeesController::class, 'cancel'])->name('system-for-employees.time-tracking.cancel');
+            Route::patch('/{id}/restore', [TimeTrackingEmployeesController::class, 'restore'])->name('system-for-employees.time-tracking.restore');
         });
 
         Route::prefix('solicitations')->group(function () {
