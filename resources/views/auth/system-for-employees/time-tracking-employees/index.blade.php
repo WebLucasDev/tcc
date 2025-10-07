@@ -28,9 +28,6 @@
         @endif
     </div>
 
-    <!-- Modal de Edição -->
-    @include('auth.system-for-employees.time-tracking-employees.partials.modal-edit')
-
     <!-- Modal de Cancelamento -->
     @include('auth.system-for-employees.time-tracking-employees.partials.modal-cancel')
 

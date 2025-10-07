@@ -15,7 +15,7 @@
 
         <div class="p-6 border-t border-[var(--color-text)]/10 flex justify-end gap-3">
             <button type="button" onclick="window.closeRestoreModal()"
-                class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-text)] transition-colors">
+                class="px-6 py-2 border border-[var(--color-text)]/20 rounded-lg hover:bg-[var(--color-text)]/5 text-[var(--color-text)] transition-colors">
                 Cancelar
             </button>
             <form method="POST" id="restore-form" class="inline">

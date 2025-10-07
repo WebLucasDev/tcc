@@ -1,4 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // ==================== PREVENIR MÚLTIPLAS SUBMISSÕES ====================
+    const timeTrackingForm = document.getElementById('time-tracking-form');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    if (timeTrackingForm && submitBtn) {
+        timeTrackingForm.addEventListener('submit', function(e) {
+            // Verificar se o botão já está desabilitado
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Desabilitar o botão e mudar o visual
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            // Salvar HTML original
+            const originalHTML = submitBtn.innerHTML;
+            
+            // Mostrar indicador de carregamento
+            submitBtn.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Registrando...
+            `;
+            
+            // Prevenir múltiplos cliques
+            submitBtn.style.pointerEvents = 'none';
+        });
+    }
+
     // ==================== RELÓGIO DIGITAL ====================
     function updateClock() {
         const now = new Date();
@@ -153,54 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== FUNÇÕES DE MODAL ====================
 
-    // Modal de Edição
-    window.openEditModal = function(trackingId) {
-        const modal = document.getElementById('edit-modal');
-        if (!modal) return;
-
-        // Buscar dados do registro
-        fetch(`/sistema-colaboradores/bater-ponto/${trackingId}`)
-            .then(response => response.json())
-            .then(data => {
-                // Preencher o formulário
-                document.getElementById('edit-id').value = data.id;
-                document.getElementById('edit-date-display').value = formatDate(data.date);
-
-                // Preencher todos os 4 horários
-                document.getElementById('edit-entry-time-1').value = data.entry_time_1 || '';
-                document.getElementById('edit-entry-time-1-observation').value = data.entry_time_1_observation || '';
-
-                document.getElementById('edit-return-time-1').value = data.return_time_1 || '';
-                document.getElementById('edit-return-time-1-observation').value = data.return_time_1_observation || '';
-
-                document.getElementById('edit-entry-time-2').value = data.entry_time_2 || '';
-                document.getElementById('edit-entry-time-2-observation').value = data.entry_time_2_observation || '';
-
-                document.getElementById('edit-return-time-2').value = data.return_time_2 || '';
-                document.getElementById('edit-return-time-2-observation').value = data.return_time_2_observation || '';
-
-                // Atualizar todos os contadores
-                updateCharCounter('edit-entry-time-1-observation', 'edit-entry-1-char-counter');
-                updateCharCounter('edit-return-time-1-observation', 'edit-return-1-char-counter');
-                updateCharCounter('edit-entry-time-2-observation', 'edit-entry-2-char-counter');
-                updateCharCounter('edit-return-time-2-observation', 'edit-return-2-char-counter');
-
-                // Mostrar modal
-                modal.classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Erro ao carregar registro:', error);
-                alert('Erro ao carregar os dados do registro.');
-            });
-    };
-
-    window.closeEditModal = function() {
-        const modal = document.getElementById('edit-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-    };
-
     // Modal de Cancelamento
     window.openCancelModal = function(trackingId) {
         const modal = document.getElementById('cancel-modal');
@@ -209,6 +191,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         form.action = `/sistema-colaboradores/bater-ponto/${trackingId}/cancel`;
         modal.classList.remove('hidden');
+        
+        // Resetar o botão de submit (caso tenha sido desabilitado antes)
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.style.pointerEvents = '';
+            submitBtn.innerHTML = `
+                <i class="fa-solid fa-rotate-left mr-2"></i>
+                Sim, Cancelar
+            `;
+        }
     };
 
     window.closeCancelModal = function() {
@@ -226,6 +220,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         form.action = `/sistema-colaboradores/bater-ponto/${trackingId}/restore`;
         modal.classList.remove('hidden');
+        
+        // Resetar o botão de submit (caso tenha sido desabilitado antes)
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.style.pointerEvents = '';
+            submitBtn.innerHTML = `
+                <i class="fa-solid fa-check mr-2"></i>
+                Sim, Restaurar
+            `;
+        }
     };
 
     window.closeRestoreModal = function() {
@@ -238,20 +244,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fechar modais com ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            window.closeEditModal();
             window.closeCancelModal();
             window.closeRestoreModal();
         }
     });
 
     // Fechar modais clicando fora
-    const modals = ['edit-modal', 'cancel-modal', 'restore-modal'];
+    const modals = ['cancel-modal', 'restore-modal'];
     modals.forEach(modalId => {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.addEventListener('click', function(e) {
                 if (e.target === this) {
-                    if (modalId === 'edit-modal') window.closeEditModal();
                     if (modalId === 'cancel-modal') window.closeCancelModal();
                     if (modalId === 'restore-modal') window.closeRestoreModal();
                 }
@@ -259,37 +263,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ==================== CONTADORES DE CARACTERES DO MODAL ====================
-    const editInputs = [
-        { input: 'edit-entry-time-1-observation', counter: 'edit-entry-1-char-counter' },
-        { input: 'edit-return-time-1-observation', counter: 'edit-return-1-char-counter' },
-        { input: 'edit-entry-time-2-observation', counter: 'edit-entry-2-char-counter' },
-        { input: 'edit-return-time-2-observation', counter: 'edit-return-2-char-counter' }
-    ];
-
-    editInputs.forEach(({ input, counter }) => {
-        const inputElement = document.getElementById(input);
-        if (inputElement) {
-            inputElement.addEventListener('input', function() {
-                updateCharCounter(input, counter);
-            });
-        }
-    });
-
-    function updateCharCounter(inputId, counterId) {
-        const input = document.getElementById(inputId);
-        const counter = document.getElementById(counterId);
-
-        if (input && counter) {
-            const currentLength = input.value.length;
-            counter.textContent = `${currentLength}/30`;
-
-            if (currentLength >= 25) {
-                counter.classList.add('text-orange-500');
-            } else {
-                counter.classList.remove('text-orange-500');
+    // ==================== PREVENIR MÚLTIPLAS SUBMISSÕES NOS MODAIS ====================
+    const cancelForm = document.getElementById('cancel-form');
+    if (cancelForm) {
+        cancelForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            if (!submitBtn) return;
+            
+            // Verificar se o botão já está desabilitado
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return false;
             }
-        }
+            
+            // Desabilitar o botão e mudar o visual
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtn.style.pointerEvents = 'none';
+            
+            // Mostrar indicador de carregamento
+            submitBtn.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                Cancelando...
+            `;
+        });
+    }
+
+    const restoreForm = document.getElementById('restore-form');
+    if (restoreForm) {
+        restoreForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            if (!submitBtn) return;
+            
+            // Verificar se o botão já está desabilitado
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Desabilitar o botão e mudar o visual
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtn.style.pointerEvents = 'none';
+            
+            // Mostrar indicador de carregamento
+            submitBtn.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                Restaurando...
+            `;
+        });
     }
 
     // ==================== FUNÇÕES AUXILIARES ====================

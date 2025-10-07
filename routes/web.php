@@ -116,14 +116,16 @@ Route::middleware('collaborator.auth')->group(function () {
             Route::get('/', [TimeTrackingEmployeesController::class, 'index'])->name('system-for-employees.time-tracking.index');
             Route::post('/', [TimeTrackingEmployeesController::class, 'store'])->name('system-for-employees.time-tracking.store');
             Route::get('/next-tracking-info', [TimeTrackingEmployeesController::class, 'getNextTrackingInfo'])->name('system-for-employees.time-tracking.next-info');
-            Route::get('/{id}', [TimeTrackingEmployeesController::class, 'show'])->name('system-for-employees.time-tracking.show');
-            Route::patch('/update', [TimeTrackingEmployeesController::class, 'update'])->name('system-for-employees.time-tracking.update');
             Route::patch('/{id}/cancel', [TimeTrackingEmployeesController::class, 'cancel'])->name('system-for-employees.time-tracking.cancel');
             Route::patch('/{id}/restore', [TimeTrackingEmployeesController::class, 'restore'])->name('system-for-employees.time-tracking.restore');
         });
 
         Route::prefix('solicitations')->group(function () {
             Route::get('/', [SolicitationEmployeesController::class, 'index'])->name('system-for-employees.solicitation.index');
+            Route::get('/create', [SolicitationEmployeesController::class, 'create'])->name('system-for-employees.solicitation.create');
+            Route::post('/', [SolicitationEmployeesController::class, 'store'])->name('system-for-employees.solicitation.store');
+            Route::get('/{id}', [SolicitationEmployeesController::class, 'show'])->name('system-for-employees.solicitation.show');
+            Route::patch('/{id}/cancel', [SolicitationEmployeesController::class, 'cancel'])->name('system-for-employees.solicitation.cancel');
         });
 
         Route::prefix('banco-horas')->group(function () {

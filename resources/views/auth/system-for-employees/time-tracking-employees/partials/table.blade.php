@@ -120,11 +120,6 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <div class="flex items-center justify-center gap-2">
                                 @if ($tracking->status !== 'ausente')
-                                    <button onclick="window.openEditModal({{ $tracking->id }})"
-                                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                                        title="Editar">
-                                        <i class="fa-solid fa-edit"></i>
-                                    </button>
                                     @if ($tracking->entry_time_1 || $tracking->return_time_1 || $tracking->entry_time_2 || $tracking->return_time_2)
                                         <button onclick="window.openCancelModal({{ $tracking->id }})"
                                             class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
