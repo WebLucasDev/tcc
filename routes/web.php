@@ -106,6 +106,7 @@ Route::middleware('user.auth')->group(function () {
 });
 
 Route::middleware('collaborator.auth')->group(function () {
+    
     Route::prefix('sistema-colaboradores')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
