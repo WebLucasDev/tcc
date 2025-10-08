@@ -3,6 +3,52 @@
  * Funcionalidades para o banco de horas do colaborador
  */
 
+/**
+ * Toggle dos detalhes do dia
+ * Esta função precisa estar no escopo global para ser chamada pelo onclick
+ */
+window.toggleDayDetails = function(index) {
+    const detailsDiv = document.getElementById('day-details-' + index);
+    const chevronIcon = document.querySelector('.chevron-icon-' + index);
+
+    if (detailsDiv) {
+        if (detailsDiv.classList.contains('hidden')) {
+            // Mostrar detalhes
+            detailsDiv.classList.remove('hidden');
+
+            // Animar entrada
+            detailsDiv.style.maxHeight = '0';
+            detailsDiv.style.opacity = '0';
+            detailsDiv.style.transition = 'max-height 0.3s ease-out, opacity 0.3s ease-out';
+
+            setTimeout(() => {
+                detailsDiv.style.maxHeight = detailsDiv.scrollHeight + 'px';
+                detailsDiv.style.opacity = '1';
+            }, 10);
+
+            // Rotacionar chevron
+            if (chevronIcon) {
+                chevronIcon.style.transform = 'rotate(180deg)';
+            }
+        } else {
+            // Esconder detalhes
+            detailsDiv.style.maxHeight = '0';
+            detailsDiv.style.opacity = '0';
+
+            setTimeout(() => {
+                detailsDiv.classList.add('hidden');
+                detailsDiv.style.maxHeight = '';
+                detailsDiv.style.opacity = '';
+            }, 300);
+
+            // Rotacionar chevron de volta
+            if (chevronIcon) {
+                chevronIcon.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Comp Time (Employee) JS carregado');
 
