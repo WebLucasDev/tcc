@@ -37,7 +37,7 @@ class LoginController extends Controller
 
             } elseif ($request->isUser()) {
                 // Tenta autenticar como usuário/gestor
-                $authenticated = Auth::guard('web')->attempt([
+                $authenticated = Auth::guard('user')->attempt([
                     'email' => $request['email'],
                     'password' => $request['password']
                 ]);
@@ -61,7 +61,7 @@ class LoginController extends Controller
     public function logout()
     {
         // Faz logout de ambos os guards para garantir que o usuário seja deslogado independente do tipo
-        Auth::guard('web')->logout();
+        Auth::guard('user')->logout();
         Auth::guard('collaborator')->logout();
 
         return redirect()->route('login.index')->with('success', 'Logout realizado com sucesso!');

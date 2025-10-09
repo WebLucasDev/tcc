@@ -16,8 +16,8 @@ class UserAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Verifica se o usuário está autenticado no guard 'web' (gestores)
-        if (!Auth::guard('web')->check()) {
+        // Verifica se o usuário está autenticado no guard 'user' (gestores)
+        if (!Auth::guard('user')->check()) {
             return redirect()->route('login.index')->with('error', 'Acesso negado. Faça login como gestor.');
         }
 

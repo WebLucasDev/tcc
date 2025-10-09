@@ -17,12 +17,12 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
         // Se não foram especificados guards, usa os dois principais
-        $guards = empty($guards) ? ['web', 'collaborator'] : $guards;
+        $guards = empty($guards) ? ['user', 'collaborator'] : $guards;
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                // Se for um gestor autenticado (guard 'web')
-                if ($guard === 'web') {
+                // Se for um gestor autenticado (guard 'user')
+                if ($guard === 'user') {
                     return redirect()->route('dashboard.index');
                 }
 
