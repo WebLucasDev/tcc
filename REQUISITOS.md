@@ -3,23 +3,12 @@
 ## Sistema de Gestão de Ponto Eletrônico e Banco de Horas
 
 **Projeto:** TCC - Trabalho de Conclusão de Curso  
-**Tecnologia:** Laravel 12  
-
----
-
-## 📑 Índice
-
-1. [Visão Geral](#-visão-geral)
-2. [Requisitos Funcionais](#-requisitos-funcionais)
-3. [Requisitos Não Funcionais](#-requisitos-não-funcionais)
-4. [Regras de Negócio](#-regras-de-negócio)
-5. [Casos de Uso](#-casos-de-uso)
 
 ---
 
 ## 🎯 Visão Geral
 
-Sistema web para gestão de ponto eletrônico e controle de banco de horas em conformidade com a CLT (Consolidação das Leis do Trabalho) brasileira, com foco em jornadas de trabalho de 44 horas semanais. O sistema atende dois perfis de usuários: **Administradores/Gestores** e **Colaboradores**.
+Sistema web para gestão de ponto eletrônico e controle de banco de horas em conformidade com a CLT (Consolidação das Leis do Trabalho) brasileira, com foco em jornadas de trabalho de 44 horas semanais. O sistema atende dois perfis de usuários: **Usuários/Gestores** e **Colaboradores**.
 
 ### Objetivos Principais
 
