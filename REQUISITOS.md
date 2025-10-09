@@ -5,7 +5,7 @@
 **Versão:** 1.0  
 **Data:** 09 de outubro de 2025  
 **Projeto:** TCC - Trabalho de Conclusão de Curso  
-**Tecnologia:** Laravel 11 + TailwindCSS  
+**Tecnologia:** Laravel 12  
 
 ---
 
