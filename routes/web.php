@@ -17,10 +17,6 @@ use App\Http\Controllers\TimeTrackingEmployeesController;
 use App\Http\Controllers\WorkHoursController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('public.welcome.index');
-});
-
 Route::middleware('guest')->group(function () {
 
     Route::get('/login', [LoginController::class, 'index'])->name('login.index');
@@ -106,7 +102,7 @@ Route::middleware('user.auth')->group(function () {
 });
 
 Route::middleware('collaborator.auth')->group(function () {
-    
+
     Route::prefix('sistema-colaboradores')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
