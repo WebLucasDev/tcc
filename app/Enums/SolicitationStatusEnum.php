@@ -9,9 +9,6 @@ enum SolicitationStatusEnum: string
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
 
-    /**
-     * Retorna o label em português para exibição ao usuário
-     */
     public function label(): string
     {
         return match($this) {
@@ -22,9 +19,6 @@ enum SolicitationStatusEnum: string
         };
     }
 
-    /**
-     * Retorna a cor associada ao status
-     */
     public function color(): string
     {
         return match($this) {
@@ -35,9 +29,6 @@ enum SolicitationStatusEnum: string
         };
     }
 
-    /**
-     * Retorna o ícone associado ao status
-     */
     public function icon(): string
     {
         return match($this) {
@@ -48,9 +39,6 @@ enum SolicitationStatusEnum: string
         };
     }
 
-    /**
-     * Retorna todas as opções para select
-     */
     public static function options(): array
     {
         return [

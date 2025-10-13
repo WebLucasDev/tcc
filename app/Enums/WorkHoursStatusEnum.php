@@ -7,17 +7,11 @@ enum WorkHoursStatusEnum: string
     case ACTIVE = 'ativo';
     case INACTIVE = 'inativo';
 
-    /**
-     * Get all possible values
-     */
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
 
-    /**
-     * Get label for display
-     */
     public function label(): string
     {
         return match($this) {
@@ -26,9 +20,6 @@ enum WorkHoursStatusEnum: string
         };
     }
 
-    /**
-     * Get CSS class for status badge
-     */
     public function badgeClass(): string
     {
         return match($this) {
@@ -37,9 +28,6 @@ enum WorkHoursStatusEnum: string
         };
     }
 
-    /**
-     * Get icon for status
-     */
     public function icon(): string
     {
         return match($this) {
@@ -48,9 +36,6 @@ enum WorkHoursStatusEnum: string
         };
     }
 
-    /**
-     * Get color for status
-     */
     public function color(): string
     {
         return match($this) {
@@ -59,9 +44,6 @@ enum WorkHoursStatusEnum: string
         };
     }
 
-    /**
-     * Check if status is active
-     */
     public function isActive(): bool
     {
         return $this === self::ACTIVE;
