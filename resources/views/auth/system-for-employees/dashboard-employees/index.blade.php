@@ -433,7 +433,7 @@
                                 <div>
                                     <p class="font-medium text-[var(--color-main)] text-sm">{{ $solicitation->type }}</p>
                                     <p class="text-xs text-[var(--color-text)]">
-                                        {{ $solicitation->date ? \Carbon\Carbon::parse($solicitation->date)->format('d/m/Y') : 'Sem data' }} - 
+                                        {{ $solicitation->date ? \Carbon\Carbon::parse($solicitation->date)->format('d/m/Y') : 'Sem data' }} -
                                         {{ $solicitation->created_at->diffForHumans() }}
                                     </p>
                                 </div>

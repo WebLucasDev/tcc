@@ -90,7 +90,7 @@ class DashboardEmployessController extends Controller
 
         $totalBankBalance = 0;
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->dayOfWeek !== Carbon::SUNDAY) {
             $currentDate->subDay();
         }
@@ -135,7 +135,7 @@ class DashboardEmployessController extends Controller
             
             $cltWeeklyLimitMinutes = 44 * 60;
             $maxWeeklyOvertimeMinutes = 10 * 60;
-            
+
             if ($weekWorkedMinutes > $cltWeeklyLimitMinutes) {
                 $overtimeMinutes = $weekWorkedMinutes - $weekExpectedMinutes;
                 $weekBalance = min($overtimeMinutes, $maxWeeklyOvertimeMinutes);
