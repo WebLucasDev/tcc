@@ -104,48 +104,53 @@
                          id="details-{{ $collaborator->id }}">
                         <div class="p-6 space-y-6">
 
-                            <!-- Horário Padrão -->
+                            <!-- Jornada de Trabalho -->
                             <div class="bg-[var(--color-background)] border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                                         <i class="fa-solid fa-clock text-white text-xs"></i>
                                     </div>
-                                    <h5 class="text-sm font-bold text-[var(--color-text)]">Horário Padrão de Trabalho</h5>
+                                    <h5 class="text-sm font-bold text-[var(--color-text)]">Jornada de Trabalho</h5>
                                 </div>
 
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
-                                        <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Entrada Manhã</div>
-                                        <div class="text-sm font-bold text-[var(--color-text)]">
-                                            {{ $collaborator->entry_time_1 ? \Carbon\Carbon::parse($collaborator->entry_time_1)->format('H:i') : '-' }}
+                                @if($collaborator->workHours)
+                                    <div class="space-y-3">
+                                        <div class="text-center bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                                            <div class="text-xs font-semibold text-blue-800 dark:text-blue-200 mb-1">Jornada Cadastrada</div>
+                                            <div class="text-lg font-bold text-blue-900 dark:text-blue-100">{{ $collaborator->workHours->name }}</div>
+                                            @if($collaborator->workHours->description)
+                                                <div class="text-xs text-blue-700 dark:text-blue-300 mt-1">{{ $collaborator->workHours->description }}</div>
+                                            @endif
                                         </div>
-                                    </div>
-                                    <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
-                                        <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Saída Almoço</div>
-                                        <div class="text-sm font-bold text-[var(--color-text)]">
-                                            {{ $collaborator->return_time_1 ? \Carbon\Carbon::parse($collaborator->return_time_1)->format('H:i') : '-' }}
-                                        </div>
-                                    </div>
-                                    <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
-                                        <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Volta Almoço</div>
-                                        <div class="text-sm font-bold text-[var(--color-text)]">
-                                            {{ $collaborator->entry_time_2 ? \Carbon\Carbon::parse($collaborator->entry_time_2)->format('H:i') : '-' }}
-                                        </div>
-                                    </div>
-                                    <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
-                                        <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Saída Tarde</div>
-                                        <div class="text-sm font-bold text-[var(--color-text)]">
-                                            {{ $collaborator->return_time_2 ? \Carbon\Carbon::parse($collaborator->return_time_2)->format('H:i') : '-' }}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="mt-3 text-center">
-                                    <span class="text-sm text-[var(--color-text)] opacity-70">
-                                        Carga horária diária:
-                                        <strong>{{ sprintf('%02d:%02d', intval($bankHours['standard_daily_minutes'] / 60), $bankHours['standard_daily_minutes'] % 60) }}</strong>
-                                    </span>
-                                </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
+                                                <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Carga Semanal</div>
+                                                <div class="text-sm font-bold text-[var(--color-text)]">
+                                                    {{ $collaborator->workHours->total_weekly_hours }}h
+                                                </div>
+                                            </div>
+                                            <div class="text-center bg-[var(--color-background)] p-3 rounded border border-gray-200 dark:border-gray-600">
+                                                <div class="text-xs font-semibold text-[var(--color-text)] opacity-60 mb-1">Carga Diária Média</div>
+                                                <div class="text-sm font-bold text-[var(--color-text)]">
+                                                    {{ sprintf('%02d:%02d', intval($bankHours['standard_daily_minutes'] / 60), $bankHours['standard_daily_minutes'] % 60) }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center text-xs text-[var(--color-text)] opacity-60 bg-[var(--color-background)] border border-gray-200 dark:border-gray-600 rounded p-2">
+                                            <i class="fa-solid fa-calendar-check mr-1"></i>
+                                            Dias ativos: {{ implode(', ', array_map(function($day) {
+                                                return ucfirst(substr($day, 0, 3));
+                                            }, $collaborator->workHours->getActiveDays())) }}
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="text-center py-4">
+                                        <i class="fa-solid fa-exclamation-triangle text-orange-500 text-2xl mb-2"></i>
+                                        <p class="text-sm text-[var(--color-text)] opacity-60">Nenhuma jornada definida</p>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Resumo do Período -->

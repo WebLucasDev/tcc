@@ -12,19 +12,15 @@ class CompTimeController extends Controller
 {
     public function index(Request $request)
     {
-        // Filtros
         $collaboratorId = $request->get('collaborator_id');
         $month = $request->get('month', now()->format('Y-m'));
 
-        // Buscar todos os colaboradores para o filtro
         $allCollaborators = CollaboratorModel::where('status', CollaboratorStatusEnum::ACTIVE)
             ->orderBy('name')
             ->get();
 
-        // Calcular dados do banco de horas (agora seguindo CLT - 44h semanais)
         $compTimeData = $this->calculateCompTimeDataCLT($collaboratorId, $month);
 
-        // Calcular resumo dos dados
         $summary = $this->calculateSummary($compTimeData);
 
         $breadcrumbs = [
@@ -32,7 +28,6 @@ class CompTimeController extends Controller
             ['label' => 'Banco de Horas', 'url' => null]
         ];
 
-        // Se for requisição AJAX, retornar apenas os dados necessários
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -53,18 +48,13 @@ class CompTimeController extends Controller
         ));
     }
 
-    /**
-     * Calcula os dados do banco de horas seguindo a CLT brasileira (44h semanais)
-     */
     private function calculateCompTimeDataCLT($collaboratorId = null, $month = null)
     {
-        // Configurar período de análise (mês completo para mostrar todas as semanas)
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
 
-        // Query base dos colaboradores
         $collaboratorsQuery = CollaboratorModel::with('workHours')
-            ->where('status', \App\Enums\CollaboratorStatusEnum::ACTIVE);
+            ->where('status', CollaboratorStatusEnum::ACTIVE);
 
         if ($collaboratorId) {
             $collaboratorsQuery->where('id', $collaboratorId);
@@ -86,9 +76,6 @@ class CompTimeController extends Controller
         return $compTimeData;
     }
 
-    /**
-     * Calcula o resumo dos dados do banco de horas
-     */
     private function calculateSummary($compTimeData)
     {
         $summary = [
@@ -111,7 +98,6 @@ class CompTimeController extends Controller
 
                 $summary['total_worked_minutes'] += $worked;
 
-                // Calcular total esperado baseado na jornada individual
                 $expectedMinutes = 0;
                 if (isset($data['bank_hours']['weekly_details'])) {
                     foreach ($data['bank_hours']['weekly_details'] as $week) {
@@ -133,17 +119,14 @@ class CompTimeController extends Controller
         }
 
         return $summary;
-    }    /**
-     * Calcula o banco de horas de um colaborador seguindo a CLT (44h semanais)
-     */
+    }
+
     private function calculateCollaboratorBankHoursCLT($collaborator, $startDate, $endDate)
     {
-        // Verificar se o colaborador tem jornada de trabalho definida
         if (!$collaborator->workHours) {
             return $this->getEmptyBankHoursData($startDate, $endDate);
         }
 
-        // Buscar todos os registros do período
         $timeTrackings = TimeTrackingModel::where('collaborator_id', $collaborator->id)
             ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('date')
@@ -152,8 +135,7 @@ class CompTimeController extends Controller
                 return $item->date->format('Y-m-d');
             });
 
-        // Calcular limite semanal baseado na jornada individual do colaborador
-        $weeklyLimitMinutes = $this->calculateCollaboratorWeeklyLimitMinutes($collaborator);
+        $collaboratorWeeklyMinutes = $collaborator->workHours->total_weekly_hours * 60;
 
         $totalBankBalance = 0;
         $totalWorkedMinutes = 0;
@@ -161,33 +143,27 @@ class CompTimeController extends Controller
         $weeklyDetails = [];
         $recentDays = [];
 
-        // Encontrar o primeiro domingo do período para começar as semanas
         $currentDate = $startDate->copy();
         while ($currentDate->dayOfWeek !== Carbon::SUNDAY) {
             $currentDate->subDay();
         }
 
-        // Processar semana por semana (Domingo a Sábado)
         while ($currentDate <= $endDate) {
             $weekStart = $currentDate->copy();
             $weekEnd = $currentDate->copy()->addDays(6);
 
-            // Se a semana tem algum dia dentro do período analisado
             if ($weekEnd >= $startDate && $weekStart <= $endDate) {
                 $weekWorkedMinutes = 0;
                 $weekExpectedMinutes = 0;
                 $weekDays = [];
 
-                // Processar cada dia da semana (Domingo a Sábado)
                 for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
                     $day = $weekStart->copy()->addDays($dayOffset);
 
-                    // Só processar se o dia está dentro do período
                     if ($day >= $startDate && $day <= $endDate) {
                         $dayKey = $day->format('Y-m-d');
                         $tracking = $timeTrackings->get($dayKey);
 
-                        // Calcular horas esperadas para o dia baseado na jornada
                         $expectedDailyMinutes = $this->getExpectedDailyMinutes($collaborator, $day);
 
                         $dayWorkedMinutes = 0;
@@ -208,7 +184,6 @@ class CompTimeController extends Controller
                             'day_name' => $day->locale('pt_BR')->dayName
                         ];
 
-                        // Adicionar aos dias recentes para exibição
                         if ($tracking || $expectedDailyMinutes > 0) {
                             $recentDays[] = [
                                 'date' => $day->copy(),
@@ -224,20 +199,17 @@ class CompTimeController extends Controller
                     }
                 }
 
-                // Calcular banco de horas da semana
-                // CLT: Limite de 44h semanais, mas respeitando a jornada individual
                 $weekBankBalance = 0;
 
-                // Só calcula se houver pelo menos um registro ou dia esperado de trabalho
                 if ($weekExpectedMinutes > 0 || $weekWorkedMinutes > 0) {
-                    // Diferença entre trabalhado e esperado
                     $weekBankBalance = $weekWorkedMinutes - $weekExpectedMinutes;
 
-                    // CLT: Máximo 2h extras por dia, 10h por semana
-                    // Se excedeu muito, ajustar (isso é uma proteção)
-                    $maxWeeklyOvertime = 10 * 60; // 10 horas em minutos
-                    if ($weekBankBalance > $maxWeeklyOvertime) {
-                        $weekBankBalance = $maxWeeklyOvertime;
+                    $cltWeeklyLimitMinutes = 44 * 60;
+                    $maxWeeklyOvertimeMinutes = 10 * 60;
+
+                    if ($weekWorkedMinutes > $cltWeeklyLimitMinutes) {
+                        $overtimeMinutes = $weekWorkedMinutes - $weekExpectedMinutes;
+                        $weekBankBalance = min($overtimeMinutes, $maxWeeklyOvertimeMinutes);
                     }
                 }
 
@@ -250,23 +222,20 @@ class CompTimeController extends Controller
                     'week_end' => $weekEnd->copy(),
                     'worked_minutes' => $weekWorkedMinutes,
                     'expected_minutes' => $weekExpectedMinutes,
-                    'limit_minutes' => $weeklyLimitMinutes,
+                    'limit_minutes' => $collaboratorWeeklyMinutes,
                     'bank_balance' => $weekBankBalance,
                     'days' => $weekDays
                 ];
             }
 
-            // Próxima semana
             $currentDate->addWeek();
         }
 
-        // Calcular total de minutos esperados baseado nas jornadas reais
         $totalExpectedMinutes = 0;
         foreach ($weeklyDetails as $week) {
             $totalExpectedMinutes += $week['expected_minutes'] ?? 0;
         }
 
-        // Calcular média diária esperada
         $totalDaysWithExpectation = collect($recentDays)->where('expected_minutes', '>', 0)->count();
         $standardDailyMinutes = $totalDaysWithExpectation > 0 ?
             round($totalExpectedMinutes / $totalDaysWithExpectation) :
@@ -277,136 +246,44 @@ class CompTimeController extends Controller
             'period_end' => $endDate,
             'total_weeks_analyzed' => $totalWeeksAnalyzed,
             'total_worked_minutes' => $totalWorkedMinutes,
-            'weekly_limit_minutes' => $weeklyLimitMinutes,
+            'weekly_limit_minutes' => $collaboratorWeeklyMinutes,
             'bank_balance_minutes' => $totalBankBalance,
             'weekly_details' => $weeklyDetails,
             'work_days' => collect($recentDays)->sortByDesc('date')->values()->toArray(),
             'work_days_count' => collect($recentDays)->count(),
             'total_standard_minutes' => $totalExpectedMinutes,
             'standard_daily_minutes' => $standardDailyMinutes,
-            'collaborator_weekly_minutes' => $this->calculateCollaboratorWeeklyLimitMinutes($collaborator)
+            'collaborator_weekly_minutes' => $collaboratorWeeklyMinutes
         ];
     }
 
-    /**
-     * [MÉTODO ANTERIOR - MANTIDO PARA REFERÊNCIA]
-     * Calcula o banco de horas de um colaborador específico (método antigo)
-     * ATENÇÃO: Este método não segue a CLT. Use calculateCollaboratorBankHoursCLT()
-     */
-    private function calculateCollaboratorBankHours($collaborator, $startDate, $endDate)
-    {
-        // Buscar registros de ponto do período
-        $timeTrackings = TimeTrackingModel::where('collaborator_id', $collaborator->id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->orderBy('date')
-            ->get();
-
-        // Calcular carga horária padrão diária do colaborador (em minutos)
-        $standardDailyMinutes = $this->calculateStandardDailyMinutes($collaborator);
-
-        $totalWorkedMinutes = 0;
-        $totalStandardMinutes = 0;
-        $workDays = [];
-        $workDaysCount = 0;
-
-        // Primeiro, processar todos os dias com registros (incluindo finais de semana)
-        foreach ($timeTrackings as $tracking) {
-            $trackingDate = Carbon::parse($tracking->date);
-
-            // CORREÇÃO: Incluir TODOS os dias trabalhados, incluindo finais de semana
-            $workDaysCount++;
-            $workedMinutes = $tracking->total_hours_worked ?? 0;
-            $totalWorkedMinutes += $workedMinutes;
-
-            // Para dias úteis, usar carga padrão. Para finais de semana, carga padrão = 0
-            $dayStandardMinutes = $trackingDate->isWeekend() ? 0 : $standardDailyMinutes;
-            $totalStandardMinutes += $dayStandardMinutes;
-
-            $workDays[] = [
-                'date' => $trackingDate,
-                'tracking' => $tracking,
-                'worked_minutes' => $workedMinutes,
-                'standard_minutes' => $dayStandardMinutes,
-                'difference_minutes' => $workedMinutes - $dayStandardMinutes,
-                'status' => $tracking->status,
-                'is_weekend' => $trackingDate->isWeekend(),
-                'day_name' => $trackingDate->locale('pt_BR')->dayName
-            ];
-        }
-
-        // Calcular saldo do banco de horas
-        $bankBalanceMinutes = $totalWorkedMinutes - $totalStandardMinutes;
-
-        return [
-            'period_start' => $startDate,
-            'period_end' => $endDate,
-            'work_days_count' => $workDaysCount,
-            'total_worked_minutes' => $totalWorkedMinutes,
-            'total_standard_minutes' => $totalStandardMinutes,
-            'bank_balance_minutes' => $bankBalanceMinutes,
-            'work_days' => collect($workDays)->sortByDesc('date')->take(10)->values()->toArray(), // Últimos 10 dias para exibição
-            'standard_daily_minutes' => $standardDailyMinutes,
-            'weekly_limit_minutes' => 44 * 60, // Para compatibilidade
-            'collaborator_weekly_minutes' => $standardDailyMinutes * 5, // Para compatibilidade
-            'weekly_details' => [] // Para compatibilidade
-        ];
-    }
-
-    /**
-     * Calcula a carga horária padrão diária de um colaborador em minutos
-     * Agora usa a jornada definida no WorkHoursModel
-     */
     private function calculateStandardDailyMinutes($collaborator)
     {
-        // Se não tem jornada definida, usar padrão CLT (8h48min)
         if (!$collaborator->workHours) {
-            return 528; // 8h48min em minutos (44h/5 dias)
+            return 528;
         }
 
-        // Usar a jornada semanal dividida pelos dias ativos
         $weeklyMinutes = $collaborator->workHours->total_weekly_hours * 60;
         $activeDays = count($collaborator->workHours->getActiveDays());
 
         return $activeDays > 0 ? round($weeklyMinutes / $activeDays) : 0;
     }
 
-    /**
-     * Calcula o limite semanal de minutos baseado na jornada do colaborador
-     */
-    private function calculateCollaboratorWeeklyLimitMinutes($collaborator)
-    {
-        if (!$collaborator->workHours) {
-            return 44 * 60; // CLT padrão: 44h = 2640 minutos
-        }
-
-        // Usar a jornada semanal configurada (mas limitada a 44h pela CLT)
-        $weeklyMinutes = $collaborator->workHours->total_weekly_hours * 60;
-        $cltLimit = 44 * 60; // 2640 minutos
-
-        // Não pode exceder o limite da CLT
-        return min($weeklyMinutes, $cltLimit);
-    }
-
-    /**
-     * Calcula os minutos esperados para um dia específico baseado na jornada
-     */
     private function getExpectedDailyMinutes($collaborator, Carbon $date)
     {
         if (!$collaborator->workHours) {
-            return $date->isWeekend() ? 0 : 528; // CLT padrão
+            return $date->isWeekend() ? 0 : 528;
         }
 
         $workHours = $collaborator->workHours;
-        $dayOfWeek = strtolower($date->format('l')); // monday, tuesday, etc.
+        $dayOfWeek = strtolower($date->format('l'));
 
-        // Verificar se o dia está ativo na jornada
         if (!$workHours->{$dayOfWeek . '_active'}) {
             return 0;
         }
 
         $totalMinutes = 0;
 
-        // Primeiro período
         if ($workHours->{$dayOfWeek . '_entry_1'} && $workHours->{$dayOfWeek . '_exit_1'}) {
             $entry1 = Carbon::parse($workHours->{$dayOfWeek . '_entry_1'});
             $exit1 = Carbon::parse($workHours->{$dayOfWeek . '_exit_1'});
@@ -418,7 +295,6 @@ class CompTimeController extends Controller
             $totalMinutes += $entry1->diffInMinutes($exit1);
         }
 
-        // Segundo período
         if ($workHours->{$dayOfWeek . '_entry_2'} && $workHours->{$dayOfWeek . '_exit_2'}) {
             $entry2 = Carbon::parse($workHours->{$dayOfWeek . '_entry_2'});
             $exit2 = Carbon::parse($workHours->{$dayOfWeek . '_exit_2'});
@@ -433,9 +309,6 @@ class CompTimeController extends Controller
         return $totalMinutes;
     }
 
-    /**
-     * Retorna dados vazios para banco de horas quando não há jornada definida
-     */
     private function getEmptyBankHoursData($startDate, $endDate)
     {
         return [
@@ -454,27 +327,6 @@ class CompTimeController extends Controller
         ];
     }
 
-    /**
-     * Retorna a carga horária padrão conforme CLT (44h semanais)
-     */
-    private function getCLTDailyMinutes()
-    {
-        // CLT: 44h semanais ÷ 5 dias úteis = 8h48min por dia = 528 minutos
-        return 528; // 8 horas e 48 minutos
-    }
-
-    /**
-     * Retorna a carga horária semanal conforme CLT
-     */
-    private function getCLTWeeklyMinutes()
-    {
-        // CLT: 44 horas semanais = 2640 minutos
-        return 2640;
-    }
-
-    /**
-     * Converte minutos para formato HH:MM
-     */
     public static function formatMinutesToHours($minutes)
     {
         if ($minutes === 0) {

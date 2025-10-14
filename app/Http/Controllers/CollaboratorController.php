@@ -176,7 +176,6 @@ class CollaboratorController extends Controller
                 'status' => $request->validated()['status'],
             ];
 
-            // Só atualiza a senha se ela foi fornecida
             if (!empty($request->validated()['password'])) {
                 $updateData['password'] = $request->validated()['password'];
             }
@@ -197,7 +196,6 @@ class CollaboratorController extends Controller
         try {
             $collaborator = CollaboratorModel::findOrFail($id);
 
-            // Verificar se o colaborador possui registros de ponto
             $hasTimeTracking = TimeTrackingModel::where('collaborator_id', $collaborator->id)->exists();
 
             if ($hasTimeTracking) {
