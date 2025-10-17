@@ -18,9 +18,9 @@ class PositionController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('department', function ($dept) use ($search) {
-                      $dept->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('department', function ($dept) use ($search) {
+                        $dept->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -47,7 +47,7 @@ class PositionController extends Controller
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
-            ['label' => 'Cargos', 'url' => null]
+            ['label' => 'Cargos', 'url' => null],
         ];
 
         if ($request->ajax()) {
@@ -58,8 +58,8 @@ class PositionController extends Controller
                 'statistics' => [
                     'total' => $positions->total(),
                     'with_department' => $withDepartment,
-                    'without_department' => $withoutDepartment
-                ]
+                    'without_department' => $withoutDepartment,
+                ],
             ]);
         }
 
@@ -134,7 +134,6 @@ class PositionController extends Controller
     {
         try {
             $position = PositionModel::findOrFail($id);
-
 
             if ($position->collaborators()->count() > 0) {
                 return redirect()->back()

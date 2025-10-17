@@ -35,7 +35,7 @@ class DepartmentController extends Controller
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
-            ['label' => 'Departamentos', 'url' => null]
+            ['label' => 'Departamentos', 'url' => null],
         ];
 
         if ($request->ajax()) {
@@ -46,8 +46,8 @@ class DepartmentController extends Controller
                 'statistics' => [
                     'total' => $departments->total(),
                     'with_positions' => $withPositions,
-                    'with_collaborators' => $withCollaborators
-                ]
+                    'with_collaborators' => $withCollaborators,
+                ],
             ]);
         }
 
@@ -116,7 +116,6 @@ class DepartmentController extends Controller
     {
         try {
             $department = DepartmentModel::findOrFail($id);
-
 
             if ($department->collaborators()->count() > 0) {
                 return redirect()->back()

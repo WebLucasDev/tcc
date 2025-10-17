@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-
-    /**
-     * Exibe a tela de login
-     */
     public function index()
     {
         return view('public.login.index');
@@ -20,47 +16,40 @@ class LoginController extends Controller
     public function auth(LoginRequest $request)
     {
         try {
-            // Determina qual guard usar baseado no tipo de usuário
             if ($request->isCollaborator()) {
-                // Tenta autenticar como colaborador
                 $authenticated = Auth::guard('collaborator')->attempt([
                     'email' => $request['email'],
-                    'password' => $request['password']
+                    'password' => $request['password'],
                 ]);
 
-                if (!$authenticated) {
+                if (! $authenticated) {
                     return back()->withInput()->with('error', 'Credenciais inválidas.');
                 }
 
-                // Redireciona para o sistema de colaboradores
                 return redirect()->route('system-for-employees.dashboard.index');
 
             } elseif ($request->isUser()) {
-                // Tenta autenticar como usuário/gestor
                 $authenticated = Auth::guard('user')->attempt([
                     'email' => $request['email'],
-                    'password' => $request['password']
+                    'password' => $request['password'],
                 ]);
 
-                if (!$authenticated) {
+                if (! $authenticated) {
                     return back()->withInput()->with('error', 'Credenciais inválidas.');
                 }
 
-                // Redireciona para o dashboard administrativo
                 return redirect()->route('dashboard.index');
 
             } else {
                 return back()->withInput()->with('error', 'Credenciais inválidas.');
             }
-        }
-        catch (Exception $exception) {
+        } catch (Exception $exception) {
             return back()->withInput()->with('error', 'Erro interno do servidor. Tente novamente.');
         }
     }
 
     public function logout()
     {
-        // Faz logout de ambos os guards para garantir que o usuário seja deslogado independente do tipo
         Auth::guard('user')->logout();
         Auth::guard('collaborator')->logout();
 

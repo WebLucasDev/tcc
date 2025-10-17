@@ -2,31 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CollaboratorStatusEnum;
+use App\Enums\SolicitationStatusEnum;
+use App\Enums\TimeTrackingStatusEnum;
+use App\Models\CollaboratorModel;
+use App\Models\DepartmentModel;
+use App\Models\SolicitationModel;
+use App\Models\TimeTrackingModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\CollaboratorModel;
-use App\Models\TimeTrackingModel;
-use App\Models\SolicitationModel;
-use App\Models\DepartmentModel;
-use App\Enums\CollaboratorStatusEnum;
-use App\Enums\TimeTrackingStatusEnum;
-use App\Enums\SolicitationStatusEnum;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    /**
-     * Exibe o Dashboard com relatórios reais do sistema.
-     */
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Filtros
         $month = $request->get('month', Carbon::now()->format('Y-m'));
         $department_id = $request->get('department_id');
 
-        // Buscar dados para o dashboard
         $metrics = $this->getMetrics($month, $department_id);
         $departments = DepartmentModel::orderBy('name')->get();
 
@@ -39,9 +34,6 @@ class DashboardController extends Controller
         ));
     }
 
-    /**
-     * Coleta todas as métricas para o dashboard
-     */
     private function getMetrics($month, $department_id = null)
     {
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
@@ -53,7 +45,7 @@ class DashboardController extends Controller
                 'start' => $startDate,
                 'end' => $endDate,
                 'month_name' => $startDate->locale('pt_BR')->monthName,
-                'year' => $startDate->year
+                'year' => $startDate->year,
             ],
             'overview' => $this->getOverviewMetrics($startDate, $endDate, $department_id),
             'punctuality' => $this->getPunctualityMetrics($startDate, $endDate, $department_id),
@@ -61,31 +53,27 @@ class DashboardController extends Controller
             'daily_attendance' => $this->getDailyAttendance($startDate, $endDate, $department_id),
             'top_performers' => $this->getTopPerformers($startDate, $endDate, $department_id),
             'alerts' => $this->getAlerts($startDate, $endDate, $department_id),
-            'solicitations_summary' => $this->getSolicitationsSummary($startDate, $endDate, $department_id)
+            'solicitations_summary' => $this->getSolicitationsSummary($startDate, $endDate, $department_id),
         ];
     }
 
-    /**
-     * Métricas gerais de visão geral
-     */
     private function getOverviewMetrics($startDate, $endDate, $department_id = null)
     {
         $collaboratorsQuery = CollaboratorModel::where('status', CollaboratorStatusEnum::ACTIVE);
 
         if ($department_id) {
-            $collaboratorsQuery->whereHas('position', function($q) use ($department_id) {
+            $collaboratorsQuery->whereHas('position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
 
         $totalCollaborators = $collaboratorsQuery->count();
 
-        // Registros do período
         $recordsQuery = TimeTrackingModel::whereBetween('date', [$startDate, $endDate])
             ->with('collaborator');
 
         if ($department_id) {
-            $recordsQuery->whereHas('collaborator.position', function($q) use ($department_id) {
+            $recordsQuery->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -108,13 +96,10 @@ class DashboardController extends Controller
             'absent_records' => $absentRecords,
             'total_worked_hours' => round($totalWorkedMinutes / 60, 1),
             'average_worked_hours' => $averageWorkedHours,
-            'completion_rate' => $totalRecords > 0 ? round(($completeRecords / $totalRecords) * 100, 1) : 0
+            'completion_rate' => $totalRecords > 0 ? round(($completeRecords / $totalRecords) * 100, 1) : 0,
         ];
     }
 
-    /**
-     * Métricas de pontualidade
-     */
     private function getPunctualityMetrics($startDate, $endDate, $department_id = null)
     {
         $recordsQuery = TimeTrackingModel::whereBetween('date', [$startDate, $endDate])
@@ -122,7 +107,7 @@ class DashboardController extends Controller
             ->with('collaborator.workHours');
 
         if ($department_id) {
-            $recordsQuery->whereHas('collaborator.position', function($q) use ($department_id) {
+            $recordsQuery->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -134,18 +119,21 @@ class DashboardController extends Controller
         $totalLateMinutes = 0;
 
         foreach ($records as $record) {
-            if (!$record->collaborator || !$record->collaborator->workHours) continue;
+            if (! $record->collaborator || ! $record->collaborator->workHours) {
+                continue;
+            }
 
             $date = Carbon::parse($record->date);
             $dayOfWeek = strtolower($date->format('l'));
-            $expectedEntry = $record->collaborator->workHours->{$dayOfWeek . '_entry_1'};
+            $expectedEntry = $record->collaborator->workHours->{$dayOfWeek.'_entry_1'};
 
-            if (!$expectedEntry) continue;
+            if (! $expectedEntry) {
+                continue;
+            }
 
             $actualEntry = Carbon::parse($record->entry_time_1);
             $expectedEntryTime = Carbon::parse($expectedEntry);
 
-            // Tolerância de 10 minutos
             if ($actualEntry->lte($expectedEntryTime->addMinutes(10))) {
                 $onTime++;
             } else {
@@ -164,26 +152,23 @@ class DashboardController extends Controller
             'late' => $late,
             'punctuality_rate' => $punctualityRate,
             'average_late_minutes' => $averageLateMinutes,
-            'total_late_minutes' => $totalLateMinutes
+            'total_late_minutes' => $totalLateMinutes,
         ];
     }
 
-    /**
-     * Registros recentes (hoje)
-     */
     private function getRecentRecords($date, $department_id = null)
     {
         $query = TimeTrackingModel::whereDate('date', $date)
             ->with('collaborator')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNotNull('entry_time_1')
-                  ->orWhereNotNull('return_time_1')
-                  ->orWhereNotNull('entry_time_2')
-                  ->orWhereNotNull('return_time_2');
+                    ->orWhereNotNull('return_time_1')
+                    ->orWhereNotNull('entry_time_2')
+                    ->orWhereNotNull('return_time_2');
             });
 
         if ($department_id) {
-            $query->whereHas('collaborator.position', function($q) use ($department_id) {
+            $query->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -197,20 +182,17 @@ class DashboardController extends Controller
                     'last_action' => $this->getLastAction($record),
                     'time' => $this->getLastActionTime($record),
                     'status' => $record->status->value,
-                    'total_hours' => $record->total_hours_worked ? round($record->total_hours_worked / 60, 1) : 0
+                    'total_hours' => $record->total_hours_worked ? round($record->total_hours_worked / 60, 1) : 0,
                 ];
             });
     }
 
-    /**
-     * Presença diária do mês
-     */
     private function getDailyAttendance($startDate, $endDate, $department_id = null)
     {
         $totalCollaborators = CollaboratorModel::where('status', CollaboratorStatusEnum::ACTIVE);
 
         if ($department_id) {
-            $totalCollaborators->whereHas('position', function($q) use ($department_id) {
+            $totalCollaborators->whereHas('position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -225,7 +207,7 @@ class DashboardController extends Controller
                 ->whereIn('status', [TimeTrackingStatusEnum::COMPLETO, TimeTrackingStatusEnum::INCOMPLETO]);
 
             if ($department_id) {
-                $recordsQuery->whereHas('collaborator.position', function($q) use ($department_id) {
+                $recordsQuery->whereHas('collaborator.position', function ($q) use ($department_id) {
                     $q->where('department_id', $department_id);
                 });
             }
@@ -238,7 +220,7 @@ class DashboardController extends Controller
                 'day_name' => $currentDate->locale('pt_BR')->dayName,
                 'present_count' => $presentCount,
                 'attendance_rate' => $attendanceRate,
-                'is_weekend' => $currentDate->isWeekend()
+                'is_weekend' => $currentDate->isWeekend(),
             ];
 
             $currentDate->addDay();
@@ -247,9 +229,6 @@ class DashboardController extends Controller
         return $dailyData;
     }
 
-    /**
-     * Top performers do mês
-     */
     private function getTopPerformers($startDate, $endDate, $department_id = null)
     {
         $query = TimeTrackingModel::whereBetween('date', [$startDate, $endDate])
@@ -263,7 +242,7 @@ class DashboardController extends Controller
             ->having('total_days', '>', 0);
 
         if ($department_id) {
-            $query->whereHas('collaborator.position', function($q) use ($department_id) {
+            $query->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -280,23 +259,20 @@ class DashboardController extends Controller
                     'complete_days' => $record->complete_days,
                     'completion_rate' => $completionRate,
                     'total_hours' => round($record->total_minutes / 60, 1),
-                    'avg_hours' => round($record->avg_minutes / 60, 1)
+                    'avg_hours' => round($record->avg_minutes / 60, 1),
                 ];
             });
     }
 
-    /**
-     * Alertas do sistema
-     */
     private function getAlerts($startDate, $endDate, $department_id = null)
     {
-        // Colaboradores com muitos atrasos
+
         $lateQuery = TimeTrackingModel::whereBetween('date', [$startDate, $endDate])
             ->with('collaborator.workHours')
             ->whereNotNull('entry_time_1');
 
         if ($department_id) {
-            $lateQuery->whereHas('collaborator.position', function($q) use ($department_id) {
+            $lateQuery->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -309,17 +285,16 @@ class DashboardController extends Controller
                     $lateCount++;
                 }
             }
-            if ($lateCount >= 5) { // 5+ atrasos no mês
+            if ($lateCount >= 5) {
                 $lateCollaborators++;
             }
         }
 
-        // Colaboradores com muitas ausências
         $absentQuery = TimeTrackingModel::whereBetween('date', [$startDate, $endDate])
             ->where('status', TimeTrackingStatusEnum::AUSENTE);
 
         if ($department_id) {
-            $absentQuery->whereHas('collaborator.position', function($q) use ($department_id) {
+            $absentQuery->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -329,25 +304,21 @@ class DashboardController extends Controller
             ->having('absent_count', '>=', 3)
             ->count();
 
-        // Solicitações pendentes
         $pendingSolicitations = SolicitationModel::where('status', SolicitationStatusEnum::PENDING)->count();
 
         return [
             'frequent_late' => $lateCollaborators,
             'frequent_absent' => $frequentAbsent,
-            'pending_solicitations' => $pendingSolicitations
+            'pending_solicitations' => $pendingSolicitations,
         ];
     }
 
-    /**
-     * Resumo das solicitações
-     */
     private function getSolicitationsSummary($startDate, $endDate, $department_id = null)
     {
         $query = SolicitationModel::whereBetween('created_at', [$startDate, $endDate]);
 
         if ($department_id) {
-            $query->whereHas('collaborator.position', function($q) use ($department_id) {
+            $query->whereHas('collaborator.position', function ($q) use ($department_id) {
                 $q->where('department_id', $department_id);
             });
         }
@@ -362,45 +333,62 @@ class DashboardController extends Controller
             'pending' => $pending,
             'approved' => $approved,
             'rejected' => $rejected,
-            'approval_rate' => ($approved + $rejected) > 0 ? round(($approved / ($approved + $rejected)) * 100, 1) : 0
+            'approval_rate' => ($approved + $rejected) > 0 ? round(($approved / ($approved + $rejected)) * 100, 1) : 0,
         ];
     }
 
-    /**
-     * Métodos auxiliares
-     */
     private function getLastAction($record)
     {
-        if ($record->return_time_2) return 'Saída Final';
-        if ($record->entry_time_2) return 'Retorno';
-        if ($record->return_time_1) return 'Saída Almoço';
-        if ($record->entry_time_1) return 'Entrada';
+        if ($record->return_time_2) {
+            return 'Saída Final';
+        }
+        if ($record->entry_time_2) {
+            return 'Retorno';
+        }
+        if ($record->return_time_1) {
+            return 'Saída Almoço';
+        }
+        if ($record->entry_time_1) {
+            return 'Entrada';
+        }
+
         return 'N/A';
     }
 
     private function getLastActionTime($record)
     {
-        if ($record->return_time_2) return Carbon::parse($record->return_time_2)->format('H:i');
-        if ($record->entry_time_2) return Carbon::parse($record->entry_time_2)->format('H:i');
-        if ($record->return_time_1) return Carbon::parse($record->return_time_1)->format('H:i');
-        if ($record->entry_time_1) return Carbon::parse($record->entry_time_1)->format('H:i');
+        if ($record->return_time_2) {
+            return Carbon::parse($record->return_time_2)->format('H:i');
+        }
+        if ($record->entry_time_2) {
+            return Carbon::parse($record->entry_time_2)->format('H:i');
+        }
+        if ($record->return_time_1) {
+            return Carbon::parse($record->return_time_1)->format('H:i');
+        }
+        if ($record->entry_time_1) {
+            return Carbon::parse($record->entry_time_1)->format('H:i');
+        }
+
         return '--:--';
     }
 
     private function isLateArrival($record)
     {
-        if (!$record->entry_time_1 || !$record->collaborator->workHours) {
+        if (! $record->entry_time_1 || ! $record->collaborator->workHours) {
             return false;
         }
 
         $dayOfWeek = strtolower(Carbon::parse($record->date)->format('l'));
-        $expectedEntry = $record->collaborator->workHours->{$dayOfWeek . '_entry_1'};
+        $expectedEntry = $record->collaborator->workHours->{$dayOfWeek.'_entry_1'};
 
-        if (!$expectedEntry) return false;
+        if (! $expectedEntry) {
+            return false;
+        }
 
         $actualEntry = Carbon::parse($record->entry_time_1);
         $expectedEntryTime = Carbon::parse($expectedEntry);
 
-        return $actualEntry->gt($expectedEntryTime->addMinutes(10)); // 10 min de tolerância
+        return $actualEntry->gt($expectedEntryTime->addMinutes(10));
     }
 }

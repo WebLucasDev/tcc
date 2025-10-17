@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\login\SendRequest;
 use App\Http\Requests\login\ProcessResetRequest;
-use App\Models\User;
+use App\Http\Requests\login\SendRequest;
 use App\Mail\ForgotPasswordMail;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,10 +22,10 @@ class ForgotPasswordController extends Controller
         try {
             $user = User::where('email', $request->email)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'E-mail inválido!'
+                    'message' => 'E-mail inválido!',
                 ], 404);
             }
 
@@ -36,41 +36,40 @@ class ForgotPasswordController extends Controller
             DB::table('password_reset_tokens')->insert([
                 'email' => $request->email,
                 'token' => Hash::make($token),
-                'created_at' => Carbon::now()
+                'created_at' => Carbon::now(),
             ]);
 
-            // Envia o email
             $resetUrl = route('forgot-password.open-reset', ['token' => $token]);
 
             Mail::to($request->email)->send(new ForgotPasswordMail($user, $token, $resetUrl));
 
             return response()->json([
                 'success' => true,
-                'message' => 'Instruções de alteração de senha enviadas por email!'
+                'message' => 'Instruções de alteração de senha enviadas por email!',
             ], 200);
 
         } catch (\Exception $e) {
-            // Log do erro para debug
-            Log::error('Erro ao enviar email de recuperação de senha: ' . $e->getMessage(), [
+
+            Log::error('Erro ao enviar email de recuperação de senha: '.$e->getMessage(), [
                 'email' => $request->email,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor. Tente novamente.'
+                'message' => 'Erro interno do servidor. Tente novamente.',
             ], 500);
         }
     }
 
     public function openReset(Request $request, $token)
     {
-        // Verifica se o token existe e ainda é válido (24 horas)
+
         $passwordReset = DB::table('password_reset_tokens')
             ->where('created_at', '>', Carbon::now()->subHours(24))
             ->first();
 
-        if (!$passwordReset) {
+        if (! $passwordReset) {
             return redirect()->route('login.index')->with('error', 'Token inválido ou expirado.');
         }
 
@@ -80,22 +79,20 @@ class ForgotPasswordController extends Controller
     public function processReset(ProcessResetRequest $request)
     {
         try {
-            // Verifica se o token existe e ainda é válido
+
             $passwordReset = DB::table('password_reset_tokens')
                 ->where('email', $request->email)
                 ->where('created_at', '>', Carbon::now()->subHours(24))
                 ->first();
 
-            if (!$passwordReset || !Hash::check($request->token, $passwordReset->token)) {
+            if (! $passwordReset || ! Hash::check($request->token, $passwordReset->token)) {
                 return back()->with('error', 'Token inválido ou expirado.');
             }
 
-            // Atualiza a senha do usuário
             $user = User::where('email', $request->email)->first();
             $user->password = Hash::make($request->password);
             $user->save();
 
-            // Remove o token usado
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
             return redirect()->route('login.index')->with('success', 'Senha alterada com sucesso!');
@@ -116,13 +113,13 @@ class ForgotPasswordController extends Controller
         if (Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'success' => true,
-                'message' => 'Senha atual está correta.'
+                'message' => 'Senha atual está correta.',
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Senha atual incorreta.'
+            'message' => 'Senha atual incorreta.',
         ], 422);
     }
 }

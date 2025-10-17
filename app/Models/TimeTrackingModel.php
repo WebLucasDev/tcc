@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\TimeTrackingStatusEnum;
-use App\Enums\TimeTrackingActionEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
@@ -38,28 +37,20 @@ class TimeTrackingModel extends Model
         'status' => TimeTrackingStatusEnum::class,
     ];
 
-    /**
-     * Relacionamento com o colaborador
-     */
     public function collaborator(): BelongsTo
     {
         return $this->belongsTo(CollaboratorModel::class, 'collaborator_id');
     }
 
-    /**
-     * Calcula as horas trabalhadas no dia
-     */
     public function calculateWorkedHours(): int
     {
         $totalMinutes = 0;
 
-        // Período da manhã
         if ($this->entry_time_1 && $this->return_time_1) {
             $morning = Carbon::parse($this->entry_time_1)->diffInMinutes(Carbon::parse($this->return_time_1));
             $totalMinutes += $morning;
         }
 
-        // Período da tarde
         if ($this->entry_time_2 && $this->return_time_2) {
             $afternoon = Carbon::parse($this->entry_time_2)->diffInMinutes(Carbon::parse($this->return_time_2));
             $totalMinutes += $afternoon;
@@ -68,9 +59,6 @@ class TimeTrackingModel extends Model
         return $totalMinutes;
     }
 
-    /**
-     * Formata o total de horas trabalhadas
-     */
     public function getFormattedWorkedHoursAttribute(): string
     {
         if (!$this->total_hours_worked) {
@@ -83,9 +71,6 @@ class TimeTrackingModel extends Model
         return sprintf('%02d:%02d', $hours, $minutes);
     }
 
-    /**
-     * Verifica se o ponto está completo
-     */
     public function isComplete(): bool
     {
         return !is_null($this->entry_time_1) &&
@@ -94,9 +79,6 @@ class TimeTrackingModel extends Model
                !is_null($this->return_time_2);
     }
 
-    /**
-     * Atualiza o status baseado nos registros
-     */
     public function updateStatus(): void
     {
         if ($this->isComplete()) {
@@ -111,34 +93,22 @@ class TimeTrackingModel extends Model
         }
     }
 
-    /**
-     * Scope para buscar registros por período
-     */
     public function scopeByDateRange($query, $startDate, $endDate)
     {
         return $query->whereBetween('date', [$startDate, $endDate]);
     }
 
-    /**
-     * Scope para buscar registros por colaborador
-     */
     public function scopeByCollaborator($query, $collaboratorId)
     {
         return $query->where('collaborator_id', $collaboratorId);
     }
 
-    /**
-     * Scope para buscar registros do mês atual
-     */
     public function scopeCurrentMonth($query)
     {
         return $query->whereMonth('date', now()->month)
                     ->whereYear('date', now()->year);
     }
 
-    /**
-     * Boot do modelo
-     */
     protected static function boot()
     {
         parent::boot();

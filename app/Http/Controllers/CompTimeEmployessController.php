@@ -22,7 +22,7 @@ class CompTimeEmployessController extends Controller
                 'html' => [
                     'summary' => view('auth.system-for-employees.comp-time-employees.partials.summary', compact('bankHoursData'))->render(),
                     'details' => view('auth.system-for-employees.comp-time-employees.partials.details', compact('bankHoursData'))->render(),
-                ]
+                ],
             ]);
         }
 
@@ -38,7 +38,7 @@ class CompTimeEmployessController extends Controller
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
 
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return $this->getEmptyBankHoursData($startDate, $endDate);
         }
 
@@ -106,10 +106,10 @@ class CompTimeEmployessController extends Controller
             }
 
             $weekBalance = $weekWorkedMinutes - $weekExpectedMinutes;
-            
+
             $cltWeeklyLimitMinutes = 44 * 60;
             $maxWeeklyOvertimeMinutes = 10 * 60;
-            
+
             if ($weekWorkedMinutes > $cltWeeklyLimitMinutes) {
                 $overtimeMinutes = $weekWorkedMinutes - $weekExpectedMinutes;
                 $weekBalance = min($overtimeMinutes, $maxWeeklyOvertimeMinutes);
@@ -141,26 +141,24 @@ class CompTimeEmployessController extends Controller
         ];
     }
 
-
-
     private function getExpectedDailyMinutes($collaborator, Carbon $date)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return 0;
         }
 
         $workHours = $collaborator->workHours;
         $dayOfWeek = strtolower($date->locale('en')->dayName);
 
-        $dayActiveField = $dayOfWeek . '_active';
-        if (!$workHours->$dayActiveField) {
+        $dayActiveField = $dayOfWeek.'_active';
+        if (! $workHours->$dayActiveField) {
             return 0;
         }
 
         $expectedMinutes = 0;
 
-        $entry1Field = $dayOfWeek . '_entry_1';
-        $exit1Field = $dayOfWeek . '_exit_1';
+        $entry1Field = $dayOfWeek.'_entry_1';
+        $exit1Field = $dayOfWeek.'_exit_1';
 
         if ($workHours->$entry1Field && $workHours->$exit1Field) {
             $start = Carbon::parse($workHours->$entry1Field);
@@ -173,8 +171,8 @@ class CompTimeEmployessController extends Controller
             $expectedMinutes += $start->diffInMinutes($end);
         }
 
-        $entry2Field = $dayOfWeek . '_entry_2';
-        $exit2Field = $dayOfWeek . '_exit_2';
+        $entry2Field = $dayOfWeek.'_entry_2';
+        $exit2Field = $dayOfWeek.'_exit_2';
 
         if ($workHours->$entry2Field && $workHours->$exit2Field) {
             $start = Carbon::parse($workHours->$entry2Field);
@@ -209,6 +207,7 @@ class CompTimeEmployessController extends Controller
         $hours = floor(abs($minutes) / 60);
         $mins = abs($minutes) % 60;
         $sign = $minutes < 0 ? '-' : '';
+
         return sprintf('%s%02d:%02d', $sign, $hours, $mins);
     }
 }

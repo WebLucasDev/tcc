@@ -7,8 +7,8 @@ use App\Http\Requests\registrations\collaborators\CollaboratorUpdateRequest;
 use App\Models\CollaboratorModel;
 use App\Models\DepartmentModel;
 use App\Models\PositionModel;
-use App\Models\WorkHoursModel;
 use App\Models\TimeTrackingModel;
+use App\Models\WorkHoursModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -22,13 +22,13 @@ class CollaboratorController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('position.department', function ($dept) use ($search) {
-                      $dept->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('position', function ($pos) use ($search) {
-                      $pos->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('position.department', function ($dept) use ($search) {
+                        $dept->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('position', function ($pos) use ($search) {
+                        $pos->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -66,7 +66,7 @@ class CollaboratorController extends Controller
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
-            ['label' => 'Colaboradores', 'url' => null]
+            ['label' => 'Colaboradores', 'url' => null],
         ];
 
         if ($request->ajax()) {
@@ -77,8 +77,8 @@ class CollaboratorController extends Controller
                 'statistics' => [
                     'total' => $collaborators->total(),
                     'with_department' => $withDepartment,
-                    'with_position' => $withPosition
-                ]
+                    'with_position' => $withPosition,
+                ],
             ]);
         }
 
@@ -130,12 +130,12 @@ class CollaboratorController extends Controller
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'Erro ao criar o colaborador: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Erro ao criar o colaborador: '.$e->getMessage()]);
         }
     }
 
@@ -176,7 +176,7 @@ class CollaboratorController extends Controller
                 'status' => $request->validated()['status'],
             ];
 
-            if (!empty($request->validated()['password'])) {
+            if (! empty($request->validated()['password'])) {
                 $updateData['password'] = $request->validated()['password'];
             }
 

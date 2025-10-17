@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\forEmployees\registrations\RegistrationsEmployeesUpdateRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class RegistrationsEmployeesController extends Controller
 {
@@ -20,8 +19,6 @@ class RegistrationsEmployeesController extends Controller
     {
         try {
             $collaborator = Auth::guard('collaborator')->user();
-
-            // Atualiza a senha (o mutator do model já faz o Hash::make automaticamente)
             $collaborator->password = $request['new_password'];
             $collaborator->save();
 

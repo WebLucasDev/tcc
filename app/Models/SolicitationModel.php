@@ -33,17 +33,11 @@ class SolicitationModel extends Model
         ];
     }
 
-    /**
-     * Relacionamento com o registro de time tracking
-     */
     public function timeTracking(): BelongsTo
     {
         return $this->belongsTo(TimeTrackingModel::class, 'time_tracking_id');
     }
 
-    /**
-     * Relacionamento com o colaborador que fez a solicitação
-     */
     public function collaborator(): BelongsTo
     {
         return $this->belongsTo(CollaboratorModel::class, 'collaborator_id');

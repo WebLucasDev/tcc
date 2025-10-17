@@ -12,7 +12,6 @@ class TimeTrackingEmployeesController extends Controller
     {
         $collaborator = Auth::guard('collaborator')->user();
 
-        // Busca os registros de ponto dos últimos 30 dias
         $timeTrackings = TimeTrackingModel::where('collaborator_id', $collaborator->id)
             ->where('date', '>=', now()->subDays(30))
             ->orderBy('date', 'desc')
@@ -21,7 +20,7 @@ class TimeTrackingEmployeesController extends Controller
         $paginationInfo = [
             'from' => $timeTrackings->firstItem(),
             'to' => $timeTrackings->lastItem(),
-            'total' => $timeTrackings->total()
+            'total' => $timeTrackings->total(),
         ];
 
         return view('auth.system-for-employees.time-tracking-employees.index', compact('timeTrackings', 'paginationInfo', 'collaborator'));
@@ -30,27 +29,24 @@ class TimeTrackingEmployeesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'time_observation' => 'nullable|string|max:30'
+            'time_observation' => 'nullable|string|max:30',
         ]);
 
         $collaborator = Auth::guard('collaborator')->user();
 
-        // Usa a data e hora atual do servidor
         $currentDate = now()->format('Y-m-d');
         $currentTime = now()->format('H:i');
 
-        // Busca ou cria o registro do dia
         $tracking = TimeTrackingModel::firstOrCreate(
             [
                 'collaborator_id' => $collaborator->id,
                 'date' => $currentDate,
             ],
             [
-                'status' => 'incompleto'
+                'status' => 'incompleto',
             ]
         );
 
-        // Determina qual horário preencher
         if (empty($tracking->entry_time_1)) {
             $tracking->entry_time_1 = $currentTime;
             $tracking->entry_time_1_observation = $request->time_observation;
@@ -82,43 +78,43 @@ class TimeTrackingEmployeesController extends Controller
     public function getNextTrackingInfo()
     {
         $collaborator = Auth::guard('collaborator')->user();
-        $date = now()->format('Y-m-d'); // Sempre usa a data atual
+        $date = now()->format('Y-m-d');
 
         $tracking = TimeTrackingModel::where('collaborator_id', $collaborator->id)
             ->where('date', $date)
             ->first();
 
-        if (!$tracking || empty($tracking->entry_time_1)) {
+        if (! $tracking || empty($tracking->entry_time_1)) {
             return response()->json([
                 'next_type' => 'Entrada',
-                'message' => 'Próximo registro: ENTRADA (Manhã)'
+                'message' => 'Próximo registro: ENTRADA (Manhã)',
             ]);
         }
 
         if (empty($tracking->return_time_1)) {
             return response()->json([
                 'next_type' => 'Saída para Almoço',
-                'message' => 'Próximo registro: SAÍDA PARA ALMOÇO'
+                'message' => 'Próximo registro: SAÍDA PARA ALMOÇO',
             ]);
         }
 
         if (empty($tracking->entry_time_2)) {
             return response()->json([
                 'next_type' => 'Retorno do Almoço',
-                'message' => 'Próximo registro: RETORNO DO ALMOÇO'
+                'message' => 'Próximo registro: RETORNO DO ALMOÇO',
             ]);
         }
 
         if (empty($tracking->return_time_2)) {
             return response()->json([
                 'next_type' => 'Saída',
-                'message' => 'Próximo registro: SAÍDA (Tarde)'
+                'message' => 'Próximo registro: SAÍDA (Tarde)',
             ]);
         }
 
         return response()->json([
             'next_type' => 'Completo',
-            'message' => 'Todos os horários já foram registrados'
+            'message' => 'Todos os horários já foram registrados',
         ]);
     }
 
@@ -135,25 +131,24 @@ class TimeTrackingEmployeesController extends Controller
                 ->with('error', 'Este registro já está marcado como ausente.');
         }
 
-        // Determinar qual foi o último horário registrado e cancelá-lo
-        if (!empty($tracking->return_time_2)) {
-            // Cancelar saída (tarde)
+        if (! empty($tracking->return_time_2)) {
+
             $tracking->return_time_2 = null;
             $tracking->return_time_2_observation = null;
             $tracking->status = 'incompleto';
             $message = 'Saída (Tarde) cancelada com sucesso!';
-        } elseif (!empty($tracking->entry_time_2)) {
-            // Cancelar retorno do almoço
+        } elseif (! empty($tracking->entry_time_2)) {
+
             $tracking->entry_time_2 = null;
             $tracking->entry_time_2_observation = null;
             $message = 'Retorno do Almoço cancelado com sucesso!';
-        } elseif (!empty($tracking->return_time_1)) {
-            // Cancelar saída para almoço
+        } elseif (! empty($tracking->return_time_1)) {
+
             $tracking->return_time_1 = null;
             $tracking->return_time_1_observation = null;
             $message = 'Saída para Almoço cancelada com sucesso!';
-        } elseif (!empty($tracking->entry_time_1)) {
-            // Cancelar entrada (manhã) - remove completamente o horário
+        } elseif (! empty($tracking->entry_time_1)) {
+
             $tracking->entry_time_1 = null;
             $tracking->entry_time_1_observation = null;
             $tracking->status = 'ausente';
@@ -182,7 +177,6 @@ class TimeTrackingEmployeesController extends Controller
                 ->with('error', 'Este registro não está marcado como ausente.');
         }
 
-        // Determinar o status correto ao restaurar
         $status = 'incompleto';
         if ($tracking->entry_time_1 && $tracking->return_time_1 && $tracking->entry_time_2 && $tracking->return_time_2) {
             $status = 'completo';
@@ -194,4 +188,3 @@ class TimeTrackingEmployeesController extends Controller
             ->with('success', 'Registro restaurado com sucesso!');
     }
 }
-

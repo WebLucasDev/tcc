@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TimeTrackingModel;
 use App\Models\SolicitationModel;
+use App\Models\TimeTrackingModel;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardEmployessController extends Controller
@@ -71,7 +70,7 @@ class DashboardEmployessController extends Controller
 
     private function getCurrentBankHours($collaborator, $startDate, $endDate)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return [
                 'balance_minutes' => 0,
                 'balance_formatted' => '00:00',
@@ -132,7 +131,7 @@ class DashboardEmployessController extends Controller
             }
 
             $weekBalance = $weekWorkedMinutes - $weekExpectedMinutes;
-            
+
             $cltWeeklyLimitMinutes = 44 * 60;
             $maxWeeklyOvertimeMinutes = 10 * 60;
 
@@ -162,7 +161,7 @@ class DashboardEmployessController extends Controller
 
     private function getPunctualityMetrics($collaborator, $startDate, $endDate)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return [
                 'on_time' => 0,
                 'late' => 0,
@@ -181,9 +180,11 @@ class DashboardEmployessController extends Controller
         foreach ($records as $record) {
             $date = Carbon::parse($record->date);
             $dayOfWeek = strtolower($date->locale('en')->dayName);
-            $expectedEntry = $collaborator->workHours->{$dayOfWeek . '_entry_1'};
+            $expectedEntry = $collaborator->workHours->{$dayOfWeek.'_entry_1'};
 
-            if (!$expectedEntry) continue;
+            if (! $expectedEntry) {
+                continue;
+            }
 
             $actualEntry = Carbon::parse($record->entry_time_1);
             $expectedEntryTime = Carbon::parse($expectedEntry);
@@ -207,22 +208,22 @@ class DashboardEmployessController extends Controller
 
     private function getExpectedDailyMinutes($collaborator, Carbon $date)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return 0;
         }
 
         $workHours = $collaborator->workHours;
         $dayOfWeek = strtolower($date->locale('en')->dayName);
 
-        $dayActiveField = $dayOfWeek . '_active';
-        if (!$workHours->$dayActiveField) {
+        $dayActiveField = $dayOfWeek.'_active';
+        if (! $workHours->$dayActiveField) {
             return 0;
         }
 
         $expectedMinutes = 0;
 
-        $entry1Field = $dayOfWeek . '_entry_1';
-        $exit1Field = $dayOfWeek . '_exit_1';
+        $entry1Field = $dayOfWeek.'_entry_1';
+        $exit1Field = $dayOfWeek.'_exit_1';
 
         if ($workHours->$entry1Field && $workHours->$exit1Field) {
             $start = Carbon::parse($workHours->$entry1Field);
@@ -235,8 +236,8 @@ class DashboardEmployessController extends Controller
             $expectedMinutes += $start->diffInMinutes($end);
         }
 
-        $entry2Field = $dayOfWeek . '_entry_2';
-        $exit2Field = $dayOfWeek . '_exit_2';
+        $entry2Field = $dayOfWeek.'_entry_2';
+        $exit2Field = $dayOfWeek.'_exit_2';
 
         if ($workHours->$entry2Field && $workHours->$exit2Field) {
             $start = Carbon::parse($workHours->$entry2Field);
@@ -258,7 +259,7 @@ class DashboardEmployessController extends Controller
         $current = $startDate->copy();
 
         while ($current->lte($endDate)) {
-            if (!$current->isWeekend()) {
+            if (! $current->isWeekend()) {
                 $count++;
             }
             $current->addDay();
@@ -272,6 +273,7 @@ class DashboardEmployessController extends Controller
         $hours = floor(abs($minutes) / 60);
         $mins = abs($minutes) % 60;
         $sign = $minutes < 0 ? '-' : '+';
+
         return sprintf('%s%d:%02d', $sign, $hours, $mins);
     }
 }

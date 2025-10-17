@@ -25,7 +25,7 @@ class CompTimeController extends Controller
 
         $breadcrumbs = [
             ['label' => 'Gestão de Ponto', 'url' => null],
-            ['label' => 'Banco de Horas', 'url' => null]
+            ['label' => 'Banco de Horas', 'url' => null],
         ];
 
         if ($request->ajax()) {
@@ -34,7 +34,7 @@ class CompTimeController extends Controller
                 'html' => [
                     'summary' => view('auth.time-management.comp-time.partials.summary', compact('compTimeData', 'summary'))->render(),
                     'table' => view('auth.time-management.comp-time.partials.table', compact('compTimeData'))->render(),
-                ]
+                ],
             ]);
         }
 
@@ -69,7 +69,7 @@ class CompTimeController extends Controller
 
             $compTimeData[] = [
                 'collaborator' => $collaborator,
-                'bank_hours' => $bankHours
+                'bank_hours' => $bankHours,
             ];
         }
 
@@ -86,7 +86,7 @@ class CompTimeController extends Controller
             'collaborators_with_negative_bank' => 0,
             'net_balance_minutes' => 0,
             'total_worked_minutes' => 0,
-            'total_expected_minutes' => 0
+            'total_expected_minutes' => 0,
         ];
 
         if (is_array($compTimeData) && count($compTimeData) > 0) {
@@ -123,7 +123,7 @@ class CompTimeController extends Controller
 
     private function calculateCollaboratorBankHoursCLT($collaborator, $startDate, $endDate)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return $this->getEmptyBankHoursData($startDate, $endDate);
         }
 
@@ -131,7 +131,7 @@ class CompTimeController extends Controller
             ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('date')
             ->get()
-            ->keyBy(function($item) {
+            ->keyBy(function ($item) {
                 return $item->date->format('Y-m-d');
             });
 
@@ -181,7 +181,7 @@ class CompTimeController extends Controller
                             'expected_minutes' => $expectedDailyMinutes,
                             'difference_minutes' => $dayWorkedMinutes - $expectedDailyMinutes,
                             'is_weekend' => $day->isWeekend(),
-                            'day_name' => $day->locale('pt_BR')->dayName
+                            'day_name' => $day->locale('pt_BR')->dayName,
                         ];
 
                         if ($tracking || $expectedDailyMinutes > 0) {
@@ -193,7 +193,7 @@ class CompTimeController extends Controller
                                 'difference_minutes' => $dayWorkedMinutes - $expectedDailyMinutes,
                                 'status' => $tracking ? $tracking->status : 'ausente',
                                 'is_weekend' => $day->isWeekend(),
-                                'day_name' => $day->locale('pt_BR')->dayName
+                                'day_name' => $day->locale('pt_BR')->dayName,
                             ];
                         }
                     }
@@ -224,7 +224,7 @@ class CompTimeController extends Controller
                     'expected_minutes' => $weekExpectedMinutes,
                     'limit_minutes' => $collaboratorWeeklyMinutes,
                     'bank_balance' => $weekBankBalance,
-                    'days' => $weekDays
+                    'days' => $weekDays,
                 ];
             }
 
@@ -253,13 +253,13 @@ class CompTimeController extends Controller
             'work_days_count' => collect($recentDays)->count(),
             'total_standard_minutes' => $totalExpectedMinutes,
             'standard_daily_minutes' => $standardDailyMinutes,
-            'collaborator_weekly_minutes' => $collaboratorWeeklyMinutes
+            'collaborator_weekly_minutes' => $collaboratorWeeklyMinutes,
         ];
     }
 
     private function calculateStandardDailyMinutes($collaborator)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return 528;
         }
 
@@ -271,22 +271,22 @@ class CompTimeController extends Controller
 
     private function getExpectedDailyMinutes($collaborator, Carbon $date)
     {
-        if (!$collaborator->workHours) {
+        if (! $collaborator->workHours) {
             return $date->isWeekend() ? 0 : 528;
         }
 
         $workHours = $collaborator->workHours;
         $dayOfWeek = strtolower($date->format('l'));
 
-        if (!$workHours->{$dayOfWeek . '_active'}) {
+        if (! $workHours->{$dayOfWeek.'_active'}) {
             return 0;
         }
 
         $totalMinutes = 0;
 
-        if ($workHours->{$dayOfWeek . '_entry_1'} && $workHours->{$dayOfWeek . '_exit_1'}) {
-            $entry1 = Carbon::parse($workHours->{$dayOfWeek . '_entry_1'});
-            $exit1 = Carbon::parse($workHours->{$dayOfWeek . '_exit_1'});
+        if ($workHours->{$dayOfWeek.'_entry_1'} && $workHours->{$dayOfWeek.'_exit_1'}) {
+            $entry1 = Carbon::parse($workHours->{$dayOfWeek.'_entry_1'});
+            $exit1 = Carbon::parse($workHours->{$dayOfWeek.'_exit_1'});
 
             if ($exit1->lessThan($entry1)) {
                 $exit1->addDay();
@@ -295,9 +295,9 @@ class CompTimeController extends Controller
             $totalMinutes += $entry1->diffInMinutes($exit1);
         }
 
-        if ($workHours->{$dayOfWeek . '_entry_2'} && $workHours->{$dayOfWeek . '_exit_2'}) {
-            $entry2 = Carbon::parse($workHours->{$dayOfWeek . '_entry_2'});
-            $exit2 = Carbon::parse($workHours->{$dayOfWeek . '_exit_2'});
+        if ($workHours->{$dayOfWeek.'_entry_2'} && $workHours->{$dayOfWeek.'_exit_2'}) {
+            $entry2 = Carbon::parse($workHours->{$dayOfWeek.'_entry_2'});
+            $exit2 = Carbon::parse($workHours->{$dayOfWeek.'_exit_2'});
 
             if ($exit2->lessThan($entry2)) {
                 $exit2->addDay();
@@ -323,7 +323,7 @@ class CompTimeController extends Controller
             'work_days_count' => 0,
             'total_standard_minutes' => 0,
             'standard_daily_minutes' => 0,
-            'collaborator_weekly_minutes' => 0
+            'collaborator_weekly_minutes' => 0,
         ];
     }
 
@@ -341,6 +341,6 @@ class CompTimeController extends Controller
 
         $formatted = sprintf('%02d:%02d', $hours, $remainingMinutes);
 
-        return $isNegative ? '-' . $formatted : $formatted;
+        return $isNegative ? '-'.$formatted : $formatted;
     }
 }

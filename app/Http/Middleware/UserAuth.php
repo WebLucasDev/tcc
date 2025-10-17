@@ -9,15 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserAuth
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Verifica se o usuário está autenticado no guard 'user' (gestores)
-        if (!Auth::guard('user')->check()) {
+
+        if (! Auth::guard('user')->check()) {
             return redirect()->route('login.index')->with('error', 'Acesso negado. Faça login como gestor.');
         }
 

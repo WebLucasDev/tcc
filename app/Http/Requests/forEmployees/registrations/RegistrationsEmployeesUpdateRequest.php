@@ -8,19 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class RegistrationsEmployeesUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return Auth::guard('collaborator')->check();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -29,11 +21,6 @@ class RegistrationsEmployeesUpdateRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
@@ -44,20 +31,15 @@ class RegistrationsEmployeesUpdateRequest extends FormRequest
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
             $collaborator = Auth::guard('collaborator')->user();
 
-            // Verifica se a senha atual está correta
-            if (!Hash::check($this['current_password'], $collaborator->password)) {
+            if (! Hash::check($this['current_password'], $collaborator->password)) {
                 $validator->errors()->add('current_password', 'A senha atual está incorreta.');
             }
 
-            // Verifica se a nova senha é diferente da atual
             if (Hash::check($this['new_password'], $collaborator->password)) {
                 $validator->errors()->add('new_password', 'A nova senha deve ser diferente da senha atual.');
             }

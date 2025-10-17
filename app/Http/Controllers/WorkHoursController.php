@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WorkHoursModel;
 use App\Http\Requests\registrations\workHours\WorkHoursStoreRequest;
 use App\Http\Requests\registrations\workHours\WorkHoursUpdateRequest;
+use App\Models\WorkHoursModel;
 use Illuminate\Http\Request;
 
 class WorkHoursController extends Controller
@@ -17,12 +17,12 @@ class WorkHoursController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('status')) {
-            $query->whereRaw("status = ?", [$request->status]);
+            $query->whereRaw('status = ?', [$request->status]);
         }
 
         $sortBy = $request->get('sort_by', 'name');
@@ -34,19 +34,18 @@ class WorkHoursController extends Controller
 
         $workHours = $query->paginate(10)->withQueryString();
 
-        // Calcular estatísticas com base na busca atual
         $filteredQuery = WorkHoursModel::query();
 
         if ($request->filled('search')) {
             $search = $request->search;
             $filteredQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('status')) {
-            $filteredQuery->whereRaw("status = ?", [$request->status]);
+            $filteredQuery->whereRaw('status = ?', [$request->status]);
         }
 
         $filteredWorkHours = $filteredQuery->get();
@@ -59,7 +58,7 @@ class WorkHoursController extends Controller
 
         $breadcrumbs = [
             ['label' => 'Cadastros', 'url' => null],
-            ['label' => 'Jornadas de Trabalho', 'url' => null]
+            ['label' => 'Jornadas de Trabalho', 'url' => null],
         ];
 
         if ($request->ajax()) {
@@ -70,8 +69,8 @@ class WorkHoursController extends Controller
                 'statistics' => [
                     'total' => $workHours->total(),
                     'active' => $activeCount,
-                    'inactive' => $inactiveCount
-                ]
+                    'inactive' => $inactiveCount,
+                ],
             ]);
         }
 
@@ -87,7 +86,7 @@ class WorkHoursController extends Controller
             'thursday' => 'Quinta-feira',
             'friday' => 'Sexta-feira',
             'saturday' => 'Sábado',
-            'sunday' => 'Domingo'
+            'sunday' => 'Domingo',
         ];
 
         $breadcrumbs = [
@@ -104,27 +103,26 @@ class WorkHoursController extends Controller
         try {
             $data = $request->validated();
 
-            // Processar dados dos dias da semana
             $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
             foreach ($days as $day) {
-                // Se o dia não está ativo, garantir que os horários sejam null
-                if (!isset($data[$day . '_active']) || !$data[$day . '_active']) {
-                    $data[$day . '_active'] = false;
-                    $data[$day . '_entry_1'] = null;
-                    $data[$day . '_exit_1'] = null;
-                    $data[$day . '_entry_2'] = null;
-                    $data[$day . '_exit_2'] = null;
+
+                if (! isset($data[$day.'_active']) || ! $data[$day.'_active']) {
+                    $data[$day.'_active'] = false;
+                    $data[$day.'_entry_1'] = null;
+                    $data[$day.'_exit_1'] = null;
+                    $data[$day.'_entry_2'] = null;
+                    $data[$day.'_exit_2'] = null;
                 } else {
-                    $data[$day . '_active'] = true;
-                    // Limpar horários vazios
-                    if (empty($data[$day . '_entry_1']) || empty($data[$day . '_exit_1'])) {
-                        $data[$day . '_entry_1'] = null;
-                        $data[$day . '_exit_1'] = null;
+                    $data[$day.'_active'] = true;
+
+                    if (empty($data[$day.'_entry_1']) || empty($data[$day.'_exit_1'])) {
+                        $data[$day.'_entry_1'] = null;
+                        $data[$day.'_exit_1'] = null;
                     }
-                    if (empty($data[$day . '_entry_2']) || empty($data[$day . '_exit_2'])) {
-                        $data[$day . '_entry_2'] = null;
-                        $data[$day . '_exit_2'] = null;
+                    if (empty($data[$day.'_entry_2']) || empty($data[$day.'_exit_2'])) {
+                        $data[$day.'_entry_2'] = null;
+                        $data[$day.'_exit_2'] = null;
                     }
                 }
             }
@@ -153,7 +151,7 @@ class WorkHoursController extends Controller
             'thursday' => 'Quinta-feira',
             'friday' => 'Sexta-feira',
             'saturday' => 'Sábado',
-            'sunday' => 'Domingo'
+            'sunday' => 'Domingo',
         ];
 
         $breadcrumbs = [
@@ -171,7 +169,6 @@ class WorkHoursController extends Controller
             $workHour = WorkHoursModel::findOrFail($id);
             $data = $request->validated();
 
-            // Validação manual de unicidade do nome
             $existingWorkHour = WorkHoursModel::where('name', $data['name'])
                 ->where('id', '!=', $id)
                 ->first();
@@ -182,27 +179,26 @@ class WorkHoursController extends Controller
                     ->withErrors(['name' => 'Já existe uma jornada com este nome.']);
             }
 
-            // Processar dados dos dias da semana
             $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
             foreach ($days as $day) {
-                // Se o dia não está ativo, garantir que os horários sejam null
-                if (!isset($data[$day . '_active']) || !$data[$day . '_active']) {
-                    $data[$day . '_active'] = false;
-                    $data[$day . '_entry_1'] = null;
-                    $data[$day . '_exit_1'] = null;
-                    $data[$day . '_entry_2'] = null;
-                    $data[$day . '_exit_2'] = null;
+
+                if (! isset($data[$day.'_active']) || ! $data[$day.'_active']) {
+                    $data[$day.'_active'] = false;
+                    $data[$day.'_entry_1'] = null;
+                    $data[$day.'_exit_1'] = null;
+                    $data[$day.'_entry_2'] = null;
+                    $data[$day.'_exit_2'] = null;
                 } else {
-                    $data[$day . '_active'] = true;
-                    // Limpar horários vazios
-                    if (empty($data[$day . '_entry_1']) || empty($data[$day . '_exit_1'])) {
-                        $data[$day . '_entry_1'] = null;
-                        $data[$day . '_exit_1'] = null;
+                    $data[$day.'_active'] = true;
+
+                    if (empty($data[$day.'_entry_1']) || empty($data[$day.'_exit_1'])) {
+                        $data[$day.'_entry_1'] = null;
+                        $data[$day.'_exit_1'] = null;
                     }
-                    if (empty($data[$day . '_entry_2']) || empty($data[$day . '_exit_2'])) {
-                        $data[$day . '_entry_2'] = null;
-                        $data[$day . '_exit_2'] = null;
+                    if (empty($data[$day.'_entry_2']) || empty($data[$day.'_exit_2'])) {
+                        $data[$day.'_entry_2'] = null;
+                        $data[$day.'_exit_2'] = null;
                     }
                 }
             }
@@ -225,8 +221,7 @@ class WorkHoursController extends Controller
         try {
             $workHour = WorkHoursModel::findOrFail($id);
 
-            // Verificar se a jornada está sendo usada por colaboradores
-            if ($workHour->collaborators()->count() > 0)     {
+            if ($workHour->collaborators()->count() > 0) {
                 return redirect()
                     ->route('work-hours.index')
                     ->with('error', 'Não é possível excluir esta jornada de trabalho pois ela está sendo utilizada por colaboradores.');
@@ -244,5 +239,4 @@ class WorkHoursController extends Controller
                 ->with('error', 'Erro ao excluir jornada de trabalho. Tente novamente.');
         }
     }
-
 }
