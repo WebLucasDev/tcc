@@ -16,6 +16,9 @@
 
         @include('layouts.partials.loading')
 
+        <!-- Overlay para mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 z-30 hidden md:hidden"></div>
+
         <div class="flex min-h-screen bg-[var(--color-background)]">
             @if(Auth::guard('collaborator')->check())
                 @include('layouts.partials.sidebar-collaborator')
@@ -23,7 +26,7 @@
                 @include('layouts.partials.sidebar-user')
             @endif
 
-            <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300 ease-in-out">
+            <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300 ease-in-out w-full md:w-auto">
                 @if(Auth::guard('collaborator')->check())
                     @include('layouts.partials.header-collaborator')
                 @else

@@ -1,6 +1,6 @@
-<aside class="bg-[var(--color-background)] shadow-2xl/55 w-64 min-h-screen flex flex-col transition-all duration-300 ease-in-out">
+<aside id="sidebar" class="bg-[var(--color-background)] shadow-2xl/55 w-64 min-h-screen flex flex-col transition-all duration-300 ease-in-out fixed md:relative z-40 -translate-x-full md:translate-x-0 left-0 top-0">
 
-    <div class="flex items-center justify-center p-4">
+    <div class="flex items-center justify-center p-4 pt-6">
         <img src="/imgs/logo.svg" alt="Logo Metre Sistemas">
     </div>
 

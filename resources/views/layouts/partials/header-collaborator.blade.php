@@ -1,8 +1,8 @@
-<header class="bg-[var(--color-background)] shadow-2xl/25 px-6 py-4 flex items-center justify-between">
+<header class="bg-[var(--color-background)] shadow-2xl/25 px-6 py-4 flex items-center justify-between relative z-20 md:z-50 w-full">
 
     <div class="flex items-center">
-        <button class="mr-4" id="toggle-sidebar">
-            <i class="fa-solid fa-bars text-[var(--color-text)] hover:text-[var(--color-main)]"></i>
+        <button class="mr-4 relative z-50 p-2 hover:bg-gray-100/10 rounded-lg transition-colors" id="toggle-sidebar">
+            <i class="fa-solid fa-bars text-[var(--color-text)] hover:text-[var(--color-main)] text-xl"></i>
         </button>
 
         <nav class="flex items-center space-x-2 text-sm">
