@@ -1,9 +1,9 @@
 <!-- Tabela de Registros -->
 <div class="bg-[var(--color-background)] rounded-xl shadow-lg overflow-hidden border border-[var(--color-text)]/10">
     <div class="p-6 border-b border-[var(--color-text)]/10">
-        <h2 class="text-xl font-semibold text-[var(--color-main)]">
+        <h2 class="text-xl sm:text-base font-semibold text-[var(--color-main)]">
             <i class="fa-solid fa-list mr-2"></i>
-            Meus Registros (Últimos 30 dias)
+            Meus Registros
         </h2>
     </div>
 

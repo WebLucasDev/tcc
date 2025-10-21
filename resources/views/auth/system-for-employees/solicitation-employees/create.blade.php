@@ -27,11 +27,11 @@
             </ol>
         </nav>
 
-        <h1 class="text-3xl font-bold text-[var(--color-main)]">
+        <h1 class="text-xl sm:text-3xl font-bold text-[var(--color-main)]">
             <i class="fa-solid fa-plus mr-2"></i>
             Nova Solicitação de Alteração
         </h1>
-        <p class="text-[var(--color-text)] mt-2">
+        <p class="text-[var(--color-text)] mt-2 text-sm sm:text-base">
             Solicite a correção de horários de ponto registrados incorretamente
         </p>
     </div>
@@ -46,10 +46,10 @@
                 <div class="flex items-start">
                     <i class="fa-solid fa-circle-info text-[var(--color-main)] text-xl mr-3 mt-1"></i>
                     <div class="text-sm text-[var(--color-text)]">
-                        <p class="font-semibold mb-1">Como funciona?</p>
-                        <p class="mb-2"><strong>Passo 1:</strong> Escolha o dia que você deseja corrigir;</p>
-                        <p class="mb-2"><strong>Passo 2:</strong> Selecione o período;</p>
-                        <p class="mb-2"><strong>Passo 3:</strong> Veja os horários que estão registrados atualmente;</p>
+                        <p class="font-semibold mb-1 text-sm sm:text-base">Como funciona?</p>
+                        <p class="mb-2 text-sm sm:text-base"><strong>Passo 1:</strong> Escolha o dia que você deseja corrigir;</p>
+                        <p class="mb-2 text-sm sm:text-base"><strong>Passo 2:</strong> Selecione o período;</p>
+                        <p class="mb-2 text-sm sm:text-base"><strong>Passo 3:</strong> Veja os horários que estão registrados atualmente;</p>
                         <p><strong>Passo 4:</strong> Informe os horários corretos e justifique o motivo da alteração.</p>
                     </div>
                 </div>

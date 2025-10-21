@@ -24,13 +24,13 @@
     </div>
 
     <!-- Cards de Métricas Principais -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Card Bater Ponto -->
         <div class="bg-[var(--color-background)] rounded-xl shadow-lg p-6 border border-[var(--color-text)]/10">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[var(--color-text)] text-sm font-medium">Bater Ponto</p>
-                    <p class="text-lg font-semibold text-[var(--color-main)] mt-2">Registre agora</p>
+                    <p class="text-[var(--color-text)] text-sm font-medium">Bater Ponto & Histórico</p>
+                    <p class="text-lg font-semibold text-[var(--color-main)] mt-2">Verifique agora agora</p>
                     <p class="text-green-500 text-sm mt-1">
                         <i class="fa-solid fa-clock mr-1"></i>
                         Entrada/Saída
@@ -40,29 +40,9 @@
                     <i class="fa-solid fa-clock text-green-600 text-xl"></i>
                 </div>
             </div>
-            <button class="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                Registrar Ponto
-            </button>
-        </div>
-
-        <!-- Card Histórico -->
-        <div class="bg-[var(--color-background)] rounded-xl shadow-lg p-6 border border-[var(--color-text)]/10">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[var(--color-text)] text-sm font-medium">Histórico</p>
-                    <p class="text-lg font-semibold text-[var(--color-main)] mt-2">Meus registros</p>
-                    <p class="text-blue-500 text-sm mt-1">
-                        <i class="fa-solid fa-history mr-1"></i>
-                        Consultar
-                    </p>
-                </div>
-                <div class="bg-blue-500/10 p-3 rounded-full">
-                    <i class="fa-solid fa-history text-blue-600 text-xl"></i>
-                </div>
-            </div>
-            <button class="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Ver Histórico
-            </button>
+            <a href="{{ route('system-for-employees.time-tracking.index') }}" class="block text-center w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                Visualizar
+            </a>
         </div>
 
         <!-- Card Solicitações -->
@@ -80,9 +60,9 @@
                     <i class="fa-solid fa-file-alt text-yellow-600 text-xl"></i>
                 </div>
             </div>
-            <button class="w-full mt-4 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors font-medium">
+            <a href="{{ route('system-for-employees.solicitation.index') }}" class="block text-center w-full mt-4 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors font-medium">
                 Nova Solicitação
-            </button>
+            </a>
         </div>
 
         <!-- Card Banco de Horas -->
@@ -114,10 +94,6 @@
                     <i class="fa-solid fa-user mr-2"></i>
                     Minhas Informações
                 </h3>
-                <a href="{{ route('system-for-employees.registrations.index') }}"
-                   class="text-sm text-blue-600 hover:text-blue-800">
-                    Editar
-                </a>
             </div>
 
             <div class="space-y-4">
@@ -194,7 +170,6 @@
                     <i class="fa-solid fa-clock mr-2"></i>
                     Registros de Hoje
                 </h3>
-                <a href="{{ route('system-for-employees.time-tracking.index') }}" class="text-sm text-blue-600 hover:text-blue-800">Ver todos</a>
             </div>
 
             @if($metrics['today_records']['record'])
@@ -419,9 +394,6 @@
         <div class="bg-[var(--color-background)] rounded-xl shadow-lg p-6 border border-[var(--color-text)]/10">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-semibold text-[var(--color-main)]">Minhas Solicitações</h3>
-                <a href="{{ route('system-for-employees.solicitation.index') }}" class="text-sm bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
-                    + Nova
-                </a>
             </div>
 
             @if($metrics['recent_solicitations']->count() > 0)

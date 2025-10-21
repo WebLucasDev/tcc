@@ -10,11 +10,11 @@
 
     <!-- Header Section -->
     <div class="bg-[var(--color-background)] rounded-xl shadow-lg p-6 border border-[var(--color-text)]/10">
-        <h1 class="text-3xl font-bold text-[var(--color-main)]">
+        <h1 class="text-xl sm:text-3xl font-bold text-[var(--color-main)]">
             <i class="fa-solid fa-user-circle mr-2"></i>
             Meus Dados Pessoais
         </h1>
-        <p class="text-[var(--color-text)] mt-2">
+        <p class="text-sm sm:text-base text-[var(--color-text)] mt-2">
             Visualize suas informações pessoais e altere sua senha quando necessário.
         </p>
     </div>

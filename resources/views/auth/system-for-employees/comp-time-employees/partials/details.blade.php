@@ -6,10 +6,10 @@
                 <i class="fa-solid fa-list text-white"></i>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-[var(--color-text)]">
+                <h3 class="text-sm sm:text-lg font-bold text-[var(--color-text)]">
                     Detalhamento do Banco de Horas
                 </h3>
-                <p class="text-sm text-[var(--color-text)]/60">
+                <p class="text-sm sm:text-lg text-[var(--color-text)]/60">
                     Análise diária do período selecionado
                 </p>
             </div>
@@ -21,7 +21,7 @@
         <!-- Registros Diários -->
         @if(count($bankHoursData['work_days']) > 0)
             <div>
-                <h4 class="text-lg font-bold text-[var(--color-text)] mb-4 flex items-center">
+                <h4 class="text-sm sm:text-lg font-bold text-[var(--color-text)] mb-4 flex items-center">
                     <i class="fa-solid fa-calendar-days text-[var(--color-main)] mr-2"></i>
                     {{ count($bankHoursData['work_days']) }} dia{{ count($bankHoursData['work_days']) != 1 ? 's' : '' }} registrado{{ count($bankHoursData['work_days']) != 1 ? 's' : '' }}
                 </h4>

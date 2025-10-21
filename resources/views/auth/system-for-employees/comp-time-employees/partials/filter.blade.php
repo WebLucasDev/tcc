@@ -6,15 +6,15 @@
                 <i class="fa-solid fa-filter text-white"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-[var(--color-text)]">Filtrar Período</h3>
-                <p class="text-sm text-[var(--color-text)]/60">Selecione o mês para visualizar seu banco de horas</p>
+                <h3 class="text-sm sm:text-lg font-bold text-[var(--color-text)]">Filtrar Período</h3>
+                <p class="text-xs sm:text-sm text-[var(--color-text)]/60">Selecione o mês para visualizar seu banco de horas</p>
             </div>
         </div>
     </div>
 
     <!-- Filtro de Mês -->
     <div class="max-w-md">
-        <label for="month_filter" class="block text-sm font-bold text-[var(--color-text)] mb-2">
+        <label for="month_filter" class="text-xs sm:text-sm block font-bold text-[var(--color-text)] mb-2">
             <i class="fa-solid fa-calendar mr-1"></i>
             Mês/Ano
         </label>
