@@ -10,7 +10,7 @@
 
 **Sistema de Controle de Ponto Eletrônico e Banco de Horas**
 
-[Funcionalidades](#-funcionalidades) • [Tecnologias](#-tecnologias) • [Instalação](#-instalação) • [Uso](#-uso) • [Licença](#-licença)
+[Funcionalidades](#-funcionalidades) • [Tecnologias](#️-tecnologias) • [Instalação](#-instalação) • [Uso](#-uso) • [Licença](#-licença)
 
 </div>
 
