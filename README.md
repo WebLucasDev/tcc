@@ -133,21 +133,17 @@
 - **[Laravel 12](https://laravel.com/)** - Framework PHP
 - **PHP 8.2** - Linguagem de programação
 - **MySQL** - Banco de dados relacional
-- **Laravel Tinker** - REPL para Laravel
-- **PHPUnit** - Testes unitários
 
 ### Frontend
+- **Blade Templates** - Template de desenvolvimento para interfaces web (semelhante ao HTML5)
 - **[TailwindCSS 4.0](https://tailwindcss.com/)** - Framework CSS
-- **[Vite](https://vitejs.dev/)** - Build tool e bundler
 - **JavaScript (ES6+)** - Interatividade
-- **Axios** - Requisições HTTP
 - **Font Awesome** - Ícones
+- **[Vite](https://vitejs.dev/)** - Build tool e bundler
 
 ### Ferramentas de Desenvolvimento
-- **Laravel Pint** - Code style fixer
-- **Laravel Sail** - Ambiente Docker
 - **Composer** - Gerenciador de dependências PHP
-- **NPM** - Gerenciador de pacotes JavaScript
+- **NPM** - Gerenciador de dependências JavaScript
 - **Concurrently** - Execução paralela de scripts
 
 ---
@@ -192,7 +188,7 @@ APP_URL=http://localhost:8000
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=3306 (ou a porta que desejar usar)
 DB_DATABASE=metre_ponto
 DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
@@ -221,79 +217,22 @@ php artisan migrate
 php artisan db:seed
 ```
 
-9. **Crie um link simbólico para o storage**
-```bash
-php artisan storage:link
-```
-
-10. **Compile os assets**
+9. **Compile os assets**
 ```bash
 npm run build
 ```
 
 ---
 
-## 🚀 Uso
-
-### Desenvolvimento
+## 🚀 Uso (ambiente de desenvolvimento)
 
 Execute o comando abaixo para iniciar simultaneamente o servidor Laravel, a fila e o Vite:
 
 ```bash
-composer dev
+composer run dev
 ```
 
-Ou execute separadamente:
-
-```bash
-# Terminal 1 - Servidor Laravel
-php artisan serve
-
-# Terminal 2 - Fila (se necessário)
-php artisan queue:listen
-
-# Terminal 3 - Vite (assets)
-npm run dev
-```
-
-A aplicação estará disponível em: `http://localhost:8000`
-
-### Produção
-
-1. **Compile os assets para produção**
-```bash
-npm run build
-```
-
-2. **Otimize o autoloader**
-```bash
-composer install --optimize-autoloader --no-dev
-```
-
-3. **Cache as configurações**
-```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-4. **Configure o servidor web** (Apache/Nginx) apontando para a pasta `public`
-
-### Testes
-
-Execute os testes automatizados:
-
-```bash
-composer test
-```
-
-ou
-
-```bash
-php artisan test
-```
-
----
+A aplicação estará disponível em: `http://localhost:8000/login`
 
 ## 📁 Estrutura do Projeto
 
@@ -344,8 +283,8 @@ tcc/
 - Acesso completo ao sistema
 
 ### CollaboratorModel (Colaborador)
-- Dados pessoais (nome, CPF, e-mail, telefone, endereço)
-- Vinculação a cargo e jornada de trabalho
+- Dados pessoais (nome, CPF, e-mail, telefone, endereço, etc...)
+- Vinculação a cargo, departamento e jornada de trabalho
 - Status (ativo/inativo)
 - Relacionamentos:
   - `belongsTo`: PositionModel, WorkHoursModel
@@ -395,7 +334,6 @@ tcc/
 - ✅ Proteção CSRF em formulários
 - ✅ Validação server-side obrigatória
 - ✅ Middleware de autorização por perfil
-- ✅ Sanitização de dados (CPF, telefone, CEP)
 - ✅ Isolamento de sessões por tipo de usuário
 - ✅ Logs de erros (sem exposição de dados sensíveis)
 
@@ -409,9 +347,10 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 Autor
 
-**Lucas Souza** (WebLucasDev)
+**Lucas Venancio Silva Tiago** (WebLucasDev)
 
 - GitHub: [@WebLucasDev](https://github.com/WebLucasDev)
+- Linkedin: (https://www.linkedin.com/in/lucasvenancio-dev/)
 
 ---
 
@@ -432,11 +371,3 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir uma **issue** ou
 Se você tiver alguma dúvida ou precisar de ajuda, abra uma [issue](https://github.com/WebLucasDev/tcc/issues) no GitHub.
 
 ---
-
-<div align="center">
-
-**Desenvolvido com ❤️ para facilitar a gestão de ponto eletrônico e banco de horas**
-
-⭐ Se este projeto foi útil, considere dar uma estrela!
-
-</div>
