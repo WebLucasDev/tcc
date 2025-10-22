@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
 
-    Route::get('/login', [LoginController::class, 'index'])->name('login.index');
+    Route::get('/', [LoginController::class, 'index'])->name('login.index');
     Route::post('/login', [LoginController::class, 'auth'])->name('login.auth');
 
     Route::prefix('forgot-password')->group(function () {
