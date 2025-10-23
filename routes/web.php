@@ -22,13 +22,14 @@ Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'index'])->name('login.index');
     Route::post('/login', [LoginController::class, 'auth'])->name('login.auth');
 
-    Route::prefix('forgot-password')->group(function () {
-        Route::post('/send', [ForgotPasswordController::class, 'send'])->name('forgot-password.send');
-        Route::get('/{token}', [ForgotPasswordController::class, 'openReset'])->name('forgot-password.open-reset');
-        Route::post('/', [ForgotPasswordController::class, 'processReset'])->name('forgot-password.process-reset');
-        Route::post('/check-current-password', [ForgotPasswordController::class, 'checkCurrentPassword'])->name('forgot-password.check-current-password');
+    Route::prefix('forgot-password')->name('forgot-password.')->group(function () {
+        Route::post('/send', [ForgotPasswordController::class, 'send'])->name('send');
+        Route::get('/{token}', [ForgotPasswordController::class, 'openReset'])->name('open-reset');
+        Route::post('/process-reset', [ForgotPasswordController::class, 'processReset'])->name('process-reset');
     });
 
+    Route::post('/check-current-password', [ForgotPasswordController::class, 'checkCurrentPassword'])
+        ->name('forgot-password.check-current-password');
 });
 
 Route::middleware('user.auth')->group(function () {

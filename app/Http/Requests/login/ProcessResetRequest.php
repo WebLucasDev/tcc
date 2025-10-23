@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\login;
 
+use App\Models\CollaboratorModel;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProcessResetRequest extends FormRequest
@@ -14,8 +16,19 @@ class ProcessResetRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required',
-            'email' => 'required|email|exists:users,email',
+            'token' => 'required|string',
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) {
+                    $existsInUsers = User::where('email', $value)->exists();
+                    $existsInCollaborators = CollaboratorModel::where('email', $value)->exists();
+
+                    if (!$existsInUsers && !$existsInCollaborators) {
+                        $fail('E-mail não encontrado no sistema.');
+                    }
+                },
+            ],
             'password' => 'required|string|confirmed|min:6',
         ];
     }
@@ -23,13 +36,12 @@ class ProcessResetRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'token.required' => 'Token é obrigatório.',
+            'token.required' => 'Token de recuperação é obrigatório.',
             'email.required' => 'O campo email é obrigatório.',
             'email.email' => 'Por favor, insira um email válido.',
-            'email.exists' => 'Email não encontrado.',
             'password.required' => 'O campo senha é obrigatório.',
             'password.confirmed' => 'A confirmação da senha não confere.',
-            'password.min' => 'A senha deve ter no mínimo 8 caracteres.',
+            'password.min' => 'A senha deve ter no mínimo :min caracteres.',
         ];
     }
 }

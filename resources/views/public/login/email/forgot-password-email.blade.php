@@ -43,7 +43,7 @@
             display: inline-block;
             padding: 12px 30px;
             background-color: #ff6b35;
-            color: white;
+            color: white !important;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
@@ -68,17 +68,25 @@
             padding: 15px;
             margin: 20px 0;
         }
+        .link-box {
+            word-break: break-all;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">Sistema</div>
+            <div class="logo">{{ config('app.name') }}</div>
             <h1 class="title">Redefinição de Senha</h1>
         </div>
 
         <div class="content">
-            <p>Olá <strong>{{ $user->name ?? 'Usuário' }}</strong>,</p>
+            <p>Olá <strong>{{ $user->name }}</strong>,</p>
 
             <p>Recebemos uma solicitação para redefinir a senha da sua conta. Se você fez essa solicitação, clique no botão abaixo para criar uma nova senha:</p>
 
@@ -87,7 +95,7 @@
             </div>
 
             <p>Ou copie e cole o link abaixo no seu navegador:</p>
-            <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">{{ $resetUrl }}</p>
+            <p class="link-box">{{ $resetUrl }}</p>
 
             <div class="warning">
                 <strong>⚠️ Importante:</strong>
@@ -102,7 +110,7 @@
         <div class="footer">
             <p>Este é um email automático, não responda.</p>
             <p>Se você continuar tendo problemas, entre em contato com o suporte.</p>
-            <p>&copy; {{ date('Y') }} Sistema. Todos os direitos reservados.</p>
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. Todos os direitos reservados.</p>
         </div>
     </div>
 </body>

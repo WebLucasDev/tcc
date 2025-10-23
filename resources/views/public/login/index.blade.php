@@ -18,8 +18,6 @@
         <x-error/>
         <x-success/>
 
-        @include('public.login.partials.message-recover-password')
-
         <div class="flex flex-col max-w-md p-6 sm:p-10 border rounded-md border-[var(--color-main)] shadow-2xl/55">
             <div class="flex flex-col justify-center items-center mb-8">
                 <img src="/imgs/logo.svg" alt="Logo Metre Sistemas" class="mb-4">

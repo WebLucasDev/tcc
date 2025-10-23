@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\login\ProcessResetRequest;
 use App\Http\Requests\login\SendRequest;
 use App\Mail\ForgotPasswordMail;
+use App\Models\CollaboratorModel;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,91 +17,137 @@ use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
+    /**
+     * Envia email de recuperação de senha
+     */
     public function send(SendRequest $request)
     {
         try {
+            // Busca em ambas as tabelas (users e collaborators)
             $user = User::where('email', $request->email)->first();
 
-            if (! $user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'E-mail inválido!',
-                ], 404);
+            if (!$user) {
+                $user = CollaboratorModel::where('email', $request->email)->first();
             }
 
+            if (!$user) {
+                return back()->with('error', 'E-mail não encontrado.');
+            }
+
+            // Gera token único
             $token = Str::random(64);
 
-            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            // Remove tokens antigos e cria novo
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $request->email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now(),
+                ]
+            );
 
-            DB::table('password_reset_tokens')->insert([
-                'email' => $request->email,
-                'token' => Hash::make($token),
-                'created_at' => Carbon::now(),
+            // Envia email
+            $resetUrl = route('forgot-password.open-reset', [
+                'token' => $token,
+                'email' => $request->email
             ]);
 
-            $resetUrl = route('forgot-password.open-reset', ['token' => $token]);
+            Mail::to($request->email)->send(new ForgotPasswordMail($user, $resetUrl));
 
-            Mail::to($request->email)->send(new ForgotPasswordMail($user, $token, $resetUrl));
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Instruções de alteração de senha enviadas por email!',
-            ], 200);
+            return back()->with('success', 'Instruções de alteração de senha enviadas por email!');
 
         } catch (\Exception $e) {
-
-            Log::error('Erro ao enviar email de recuperação de senha: '.$e->getMessage(), [
+            Log::error('Erro ao enviar email de recuperação de senha', [
                 'email' => $request->email,
-                'trace' => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro interno do servidor. Tente novamente.',
-            ], 500);
+            return back()->with('error', 'Erro ao enviar email. Tente novamente.');
         }
     }
 
-    public function openReset(Request $request, $token)
+    /**
+     * Abre página de redefinição de senha
+     */
+    public function openReset(Request $request, string $token)
     {
+        $email = $request->query('email');
 
+        if (!$email) {
+            return redirect()->route('login.index')
+                ->with('error', 'Link inválido.');
+        }
+
+        // Verifica se existe token válido
         $passwordReset = DB::table('password_reset_tokens')
-            ->where('created_at', '>', Carbon::now()->subHours(24))
+            ->where('email', $email)
+            ->where('created_at', '>', now()->subHours(24))
             ->first();
 
-        if (! $passwordReset) {
-            return redirect()->route('login.index')->with('error', 'Token inválido ou expirado.');
+        if (!$passwordReset) {
+            return redirect()->route('login.index')
+                ->with('error', 'Token inválido ou expirado.');
         }
 
-        return view('public.login.forgot-password', compact('token'));
+        return view('public.login.forgot-password', compact('token', 'email'));
     }
 
+    /**
+     * Processa redefinição de senha
+     */
     public function processReset(ProcessResetRequest $request)
     {
         try {
-
+            // Busca token válido
             $passwordReset = DB::table('password_reset_tokens')
                 ->where('email', $request->email)
-                ->where('created_at', '>', Carbon::now()->subHours(24))
+                ->where('created_at', '>', now()->subHours(24))
                 ->first();
 
-            if (! $passwordReset || ! Hash::check($request->token, $passwordReset->token)) {
-                return back()->with('error', 'Token inválido ou expirado.');
+            if (!$passwordReset || !Hash::check($request->token, $passwordReset->token)) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Token inválido ou expirado.');
             }
 
+            // Busca usuário em ambas as tabelas
             $user = User::where('email', $request->email)->first();
-            $user->password = Hash::make($request->password);
+
+            if (!$user) {
+                $user = CollaboratorModel::where('email', $request->email)->first();
+            }
+
+            if (!$user) {
+                return back()->with('error', 'Usuário não encontrado.');
+            }
+
+            // Atualiza senha
+            // O CollaboratorModel tem mutator, User tem cast 'hashed'
+            // Ambos funcionam com atribuição direta
+            $user->password = $request->password;
             $user->save();
 
-            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            // Remove token usado
+            DB::table('password_reset_tokens')
+                ->where('email', $request->email)
+                ->delete();
 
-            return redirect()->route('login.index')->with('success', 'Senha alterada com sucesso!');
+            return redirect()->route('login.index')
+                ->with('success', 'Senha alterada com sucesso!');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erro interno do servidor. Tente novamente.');
+            Log::error('Erro ao processar reset de senha', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Erro ao processar solicitação. Tente novamente.');
         }
     }
 
+    /**
+     * Verifica se a senha atual está correta
+     */
     public function checkCurrentPassword(Request $request)
     {
         $request->validate([

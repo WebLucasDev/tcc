@@ -2,6 +2,8 @@
 
 namespace App\Mail;
 
+use App\Models\CollaboratorModel;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -12,38 +14,37 @@ class ForgotPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public User|CollaboratorModel $user,
+        public string $resetUrl
+    ) {}
 
-    public $token;
-
-    public $resetUrl;
-
-    public function __construct($user, $token, $resetUrl)
-    {
-        $this->user = $user;
-        $this->token = $token;
-        $this->resetUrl = $resetUrl;
-    }
-
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Redefinição de Senha',
+            subject: 'Redefinição de Senha - ' . config('app.name'),
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
         return new Content(
-            view: 'login.email.forgot-password-email',
-            with: [
-                'user' => $this->user,
-                'token' => $this->token,
-                'resetUrl' => $this->resetUrl,
-            ]
+            view: 'public.login.email.forgot-password-email',
         );
     }
 
+    /**
+     * Get the attachments for the message.
+     */
     public function attachments(): array
     {
         return [];
