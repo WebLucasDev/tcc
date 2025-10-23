@@ -234,7 +234,7 @@ Execute o comando abaixo para iniciar simultaneamente o servidor Laravel, a fila
 composer run dev
 ```
 
-A aplicação estará disponível em: `http://localhost:8000/login`
+A aplicação estará disponível em: `http://localhost:8000`
 
 ## 📁 Estrutura do Projeto
 
