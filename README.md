@@ -349,7 +349,7 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 Autor
 
-**Lucas Venancio Silva Tiago** (WebLucasDev)
+**Lucas Venancio** (WebLucasDev)
 
 - GitHub: [@WebLucasDev](https://github.com/WebLucasDev)
 - Linkedin: (https://www.linkedin.com/in/lucasvenancio-dev/)
